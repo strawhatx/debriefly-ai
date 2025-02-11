@@ -9,14 +9,16 @@ import { BrokerConnectionFields } from "./BrokerConnectionFields";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 
-interface Broker {
+export interface Broker {
   id: string;
   name: string;
   description?: string;
   asset_types: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
-interface BrokerSyncProps {
+export interface BrokerSyncProps {
   availableBrokers?: Broker[];
 }
 
