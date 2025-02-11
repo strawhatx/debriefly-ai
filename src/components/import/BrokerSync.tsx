@@ -12,29 +12,39 @@ export const BrokerSync = () => {
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [formValues, setFormValues] = useState<Record<string, string>>({});
 
-  const { data: tradingAccounts } = useQuery({
+  const { data: tradingAccounts, isLoading: isLoadingAccounts } = useQuery({
     queryKey: ["tradingAccounts"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trading_accounts")
         .select(`
-          *,
-          broker:brokers(*)
+          id,
+          account_name,
+          broker:brokers (
+            id,
+            name,
+            description
+          )
         `);
       if (error) throw error;
       return data;
     },
   });
 
-  const { data: selectedAccountData } = useQuery({
+  const { data: selectedAccountData, isLoading: isLoadingSelectedAccount } = useQuery({
     queryKey: ["tradingAccount", selectedAccount],
     queryFn: async () => {
       if (!selectedAccount) return null;
       const { data, error } = await supabase
         .from("trading_accounts")
         .select(`
-          *,
-          broker:brokers(*)
+          id,
+          account_name,
+          broker:brokers (
+            id,
+            name,
+            description
+          )
         `)
         .eq("id", selectedAccount)
         .single();
@@ -44,18 +54,18 @@ export const BrokerSync = () => {
     enabled: !!selectedAccount,
   });
 
-  const { data: brokerFields } = useQuery({
-    queryKey: ["brokerFields", selectedAccountData?.broker_id],
+  const { data: brokerFields, isLoading: isLoadingFields } = useQuery({
+    queryKey: ["brokerFields", selectedAccountData?.broker?.id],
     queryFn: async () => {
-      if (!selectedAccountData?.broker_id) return [];
+      if (!selectedAccountData?.broker?.id) return [];
       const { data, error } = await supabase
         .from("broker_connection_fields")
         .select("*")
-        .eq("broker_id", selectedAccountData.broker_id);
+        .eq("broker_id", selectedAccountData.broker.id);
       if (error) throw error;
       return data;
     },
-    enabled: !!selectedAccountData?.broker_id,
+    enabled: !!selectedAccountData?.broker?.id,
   });
 
   const handleFieldChange = (fieldName: string, value: string) => {
@@ -136,6 +146,7 @@ export const BrokerSync = () => {
         accounts={tradingAccounts}
         selectedAccount={selectedAccount}
         onAccountChange={setSelectedAccount}
+        isLoading={isLoadingAccounts}
       />
 
       {selectedAccountData?.broker?.name && (
