@@ -88,7 +88,7 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       const blob = new Blob([selectedFile], { type: selectedFile.type });
       
       // Upload file using blob
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('import_files')
         .upload(filePath, blob, {
           contentType: selectedFile.type,
@@ -107,6 +107,18 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
         .from('import_files')
         .getPublicUrl(filePath);
       console.log('Public URL:', publicUrl);
+
+      // Verify the file exists by trying to fetch it
+      try {
+        const response = await fetch(publicUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to verify file upload: ${response.statusText}`);
+        }
+        console.log('File verified successfully');
+      } catch (error) {
+        console.error('Error verifying file:', error);
+        throw new Error('Failed to verify file upload');
+      }
 
       // Create the import record
       const fileExtension = sanitizedFileName.split('.').pop();
