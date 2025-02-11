@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 
 type BrokerField = {
   id: string;
-  broker: string;
+  broker_id: string;
   field_name: string;
   field_type: 'text' | 'password' | 'api_key';
   required: boolean;
