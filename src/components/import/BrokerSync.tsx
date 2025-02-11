@@ -139,8 +139,16 @@ export const BrokerSync = () => {
       />
 
       {selectedAccountData?.broker?.name && (
-        <div className="text-sm text-muted-foreground">
-          Connecting to: {selectedAccountData.broker.name}
+        <div className="p-4 border rounded-md bg-muted">
+          <h3 className="font-medium mb-1">Selected Broker</h3>
+          <p className="text-sm text-muted-foreground">
+            {selectedAccountData.broker.name}
+            {selectedAccountData.broker.description && (
+              <span className="block mt-1 text-xs">
+                {selectedAccountData.broker.description}
+              </span>
+            )}
+          </p>
         </div>
       )}
 
