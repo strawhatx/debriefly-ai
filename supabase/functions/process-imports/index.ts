@@ -15,14 +15,21 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Process imports function triggered')
+    
     // Initialize Supabase client
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing environment variables')
+    }
 
+    const supabase = createClient(supabaseUrl, supabaseKey)
+    
     const body = await req.json()
     const importId = body.import_id
+    console.log('Processing import ID:', importId)
 
     // If import_id is provided, process specific import, otherwise process all pending imports
     const query = supabase
@@ -37,46 +44,63 @@ serve(async (req) => {
     const { data: imports, error: fetchError } = await query
 
     if (fetchError) {
+      console.error('Error fetching imports:', fetchError)
       throw new Error(`Error fetching imports: ${fetchError.message}`)
     }
 
     if (!imports || imports.length === 0) {
+      console.log('No pending imports found')
       return new Response(
         JSON.stringify({ message: 'No pending imports found' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
+    console.log(`Found ${imports.length} imports to process`)
+
     for (const import_ of imports) {
       try {
         console.log(`Processing import ${import_.id}`)
 
         // Update status to processing
-        await supabase
+        const { error: updateError } = await supabase
           .from('imports')
-          .update({ status: 'processing' })
+          .update({ 
+            status: 'processing',
+            updated_at: new Date().toISOString()
+          })
           .eq('id', import_.id)
 
+        if (updateError) {
+          console.error('Error updating import status:', updateError)
+          throw new Error(`Error updating import status: ${updateError.message}`)
+        }
+
         // Download file from storage
+        console.log('Downloading file:', import_.file_path)
         const { data: fileData, error: downloadError } = await supabase
           .storage
           .from('import_files')
           .download(import_.file_path)
 
         if (downloadError) {
+          console.error('Error downloading file:', downloadError)
           throw new Error(`Error downloading file: ${downloadError.message}`)
         }
 
         // Parse CSV data
         const text = await fileData.text()
+        console.log('Parsing CSV data')
         const rows = await csv.parse(text, {
           skipFirstRow: true,
           columns: ['date', 'symbol', 'side', 'quantity', 'price']
         })
 
+        console.log(`Found ${rows.length} trades to process`)
+
         // Process each row and insert into trades table
         for (const row of rows) {
-          await supabase
+          const { error: insertError } = await supabase
             .from('trades')
             .insert({
               user_id: import_.user_id,
@@ -88,16 +112,27 @@ serve(async (req) => {
               quantity: parseFloat(row.quantity),
               entry_price: parseFloat(row.price)
             })
+
+          if (insertError) {
+            console.error('Error inserting trade:', insertError)
+            throw new Error(`Error inserting trade: ${insertError.message}`)
+          }
         }
 
         // Update import status to completed
-        await supabase
+        console.log(`Completing import ${import_.id}`)
+        const { error: completeError } = await supabase
           .from('imports')
           .update({ 
             status: 'completed',
             updated_at: new Date().toISOString()
           })
           .eq('id', import_.id)
+
+        if (completeError) {
+          console.error('Error completing import:', completeError)
+          throw new Error(`Error completing import: ${completeError.message}`)
+        }
 
         console.log(`Successfully processed import ${import_.id}`)
       } catch (error) {
