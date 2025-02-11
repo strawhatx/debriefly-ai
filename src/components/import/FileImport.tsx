@@ -26,9 +26,11 @@ const brokerTypes = [
   "TradeStation",
 ] as const;
 
+type BrokerType = typeof brokerTypes[number];
+
 export const FileImport = () => {
   const { toast } = useToast();
-  const [selectedBroker, setSelectedBroker] = useState<string>("");
+  const [selectedBroker, setSelectedBroker] = useState<BrokerType | "">("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
