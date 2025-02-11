@@ -25,12 +25,12 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8 bg-background/60 backdrop-blur-sm sticky top-0 z-10 -mt-8 p-8 border-b">
-        <h1 className="text-4xl font-bold">Trading Dashboard</h1>
-        <div className="flex items-center gap-4">
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6 bg-background/60 backdrop-blur-sm sticky top-0 z-10 -mt-6 py-4 px-6 border-b">
+        <h1 className="text-2xl font-semibold">Trading Dashboard</h1>
+        <div className="flex items-center gap-3">
           <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-            <SelectTrigger className="w-[240px]">
+            <SelectTrigger className="w-[200px] h-9 text-sm">
               <SelectValue placeholder="Select trading account" />
             </SelectTrigger>
             <SelectContent>
@@ -41,18 +41,18 @@ const Dashboard = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button className="gap-2">
-            <Import className="w-4 h-4" />
+          <Button size="sm" className="gap-2 text-sm h-9">
+            <Import className="w-3.5 h-3.5" />
             Import Trades
           </Button>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <TradingAccountsOverview />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <Card className="p-6">
           <h2 className="text-2xl font-semibold mb-4">Trading Calendar</h2>
           <TradeCalendar />
