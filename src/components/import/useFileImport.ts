@@ -27,7 +27,7 @@ export const useFileImport = (selectedAccount: string) => {
 
       const timestamp = new Date().getTime();
       const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
-      const filePath = `${timestamp}-${sanitizedFileName}`;
+      const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
       console.log('File path:', filePath);
 
       const { error: uploadError, data: uploadData } = await supabase.storage
@@ -48,7 +48,7 @@ export const useFileImport = (selectedAccount: string) => {
           user_id: user.id,
           trading_account_id: selectedAccount,
           import_type: fileExtension === 'csv' ? 'csv' : 'excel',
-          status: 'pending',  // Setting initial status as pending
+          status: 'pending',
           original_filename: sanitizedFileName,
           file_path: filePath,
           file_size: selectedFile.size,
