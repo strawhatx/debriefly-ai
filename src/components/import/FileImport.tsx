@@ -84,8 +84,8 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
       console.log('File path:', filePath);
 
-      // Upload file directly
-      const { error: uploadError } = await supabase.storage
+      // Upload file using standard upload method
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('import_files')
         .upload(filePath, selectedFile, {
           cacheControl: '3600',
@@ -97,7 +97,12 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
         console.error('Error uploading file:', uploadError);
         throw new Error(`Failed to upload file: ${uploadError.message}`);
       }
-      console.log('File uploaded successfully');
+      
+      // Log the public URL for verification
+      const { data: { publicUrl } } = supabase.storage
+        .from('import_files')
+        .getPublicUrl(filePath);
+      console.log('File uploaded successfully. Public URL:', publicUrl);
 
       // Create the import record
       const fileExtension = sanitizedFileName.split('.').pop();
