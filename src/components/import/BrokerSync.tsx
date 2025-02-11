@@ -7,13 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
 
-type Broker = {
-  id: string;
-  name: string;
-  description: string;
-  asset_types: string[];
-};
-
 export const BrokerSync = () => {
   const { toast } = useToast();
   const [selectedAccount, setSelectedAccount] = useState<string>("");
@@ -144,6 +137,12 @@ export const BrokerSync = () => {
         selectedAccount={selectedAccount}
         onAccountChange={setSelectedAccount}
       />
+
+      {selectedAccountData?.broker?.name && (
+        <div className="text-sm text-muted-foreground">
+          Connecting to: {selectedAccountData.broker.name}
+        </div>
+      )}
 
       {brokerFields && (
         <BrokerConnectionFields
