@@ -6,6 +6,8 @@ export interface Broker {
   asset_types: string[];
   created_at?: string;
   updated_at?: string;
+  file_upload_enabled: boolean;
+  broker_sync_enabled: boolean;
 }
 
 export interface BrokerSyncProps {

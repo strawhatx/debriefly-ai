@@ -63,24 +63,30 @@ export type Database = {
       brokers: {
         Row: {
           asset_types: string[]
+          broker_sync_enabled: boolean
           created_at: string
           description: string | null
+          file_upload_enabled: boolean
           id: string
           name: string
           updated_at: string
         }
         Insert: {
           asset_types?: string[]
+          broker_sync_enabled?: boolean
           created_at?: string
           description?: string | null
+          file_upload_enabled?: boolean
           id?: string
           name: string
           updated_at?: string
         }
         Update: {
           asset_types?: string[]
+          broker_sync_enabled?: boolean
           created_at?: string
           description?: string | null
+          file_upload_enabled?: boolean
           id?: string
           name?: string
           updated_at?: string

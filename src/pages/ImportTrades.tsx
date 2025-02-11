@@ -77,8 +77,11 @@ const ImportTrades = () => {
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <p>Currently, direct broker sync is supported for:</p>
                   <ul className="list-disc list-inside space-y-1">
-                    <li>Coinbase</li>
-                    <li>TradingView Paper Trading</li>
+                    {availableBrokers
+                      ?.filter(broker => broker.broker_sync_enabled)
+                      .map(broker => (
+                        <li key={broker.id}>{broker.name}</li>
+                      ))}
                   </ul>
                   <p className="mt-4">To sync your trades directly from your broker:</p>
                   <ol className="list-decimal list-inside space-y-2">

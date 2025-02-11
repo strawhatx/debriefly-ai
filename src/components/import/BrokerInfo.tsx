@@ -8,17 +8,19 @@ interface BrokerInfoProps {
   availableBrokers?: Broker[];
   onBrokerSelect: (brokerId: string) => void;
   selectedBrokerId: string;
+  syncMode?: boolean;
 }
 
 export const BrokerInfo = ({ 
   broker,
   availableBrokers,
   onBrokerSelect,
-  selectedBrokerId
+  selectedBrokerId,
+  syncMode = false
 }: BrokerInfoProps) => {
-  // Filter brokers that support sync (Coinbase and TradingView Paper Trading)
-  const syncEnabledBrokers = availableBrokers?.filter(broker => 
-    ['Coinbase', 'TradingView Paper Trading'].includes(broker.name)
+  // Filter brokers based on the requested mode
+  const filteredBrokers = availableBrokers?.filter(broker => 
+    syncMode ? broker.broker_sync_enabled : broker.file_upload_enabled
   );
 
   return (
@@ -30,7 +32,7 @@ export const BrokerInfo = ({
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
           <SelectContent>
-            {syncEnabledBrokers?.map((broker) => (
+            {filteredBrokers?.map((broker) => (
               <SelectItem key={broker.id} value={broker.id}>
                 {broker.name}
               </SelectItem>
