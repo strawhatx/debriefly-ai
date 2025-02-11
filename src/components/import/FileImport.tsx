@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 
-// Define broker types based on the enum in the database
 const brokerTypes = [
   "Coinbase",
   "Webull",
@@ -109,11 +108,16 @@ export const FileImport = () => {
     }
   };
 
+  const handleBrokerChange = (value: string) => {
+    // Type assertion here is safe because the Select component only allows values from brokerTypes
+    setSelectedBroker(value as BrokerType);
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="broker">Broker</Label>
-        <Select value={selectedBroker} onValueChange={setSelectedBroker}>
+        <Select value={selectedBroker} onValueChange={handleBrokerChange}>
           <SelectTrigger>
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
