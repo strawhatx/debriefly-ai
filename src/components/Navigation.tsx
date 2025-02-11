@@ -27,8 +27,8 @@ const Navigation = () => {
             >
               Contact
             </Link>
-            <Button onClick={() => window.location.href = "/#login"}>
-              Sign Up
+            <Button asChild>
+              <Link to="/login">Sign Up</Link>
             </Button>
           </div>
         </div>
