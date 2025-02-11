@@ -97,8 +97,12 @@ export type Database = {
         Row: {
           created_at: string
           error_message: string | null
+          file_path: string | null
+          file_size: number | null
+          file_type: string | null
           id: string
           import_type: string
+          original_filename: string | null
           status: string
           trading_account_id: string
           updated_at: string
@@ -107,8 +111,12 @@ export type Database = {
         Insert: {
           created_at?: string
           error_message?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
           id?: string
           import_type: string
+          original_filename?: string | null
           status?: string
           trading_account_id: string
           updated_at?: string
@@ -117,8 +125,12 @@ export type Database = {
         Update: {
           created_at?: string
           error_message?: string | null
+          file_path?: string | null
+          file_size?: number | null
+          file_type?: string | null
           id?: string
           import_type?: string
+          original_filename?: string | null
           status?: string
           trading_account_id?: string
           updated_at?: string

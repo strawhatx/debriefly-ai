@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { filesize } from "filesize";
 
 interface Import {
   id: string;
@@ -17,6 +18,9 @@ interface Import {
   error_message: string | null;
   created_at: string;
   account_name?: string;
+  original_filename?: string;
+  file_size?: number;
+  file_type?: string;
 }
 
 interface ImportsTableProps {
@@ -43,6 +47,8 @@ export const ImportsTable = ({ imports }: ImportsTableProps) => {
         <TableRow>
           <TableHead>Date</TableHead>
           <TableHead>Account</TableHead>
+          <TableHead>File</TableHead>
+          <TableHead>Size</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Error</TableHead>
@@ -55,9 +61,11 @@ export const ImportsTable = ({ imports }: ImportsTableProps) => {
               {format(new Date(import_.created_at), 'MMM d, yyyy HH:mm')}
             </TableCell>
             <TableCell>{import_.account_name}</TableCell>
-            <TableCell className="capitalize">
-              {import_.import_type.replace('_', ' ')}
+            <TableCell>{import_.original_filename || '-'}</TableCell>
+            <TableCell>
+              {import_.file_size ? filesize(import_.file_size).toString() : '-'}
             </TableCell>
+            <TableCell>{import_.file_type || import_.import_type}</TableCell>
             <TableCell>
               <span className={getStatusColor(import_.status)}>
                 {import_.status}

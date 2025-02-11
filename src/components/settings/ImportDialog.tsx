@@ -25,6 +25,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
   const [uploadOpen, setUploadOpen] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,18 +53,30 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
     }
 
     try {
+      setIsUploading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) throw new Error("Not authenticated");
 
-      const fileType = selectedFile.type.includes('spreadsheetml') ? 'excel' : 'csv';
+      // Upload file to storage
+      const filePath = `${user.id}/${crypto.randomUUID()}-${selectedFile.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from('import_files')
+        .upload(filePath, selectedFile);
 
+      if (uploadError) throw uploadError;
+
+      // Create import record
       const { data, error } = await supabase
         .from('imports')
         .insert({
           user_id: user.id,
           trading_account_id: selectedAccount,
-          import_type: fileType,
-          status: 'pending'
+          import_type: selectedFile.type.includes('spreadsheetml') ? 'excel' : 'csv',
+          status: 'pending',
+          original_filename: selectedFile.name,
+          file_path: filePath,
+          file_size: selectedFile.size,
+          file_type: selectedFile.type
         })
         .select()
         .single();
@@ -81,13 +94,15 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       // Reset form
       setSelectedFile(null);
       setSelectedAccount("");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting import:', error);
       toast({
         title: "Error",
         description: "Failed to start import",
         variant: "destructive",
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -121,8 +136,12 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
               Supported formats: CSV, Excel
             </p>
           </div>
-          <Button onClick={handleImport} className="w-full">
-            Start Import
+          <Button 
+            onClick={handleImport} 
+            className="w-full"
+            disabled={isUploading}
+          >
+            {isUploading ? "Uploading..." : "Start Import"}
           </Button>
         </div>
       </DialogContent>
