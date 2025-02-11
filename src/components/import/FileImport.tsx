@@ -14,37 +14,43 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 
-const brokerTypes = [
-  "Coinbase",
-  "Webull",
-  "Robinhood",
-  "Tradovate",
-  "Charles Schwab",
-  "Oanda",
-  "Forex.com",
-  "TradeStation",
-] as const;
-
-type BrokerType = typeof brokerTypes[number];
+type Broker = {
+  id: string;
+  name: string;
+  description: string;
+  asset_types: string[];
+};
 
 export const FileImport = () => {
   const { toast } = useToast();
-  const [selectedBroker, setSelectedBroker] = useState<BrokerType | "">("");
+  const [selectedBrokerId, setSelectedBrokerId] = useState<string>("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { data: tradingAccounts } = useQuery({
-    queryKey: ["tradingAccounts", selectedBroker],
+  const { data: brokers } = useQuery({
+    queryKey: ["brokers"],
     queryFn: async () => {
-      if (!selectedBroker) return [];
+      const { data, error } = await supabase
+        .from("brokers")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data as Broker[];
+    },
+  });
+
+  const { data: tradingAccounts } = useQuery({
+    queryKey: ["tradingAccounts", selectedBrokerId],
+    queryFn: async () => {
+      if (!selectedBrokerId) return [];
       const { data, error } = await supabase
         .from("trading_accounts")
         .select("*")
-        .eq("broker", selectedBroker);
+        .eq("broker_id", selectedBrokerId);
       if (error) throw error;
       return data;
     },
-    enabled: !!selectedBroker,
+    enabled: !!selectedBrokerId,
   });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +69,7 @@ export const FileImport = () => {
   };
 
   const handleImport = async () => {
-    if (!selectedBroker || !selectedAccount || !selectedFile) {
+    if (!selectedBrokerId || !selectedAccount || !selectedFile) {
       toast({
         title: "Missing information",
         description: "Please select a broker, account, and upload a file",
@@ -97,7 +103,7 @@ export const FileImport = () => {
       // Reset form
       setSelectedFile(null);
       setSelectedAccount("");
-      setSelectedBroker("");
+      setSelectedBrokerId("");
     } catch (error: any) {
       console.error('Error starting import:', error);
       toast({
@@ -108,23 +114,18 @@ export const FileImport = () => {
     }
   };
 
-  const handleBrokerChange = (value: string) => {
-    // Type assertion here is safe because the Select component only allows values from brokerTypes
-    setSelectedBroker(value as BrokerType);
-  };
-
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <Label htmlFor="broker">Broker</Label>
-        <Select value={selectedBroker} onValueChange={handleBrokerChange}>
+        <Select value={selectedBrokerId} onValueChange={setSelectedBrokerId}>
           <SelectTrigger>
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
           <SelectContent>
-            {brokerTypes.map((broker) => (
-              <SelectItem key={broker} value={broker}>
-                {broker}
+            {brokers?.map((broker) => (
+              <SelectItem key={broker.id} value={broker.id}>
+                {broker.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -136,7 +137,7 @@ export const FileImport = () => {
         <Select 
           value={selectedAccount} 
           onValueChange={setSelectedAccount}
-          disabled={!selectedBroker}
+          disabled={!selectedBrokerId}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select an account" />

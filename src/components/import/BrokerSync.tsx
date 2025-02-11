@@ -7,6 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
 
+type Broker = {
+  id: string;
+  name: string;
+  description: string;
+  asset_types: string[];
+};
+
 export const BrokerSync = () => {
   const { toast } = useToast();
   const [selectedAccount, setSelectedAccount] = useState<string>("");
@@ -17,7 +24,10 @@ export const BrokerSync = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("trading_accounts")
-        .select("*");
+        .select(`
+          *,
+          broker:brokers(*)
+        `);
       if (error) throw error;
       return data;
     },
@@ -29,7 +39,10 @@ export const BrokerSync = () => {
       if (!selectedAccount) return null;
       const { data, error } = await supabase
         .from("trading_accounts")
-        .select("*")
+        .select(`
+          *,
+          broker:brokers(*)
+        `)
         .eq("id", selectedAccount)
         .single();
       if (error) throw error;
@@ -39,17 +52,17 @@ export const BrokerSync = () => {
   });
 
   const { data: brokerFields } = useQuery({
-    queryKey: ["brokerFields", selectedAccountData?.broker],
+    queryKey: ["brokerFields", selectedAccountData?.broker_id],
     queryFn: async () => {
-      if (!selectedAccountData?.broker) return [];
+      if (!selectedAccountData?.broker_id) return [];
       const { data, error } = await supabase
         .from("broker_connection_fields")
         .select("*")
-        .eq("broker", selectedAccountData.broker);
+        .eq("broker_id", selectedAccountData.broker_id);
       if (error) throw error;
       return data;
     },
-    enabled: !!selectedAccountData?.broker,
+    enabled: !!selectedAccountData?.broker_id,
   });
 
   const handleFieldChange = (fieldName: string, value: string) => {

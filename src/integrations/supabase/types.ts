@@ -11,7 +11,7 @@ export type Database = {
     Tables: {
       broker_connection_fields: {
         Row: {
-          broker: Database["public"]["Enums"]["broker_type"]
+          broker_id: string
           created_at: string
           description: string | null
           display_name: string
@@ -22,7 +22,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          broker: Database["public"]["Enums"]["broker_type"]
+          broker_id: string
           created_at?: string
           description?: string | null
           display_name: string
@@ -33,7 +33,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          broker?: Database["public"]["Enums"]["broker_type"]
+          broker_id?: string
           created_at?: string
           description?: string | null
           display_name?: string
@@ -41,6 +41,41 @@ export type Database = {
           field_type?: Database["public"]["Enums"]["broker_field_type"]
           id?: string
           required?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_connection_fields_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brokers: {
+        Row: {
+          asset_types: string[]
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          asset_types?: string[]
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          asset_types?: string[]
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
           updated_at?: string
         }
         Relationships: []
@@ -216,9 +251,9 @@ export type Database = {
         Row: {
           account_balance: number
           account_name: string
-          broker: Database["public"]["Enums"]["broker_type"]
           broker_connected: boolean | null
           broker_credentials: Json | null
+          broker_id: string
           created_at: string
           id: string
           profit_calculation_method: Database["public"]["Enums"]["profit_calc_method"]
@@ -228,9 +263,9 @@ export type Database = {
         Insert: {
           account_balance?: number
           account_name: string
-          broker?: Database["public"]["Enums"]["broker_type"]
           broker_connected?: boolean | null
           broker_credentials?: Json | null
+          broker_id: string
           created_at?: string
           id?: string
           profit_calculation_method?: Database["public"]["Enums"]["profit_calc_method"]
@@ -240,16 +275,24 @@ export type Database = {
         Update: {
           account_balance?: number
           account_name?: string
-          broker?: Database["public"]["Enums"]["broker_type"]
           broker_connected?: boolean | null
           broker_credentials?: Json | null
+          broker_id?: string
           created_at?: string
           id?: string
           profit_calculation_method?: Database["public"]["Enums"]["profit_calc_method"]
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trading_accounts_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -260,15 +303,6 @@ export type Database = {
     }
     Enums: {
       broker_field_type: "text" | "password" | "api_key"
-      broker_type:
-        | "Coinbase"
-        | "Webull"
-        | "Robinhood"
-        | "Tradovate"
-        | "Charles Schwab"
-        | "Oanda"
-        | "Forex.com"
-        | "TradeStation"
       profit_calc_method: "FIFO" | "LIFO"
       subscription_tier: "free" | "premium"
     }

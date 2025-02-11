@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,10 +37,14 @@ const PROFIT_CALC_METHODS = ['FIFO', 'LIFO'] as const;
 interface TradingAccount {
   id: string;
   account_name: string;
-  broker: typeof BROKERS[number];
+  broker_id: string;
   profit_calculation_method: typeof PROFIT_CALC_METHODS[number];
   account_balance: number;
   created_at: string;
+  broker?: {
+    id: string;
+    name: string;
+  };
 }
 
 interface EditingAccount extends Partial<TradingAccount> {
@@ -64,7 +67,7 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
   const handleStartCreate = () => {
     setEditingAccount({
       isNew: true,
-      broker: "Coinbase",
+      broker_id: "Coinbase",
       profit_calculation_method: "FIFO",
       account_balance: 0,
     });
@@ -105,15 +108,17 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
           .insert([{
             account_name: editingAccount.account_name,
             user_id: user.id,
-            broker: editingAccount.broker,
+            broker_id: editingAccount.broker_id,
             profit_calculation_method: editingAccount.profit_calculation_method,
             account_balance: Number(editingAccount.account_balance)
           }])
-          .select()
+          .select(`
+            *,
+            broker:brokers(*)
+          `)
           .single();
 
         if (error) {
-          // If we hit the account limit, just cancel the creation
           if (error.message.includes('Trading account limit reached')) {
             toast({
               title: "Account Limit Reached",
@@ -132,12 +137,15 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
           .from('trading_accounts')
           .update({
             account_name: editingAccount.account_name,
-            broker: editingAccount.broker,
+            broker_id: editingAccount.broker_id,
             profit_calculation_method: editingAccount.profit_calculation_method,
             account_balance: Number(editingAccount.account_balance)
           })
           .eq('id', editingAccount.id)
-          .select()
+          .select(`
+            *,
+            broker:brokers(*)
+          `)
           .single();
 
         if (error) throw error;
@@ -219,8 +227,8 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
                 </TableCell>
                 <TableCell>
                   <Select
-                    value={editingAccount.broker}
-                    onValueChange={(value) => setEditingAccount({ ...editingAccount, broker: value as typeof BROKERS[number] })}
+                    value={editingAccount.broker_id}
+                    onValueChange={(value) => setEditingAccount({ ...editingAccount, broker_id: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select broker" />
@@ -284,8 +292,8 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
                     </TableCell>
                     <TableCell>
                       <Select
-                        value={editingAccount.broker}
-                        onValueChange={(value) => setEditingAccount({ ...editingAccount, broker: value as typeof BROKERS[number] })}
+                        value={editingAccount.broker_id}
+                        onValueChange={(value) => setEditingAccount({ ...editingAccount, broker_id: value })}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -338,7 +346,7 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
                 ) : (
                   <>
                     <TableCell>{account.account_name}</TableCell>
-                    <TableCell>{account.broker}</TableCell>
+                    <TableCell>{account.broker?.name || 'N/A'}</TableCell>
                     <TableCell>{account.profit_calculation_method}</TableCell>
                     <TableCell>
                       ${account.account_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -369,4 +377,3 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
     </Card>
   );
 };
-
