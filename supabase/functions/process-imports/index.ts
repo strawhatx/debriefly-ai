@@ -22,6 +22,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
     if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing environment variables:', { supabaseUrl: !!supabaseUrl, supabaseKey: !!supabaseKey })
       throw new Error('Missing environment variables')
     }
 
@@ -34,7 +35,12 @@ serve(async (req) => {
     // If import_id is provided, process specific import, otherwise process all pending imports
     const query = supabase
       .from('imports')
-      .select('*, trading_accounts(broker_id)')
+      .select(`
+        *,
+        trading_accounts!inner (
+          broker_id
+        )
+      `)
       .eq('status', 'pending')
 
     if (importId) {
@@ -42,6 +48,7 @@ serve(async (req) => {
     }
 
     const { data: imports, error: fetchError } = await query
+    console.log('Fetch response:', { data: imports, error: fetchError })
 
     if (fetchError) {
       console.error('Error fetching imports:', fetchError)
@@ -90,6 +97,7 @@ serve(async (req) => {
 
         // Parse CSV data
         const text = await fileData.text()
+        console.log('CSV content preview:', text.substring(0, 200)) // Log first 200 chars of CSV
         console.log('Parsing CSV data')
         const rows = await csv.parse(text, {
           skipFirstRow: true,
@@ -97,6 +105,7 @@ serve(async (req) => {
         })
 
         console.log(`Found ${rows.length} trades to process`)
+        console.log('Sample row:', rows[0]) // Log first row for debugging
 
         // Process each row and insert into trades table
         for (const row of rows) {
@@ -114,7 +123,7 @@ serve(async (req) => {
             })
 
           if (insertError) {
-            console.error('Error inserting trade:', insertError)
+            console.error('Error inserting trade:', insertError, 'Row data:', row)
             throw new Error(`Error inserting trade: ${insertError.message}`)
           }
         }
