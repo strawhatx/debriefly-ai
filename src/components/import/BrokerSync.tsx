@@ -126,4 +126,3 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
     </div>
   );
 };
-
