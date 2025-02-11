@@ -17,10 +17,10 @@ const ImportTrades = () => {
     queryKey: ["availableBrokers"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("available_brokers")
+        .from("brokers") // Changed from available_brokers to brokers
         .select("*");
       if (error) throw error;
-      return data;
+      return data as Broker[]; // Explicitly cast to Broker[]
     },
   });
 
