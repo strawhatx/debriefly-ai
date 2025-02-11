@@ -4,24 +4,78 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: isSignUp ? "Account created" : "Welcome back",
-      description: isSignUp
-        ? "Your account has been created successfully"
-        : "You have been logged in successfully",
-    });
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        if (formData.password !== formData.confirmPassword) {
+          toast({
+            title: "Error",
+            description: "Passwords do not match",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (signUpError) throw signUpError;
+
+        // Sign in automatically after successful registration
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (signInError) throw signInError;
+
+        toast({
+          title: "Success",
+          description: "Account created and logged in successfully",
+        });
+        navigate("/dashboard");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        toast({
+          title: "Welcome back",
+          description: "You have been logged in successfully",
+        });
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -67,8 +121,8 @@ const LoginForm = () => {
             />
           </div>
         )}
-        <Button type="submit" className="w-full">
-          {isSignUp ? "Create Account" : "Sign In"}
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
         </Button>
       </form>
 
@@ -77,6 +131,7 @@ const LoginForm = () => {
           variant="link"
           onClick={() => setIsSignUp(!isSignUp)}
           className="text-sm"
+          disabled={isLoading}
         >
           {isSignUp
             ? "Already have an account? Sign in"
