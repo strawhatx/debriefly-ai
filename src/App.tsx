@@ -17,6 +17,7 @@ import Trades from "./pages/Trades";
 import Insights from "./pages/Insights";
 import Replay from "./pages/Replay";
 import Settings from "./pages/Settings";
+import ImportTrades from "./pages/ImportTrades";
 import Sidebar from "./components/Sidebar";
 import Navigation from "./components/Navigation";
 
@@ -51,6 +52,7 @@ const App = () => {
                   <Route path="/insights" element={<Insights />} />
                   <Route path="/replay" element={<Replay />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/import" element={<ImportTrades />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
