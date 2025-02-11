@@ -78,29 +78,28 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       if (!user) throw new Error("Not authenticated");
       console.log('User authenticated:', user.id);
 
-      // Create a more structured file path
+      // Create a structured file path
       const timestamp = new Date().getTime();
       const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
-      const fileExtension = sanitizedFileName.split('.').pop();
       const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
       console.log('File path:', filePath);
 
-      // First upload file to storage using signed URLs
-      console.log('Starting file upload to storage...');
-      const { data: signedUrl, error: signUrlError } = await supabase.storage
+      // Get a signed URL for the upload
+      const { data: uploadUrl, error: signedUrlError } = await supabase.storage
         .from('import_files')
         .createSignedUploadUrl(filePath);
 
-      if (signUrlError) {
-        console.error('Error getting signed URL:', signUrlError);
-        throw new Error(`Failed to get signed URL: ${signUrlError.message}`);
+      if (signedUrlError) {
+        console.error('Error getting signed URL:', signedUrlError);
+        throw new Error(`Failed to get signed URL: ${signedUrlError.message}`);
       }
+      console.log('Got signed URL:', uploadUrl);
 
+      // Upload the file using the signed URL
       const { error: uploadError } = await supabase.storage
         .from('import_files')
-        .upload(filePath, selectedFile, {
+        .uploadToSignedUrl(filePath, uploadUrl.token, selectedFile, {
           cacheControl: '3600',
-          upsert: false,
           contentType: selectedFile.type
         });
 
@@ -110,7 +109,8 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       }
       console.log('File uploaded successfully with signed URL');
 
-      // Then create the import record
+      // Create the import record
+      const fileExtension = sanitizedFileName.split('.').pop();
       const { data: importRecord, error: importError } = await supabase
         .from('imports')
         .insert({
@@ -195,4 +195,3 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
     </div>
   );
 };
-
