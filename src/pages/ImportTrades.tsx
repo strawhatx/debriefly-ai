@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileImport } from "@/components/import/FileImport";
-import { BrokerSync } from "@/components/import/BrokerSync";
+import { BrokerSync, Broker } from "@/components/import/BrokerSync";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,7 +12,7 @@ const ImportTrades = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("file");
 
-  const { data: availableBrokers } = useQuery({
+  const { data: availableBrokers } = useQuery<Broker[]>({
     queryKey: ["availableBrokers"],
     queryFn: async () => {
       const { data, error } = await supabase
