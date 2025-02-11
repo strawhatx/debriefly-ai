@@ -84,7 +84,6 @@ const PricingPage = () => {
         </Card>
       </div>
     </div>
-  </div>
   );
 };
 
