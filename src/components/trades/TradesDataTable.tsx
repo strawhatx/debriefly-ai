@@ -75,7 +75,7 @@ export const TradesDataTable = ({
               <SelectValue placeholder="All accounts" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All accounts</SelectItem>
+              <SelectItem value="all">All accounts</SelectItem>
               {tradingAccounts.map((account) => (
                 <SelectItem key={account.id} value={account.id}>
                   {account.account_name}

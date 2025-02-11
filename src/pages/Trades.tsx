@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const Trades = () => {
-  const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [selectedAccount, setSelectedAccount] = useState<string>("all");
 
   const { data: tradingAccounts } = useQuery({
     queryKey: ["tradingAccounts"],
@@ -41,7 +41,7 @@ const Trades = () => {
         .eq("user_id", user.id)
         .order("entry_date", { ascending: false });
 
-      if (selectedAccount) {
+      if (selectedAccount !== "all") {
         query = query.eq("trading_account_id", selectedAccount);
       }
 
