@@ -84,13 +84,13 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
       console.log('File path:', filePath);
 
-      // Get the file as an ArrayBuffer
-      const fileArrayBuffer = await selectedFile.arrayBuffer();
+      // Read file as blob
+      const blob = new Blob([selectedFile], { type: selectedFile.type });
       
-      // Upload file using standard upload method with ArrayBuffer
+      // Upload file using blob
       const { error: uploadError } = await supabase.storage
         .from('import_files')
-        .upload(filePath, fileArrayBuffer, {
+        .upload(filePath, blob, {
           contentType: selectedFile.type,
           upsert: false
         });
