@@ -9,8 +9,10 @@ import { Import } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [selectedAccount, setSelectedAccount] = useState<string>("");
 
   const { data: tradingAccounts } = useQuery({
@@ -41,7 +43,11 @@ const Dashboard = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button size="sm" className="gap-2 text-sm h-9">
+          <Button 
+            size="sm" 
+            className="gap-2 text-sm h-9"
+            onClick={() => navigate("/import")}
+          >
             <Import className="w-3.5 h-3.5" />
             Import Trades
           </Button>

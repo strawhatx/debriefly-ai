@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      broker_connection_fields: {
+        Row: {
+          broker: Database["public"]["Enums"]["broker_type"]
+          created_at: string
+          description: string | null
+          display_name: string
+          field_name: string
+          field_type: Database["public"]["Enums"]["broker_field_type"]
+          id: string
+          required: boolean
+          updated_at: string
+        }
+        Insert: {
+          broker: Database["public"]["Enums"]["broker_type"]
+          created_at?: string
+          description?: string | null
+          display_name: string
+          field_name: string
+          field_type: Database["public"]["Enums"]["broker_field_type"]
+          id?: string
+          required?: boolean
+          updated_at?: string
+        }
+        Update: {
+          broker?: Database["public"]["Enums"]["broker_type"]
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          field_name?: string
+          field_type?: Database["public"]["Enums"]["broker_field_type"]
+          id?: string
+          required?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       imports: {
         Row: {
           created_at: string
@@ -181,6 +217,8 @@ export type Database = {
           account_balance: number
           account_name: string
           broker: Database["public"]["Enums"]["broker_type"]
+          broker_connected: boolean | null
+          broker_credentials: Json | null
           created_at: string
           id: string
           profit_calculation_method: Database["public"]["Enums"]["profit_calc_method"]
@@ -191,6 +229,8 @@ export type Database = {
           account_balance?: number
           account_name: string
           broker?: Database["public"]["Enums"]["broker_type"]
+          broker_connected?: boolean | null
+          broker_credentials?: Json | null
           created_at?: string
           id?: string
           profit_calculation_method?: Database["public"]["Enums"]["profit_calc_method"]
@@ -201,6 +241,8 @@ export type Database = {
           account_balance?: number
           account_name?: string
           broker?: Database["public"]["Enums"]["broker_type"]
+          broker_connected?: boolean | null
+          broker_credentials?: Json | null
           created_at?: string
           id?: string
           profit_calculation_method?: Database["public"]["Enums"]["profit_calc_method"]
@@ -217,6 +259,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      broker_field_type: "text" | "password" | "api_key"
       broker_type:
         | "Coinbase"
         | "Webull"
