@@ -4,15 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { BrokerInfo } from "./BrokerInfo";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Broker } from "./types";
 
 interface FileImportProps {
@@ -24,6 +19,8 @@ export const FileImport = ({ availableBrokers }: FileImportProps) => {
   const [selectedBrokerId, setSelectedBrokerId] = useState<string>("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const selectedBroker = availableBrokers?.find(b => b.id === selectedBrokerId);
 
   const { data: tradingAccounts } = useQuery({
     queryKey: ["tradingAccounts", selectedBrokerId],
@@ -102,55 +99,48 @@ export const FileImport = ({ availableBrokers }: FileImportProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="broker">Broker</Label>
-        <Select value={selectedBrokerId} onValueChange={setSelectedBrokerId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a broker" />
-          </SelectTrigger>
-          <SelectContent>
-            {availableBrokers?.map((broker) => (
-              <SelectItem key={broker.id} value={broker.id}>
-                {broker.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <BrokerInfo 
+        broker={selectedBroker}
+        availableBrokers={availableBrokers}
+        onBrokerSelect={setSelectedBrokerId}
+        selectedBrokerId={selectedBrokerId}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="account">Trading Account</Label>
-        <Select 
-          value={selectedAccount} 
-          onValueChange={setSelectedAccount}
-          disabled={!selectedBrokerId}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select an account" />
-          </SelectTrigger>
-          <SelectContent>
-            {tradingAccounts?.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                {account.account_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {selectedBrokerId && (
+        <div className="space-y-2">
+          <Label htmlFor="account">Trading Account</Label>
+          <Select 
+            value={selectedAccount} 
+            onValueChange={setSelectedAccount}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select an account" />
+            </SelectTrigger>
+            <SelectContent>
+              {tradingAccounts?.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.account_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-      <div className="space-y-2">
-        <Label htmlFor="file">File</Label>
-        <Input
-          id="file"
-          type="file"
-          accept=".csv,.xlsx,.xls"
-          onChange={handleFileUpload}
-          disabled={!selectedAccount}
-        />
-        <p className="text-sm text-muted-foreground">
-          Supported formats: CSV, Excel
-        </p>
-      </div>
+      {selectedAccount && (
+        <div className="space-y-2">
+          <Label htmlFor="file">File</Label>
+          <Input
+            id="file"
+            type="file"
+            accept=".csv,.xlsx,.xls"
+            onChange={handleFileUpload}
+          />
+          <p className="text-sm text-muted-foreground">
+            Supported formats: CSV, Excel
+          </p>
+        </div>
+      )}
 
       <Button onClick={handleImport} className="w-full">
         Start Import

@@ -1,21 +1,18 @@
-
-import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import { BrokerInfo } from "./BrokerInfo";
 import { useBrokerData } from "./hooks/useBrokerData";
 import { BrokerSyncProps } from "./types";
 
 export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
   const { toast } = useToast();
-  const [selectedBroker, setSelectedBroker] = useState<string>("");
   
   const {
+    selectedBroker,
+    setSelectedBroker,
     selectedAccount,
     setSelectedAccount,
     formValues,
@@ -94,23 +91,12 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label>Broker</Label>
-        <Select value={selectedBroker} onValueChange={setSelectedBroker}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a broker" />
-          </SelectTrigger>
-          <SelectContent>
-            {availableBrokers?.map((broker) => (
-              <SelectItem key={broker.id} value={broker.id}>
-                {broker.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {selectedBrokerData && <BrokerInfo broker={selectedBrokerData} />}
+      <BrokerInfo 
+        broker={selectedBrokerData}
+        availableBrokers={availableBrokers}
+        onBrokerSelect={setSelectedBroker}
+        selectedBrokerId={selectedBroker}
+      />
 
       {selectedBroker && (
         <AccountSelect
