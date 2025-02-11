@@ -101,6 +101,11 @@ const LoginForm = () => {
   return (
     <Card className="p-6 space-y-6 animate-fade-up">
       <div className="space-y-2 text-center">
+        <img 
+          src="/og-image.png" 
+          alt="Logo" 
+          className="h-12 mx-auto mb-4"
+        />
         <h2 className="text-2xl font-bold">{isSignUp ? "Create Account" : "Welcome Back"}</h2>
         <p className="text-muted-foreground">
           {isSignUp
