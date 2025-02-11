@@ -14,6 +14,18 @@ import {
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 
+// Define broker types based on the enum in the database
+const brokerTypes = [
+  "Coinbase",
+  "Webull",
+  "Robinhood",
+  "Tradovate",
+  "Charles Schwab",
+  "Oanda",
+  "Forex.com",
+  "TradeStation",
+] as const;
+
 export const FileImport = () => {
   const { toast } = useToast();
   const [selectedBroker, setSelectedBroker] = useState<string>("");
@@ -32,17 +44,6 @@ export const FileImport = () => {
       return data;
     },
     enabled: !!selectedBroker,
-  });
-
-  const { data: brokers } = useQuery({
-    queryKey: ["brokers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brokers")
-        .select("*");
-      if (error) throw error;
-      return data;
-    },
   });
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,9 +116,9 @@ export const FileImport = () => {
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
           <SelectContent>
-            {brokers?.map((broker) => (
-              <SelectItem key={broker.id} value={broker.id}>
-                {broker.name}
+            {brokerTypes.map((broker) => (
+              <SelectItem key={broker} value={broker}>
+                {broker}
               </SelectItem>
             ))}
           </SelectContent>
