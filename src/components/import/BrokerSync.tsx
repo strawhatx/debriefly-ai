@@ -97,6 +97,7 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
         availableBrokers={availableBrokers}
         onBrokerSelect={setSelectedBroker}
         selectedBrokerId={selectedBroker}
+        syncMode={true}
       />
 
       {selectedBroker && (
