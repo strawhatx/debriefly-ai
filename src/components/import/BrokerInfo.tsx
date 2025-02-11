@@ -16,6 +16,11 @@ export const BrokerInfo = ({
   onBrokerSelect,
   selectedBrokerId
 }: BrokerInfoProps) => {
+  // Filter brokers that support sync (Coinbase and TradingView Paper Trading)
+  const syncEnabledBrokers = availableBrokers?.filter(broker => 
+    ['Coinbase', 'TradingView Paper Trading'].includes(broker.name)
+  );
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -25,7 +30,7 @@ export const BrokerInfo = ({
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
           <SelectContent>
-            {availableBrokers?.map((broker) => (
+            {syncEnabledBrokers?.map((broker) => (
               <SelectItem key={broker.id} value={broker.id}>
                 {broker.name}
               </SelectItem>

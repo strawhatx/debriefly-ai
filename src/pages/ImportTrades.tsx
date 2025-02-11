@@ -75,7 +75,12 @@ const ImportTrades = () => {
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">How to Sync with Your Broker</h3>
                 <div className="space-y-4 text-sm text-muted-foreground">
-                  <p>To sync your trades directly from your broker:</p>
+                  <p>Currently, direct broker sync is supported for:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Coinbase</li>
+                    <li>TradingView Paper Trading</li>
+                  </ul>
+                  <p className="mt-4">To sync your trades directly from your broker:</p>
                   <ol className="list-decimal list-inside space-y-2">
                     <li>Select your broker from the dropdown menu</li>
                     <li>Select the trading account you want to sync</li>
