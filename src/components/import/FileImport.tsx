@@ -16,14 +16,29 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const FileImport = () => {
   const { toast } = useToast();
+  const [selectedBroker, setSelectedBroker] = useState<string>("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const { data: tradingAccounts } = useQuery({
-    queryKey: ["tradingAccounts"],
+    queryKey: ["tradingAccounts", selectedBroker],
     queryFn: async () => {
+      if (!selectedBroker) return [];
       const { data, error } = await supabase
         .from("trading_accounts")
+        .select("*")
+        .eq("broker", selectedBroker);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedBroker,
+  });
+
+  const { data: brokers } = useQuery({
+    queryKey: ["brokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brokers")
         .select("*");
       if (error) throw error;
       return data;
@@ -46,10 +61,10 @@ export const FileImport = () => {
   };
 
   const handleImport = async () => {
-    if (!selectedAccount || !selectedFile) {
+    if (!selectedBroker || !selectedAccount || !selectedFile) {
       toast({
         title: "Missing information",
-        description: "Please select an account and upload a file",
+        description: "Please select a broker, account, and upload a file",
         variant: "destructive",
       });
       return;
@@ -80,6 +95,7 @@ export const FileImport = () => {
       // Reset form
       setSelectedFile(null);
       setSelectedAccount("");
+      setSelectedBroker("");
     } catch (error: any) {
       console.error('Error starting import:', error);
       toast({
@@ -93,8 +109,28 @@ export const FileImport = () => {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
+        <Label htmlFor="broker">Broker</Label>
+        <Select value={selectedBroker} onValueChange={setSelectedBroker}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a broker" />
+          </SelectTrigger>
+          <SelectContent>
+            {brokers?.map((broker) => (
+              <SelectItem key={broker.id} value={broker.id}>
+                {broker.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="account">Trading Account</Label>
-        <Select value={selectedAccount} onValueChange={setSelectedAccount}>
+        <Select 
+          value={selectedAccount} 
+          onValueChange={setSelectedAccount}
+          disabled={!selectedBroker}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select an account" />
           </SelectTrigger>
@@ -115,6 +151,7 @@ export const FileImport = () => {
           type="file"
           accept=".csv,.xlsx,.xls"
           onChange={handleFileUpload}
+          disabled={!selectedAccount}
         />
         <p className="text-sm text-muted-foreground">
           Supported formats: CSV, Excel
