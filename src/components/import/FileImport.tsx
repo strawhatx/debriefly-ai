@@ -46,7 +46,6 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log('Selected file:', file);
     if (file) {
       if (file.type !== 'text/csv' && !file.type.includes('spreadsheetml')) {
         toast({
@@ -56,6 +55,7 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
         });
         return;
       }
+      console.log('Selected file:', file);
       setSelectedFile(file);
     }
   };
@@ -78,15 +78,38 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       if (!user) throw new Error("Not authenticated");
       console.log('User authenticated:', user.id);
 
-      // First create the import record with pending status
+      // Create a more structured file path
+      const timestamp = new Date().getTime();
+      const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
+      const fileExtension = sanitizedFileName.split('.').pop();
+      const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
+      console.log('File path:', filePath);
+
+      // First upload file to storage
+      console.log('Starting file upload to storage...');
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from('import_files')
+        .upload(filePath, selectedFile, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+        throw new Error(`Failed to upload file: ${uploadError.message}`);
+      }
+      console.log('File uploaded successfully:', uploadData);
+
+      // Then create the import record
       const { data: importRecord, error: importError } = await supabase
         .from('imports')
         .insert({
           user_id: user.id,
           trading_account_id: selectedAccount,
-          import_type: selectedFile.type.includes('spreadsheetml') ? 'excel' : 'csv',
-          status: 'pending',
-          original_filename: selectedFile.name.replace(/[^\x00-\x7F]/g, ''),
+          import_type: fileExtension === 'csv' ? 'csv' : 'excel',
+          status: 'uploaded',
+          original_filename: sanitizedFileName,
+          file_path: filePath,
           file_size: selectedFile.size,
           file_type: selectedFile.type
         })
@@ -98,39 +121,6 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
         throw importError;
       }
       console.log('Import record created:', importRecord);
-
-      // Create a unique file path including import ID and timestamp
-      const timestamp = new Date().getTime();
-      const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
-      const filePath = `${importRecord.id}/${timestamp}-${sanitizedFileName}`;
-      console.log('File path:', filePath);
-
-      // Upload file to storage
-      console.log('Starting file upload to storage...');
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('import_files')
-        .upload(filePath, selectedFile);
-
-      if (uploadError) {
-        console.error('Error uploading file:', uploadError);
-        throw uploadError;
-      }
-      console.log('File uploaded successfully:', uploadData);
-
-      // Update import record with file path and status
-      console.log('Updating import record status to uploaded...');
-      const { error: updateError } = await supabase
-        .from('imports')
-        .update({
-          file_path: filePath,
-          status: 'uploaded'
-        })
-        .eq('id', importRecord.id);
-
-      if (updateError) {
-        console.error('Error updating import record:', updateError);
-        throw updateError;
-      }
 
       toast({
         title: "Import started",
@@ -195,3 +185,4 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
     </div>
   );
 };
+
