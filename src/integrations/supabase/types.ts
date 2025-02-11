@@ -65,23 +65,32 @@ export type Database = {
       }
       trading_accounts: {
         Row: {
+          account_balance: number
           account_name: string
+          broker: Database["public"]["Enums"]["broker_type"]
           created_at: string
           id: string
+          profit_calculation_method: Database["public"]["Enums"]["profit_calc_method"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          account_balance?: number
           account_name: string
+          broker?: Database["public"]["Enums"]["broker_type"]
           created_at?: string
           id?: string
+          profit_calculation_method?: Database["public"]["Enums"]["profit_calc_method"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          account_balance?: number
           account_name?: string
+          broker?: Database["public"]["Enums"]["broker_type"]
           created_at?: string
           id?: string
+          profit_calculation_method?: Database["public"]["Enums"]["profit_calc_method"]
           updated_at?: string
           user_id?: string
         }
@@ -95,6 +104,16 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      broker_type:
+        | "Coinbase"
+        | "Webull"
+        | "Robinhood"
+        | "Tradovate"
+        | "Charles Schwab"
+        | "Oanda"
+        | "Forex.com"
+        | "TradeStation"
+      profit_calc_method: "FIFO" | "LIFO"
       subscription_tier: "free" | "premium"
     }
     CompositeTypes: {
