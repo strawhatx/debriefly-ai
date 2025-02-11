@@ -13,14 +13,19 @@ const ImportTrades = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("file");
 
-  const { data: availableBrokers } = useQuery<Broker[]>({
+  const { data: availableBrokers, isLoading } = useQuery<Broker[]>({
     queryKey: ["availableBrokers"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("brokers") // Changed from available_brokers to brokers
+        .from("brokers")
         .select("*");
-      if (error) throw error;
-      return data as Broker[]; // Explicitly cast to Broker[]
+      
+      if (error) {
+        console.error("Error fetching brokers:", error);
+        throw error;
+      }
+      
+      return data as Broker[];
     },
   });
 
