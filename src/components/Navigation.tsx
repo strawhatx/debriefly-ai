@@ -16,6 +16,12 @@ const Navigation = () => {
           </Link>
           <div className="hidden md:flex items-center gap-6">
             <Link
+              to="/dashboard"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+            <Link
               to="/blog"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
