@@ -57,7 +57,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Upload file to storage
+      // Upload file to storage with user ID in the path
       const filePath = `${user.id}/${crypto.randomUUID()}-${selectedFile.name}`;
       const { error: uploadError } = await supabase.storage
         .from('import_files')
@@ -65,7 +65,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
 
       if (uploadError) throw uploadError;
 
-      // Create import record
+      // Create import record with file information
       const { data, error } = await supabase
         .from('imports')
         .insert({
@@ -98,7 +98,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       console.error('Error starting import:', error);
       toast({
         title: "Error",
-        description: "Failed to start import",
+        description: error.message || "Failed to start import",
         variant: "destructive",
       });
     } finally {
