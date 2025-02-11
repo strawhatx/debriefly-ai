@@ -85,20 +85,30 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
       console.log('File path:', filePath);
 
-      // First upload file to storage
+      // First upload file to storage using signed URLs
       console.log('Starting file upload to storage...');
-      const { error: uploadError, data: uploadData } = await supabase.storage
+      const { data: signedUrl, error: signUrlError } = await supabase.storage
+        .from('import_files')
+        .createSignedUploadUrl(filePath);
+
+      if (signUrlError) {
+        console.error('Error getting signed URL:', signUrlError);
+        throw new Error(`Failed to get signed URL: ${signUrlError.message}`);
+      }
+
+      const { error: uploadError } = await supabase.storage
         .from('import_files')
         .upload(filePath, selectedFile, {
           cacheControl: '3600',
-          upsert: false
+          upsert: false,
+          contentType: selectedFile.type
         });
 
       if (uploadError) {
         console.error('Error uploading file:', uploadError);
         throw new Error(`Failed to upload file: ${uploadError.message}`);
       }
-      console.log('File uploaded successfully:', uploadData);
+      console.log('File uploaded successfully with signed URL');
 
       // Then create the import record
       const { data: importRecord, error: importError } = await supabase
