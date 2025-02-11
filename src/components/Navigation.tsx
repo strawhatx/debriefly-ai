@@ -22,6 +22,12 @@ const Navigation = () => {
               Blog
             </Link>
             <Link
+              to="/pricing"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
               to="/contact"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
