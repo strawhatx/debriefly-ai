@@ -6,13 +6,21 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { Check, X, Plus, Pencil } from "lucide-react";
 
 const BROKERS = [
   'Coinbase',
@@ -27,20 +35,49 @@ const BROKERS = [
 
 const PROFIT_CALC_METHODS = ['FIFO', 'LIFO'] as const;
 
+interface TradingAccount {
+  id: string;
+  account_name: string;
+  broker: typeof BROKERS[number];
+  profit_calculation_method: typeof PROFIT_CALC_METHODS[number];
+  account_balance: number;
+  created_at: string;
+}
+
+interface EditingAccount extends Partial<TradingAccount> {
+  isNew?: boolean;
+}
+
 interface TradingAccountsSectionProps {
-  tradingAccounts: any[];
-  setTradingAccounts: (accounts: any[]) => void;
+  tradingAccounts: TradingAccount[];
+  setTradingAccounts: (accounts: TradingAccount[]) => void;
 }
 
 export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: TradingAccountsSectionProps) => {
   const { toast } = useToast();
-  const [newAccountName, setNewAccountName] = useState("");
-  const [newBroker, setNewBroker] = useState<typeof BROKERS[number]>("Coinbase");
-  const [newProfitCalcMethod, setNewProfitCalcMethod] = useState<typeof PROFIT_CALC_METHODS[number]>("FIFO");
-  const [newAccountBalance, setNewAccountBalance] = useState("");
+  const [editingAccount, setEditingAccount] = useState<EditingAccount | null>(null);
 
-  const handleAddTradingAccount = async () => {
-    if (!newAccountName.trim()) {
+  const handleStartEdit = (account: TradingAccount) => {
+    setEditingAccount(account);
+  };
+
+  const handleStartCreate = () => {
+    setEditingAccount({
+      isNew: true,
+      broker: "Coinbase",
+      profit_calculation_method: "FIFO",
+      account_balance: 0,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingAccount(null);
+  };
+
+  const handleSave = async () => {
+    if (!editingAccount) return;
+
+    if (!editingAccount.account_name?.trim()) {
       toast({
         title: "Error",
         description: "Please enter an account name",
@@ -49,7 +86,7 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
       return;
     }
 
-    if (!newAccountBalance || isNaN(Number(newAccountBalance)) || Number(newAccountBalance) < 0) {
+    if (!editingAccount.account_balance || isNaN(Number(editingAccount.account_balance)) || Number(editingAccount.account_balance) < 0) {
       toast({
         title: "Error",
         description: "Please enter a valid account balance",
@@ -62,41 +99,56 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
-        .from('trading_accounts')
-        .insert([{ 
-          account_name: newAccountName,
-          user_id: user.id,
-          broker: newBroker,
-          profit_calculation_method: newProfitCalcMethod,
-          account_balance: Number(newAccountBalance)
-        }])
-        .select()
-        .single();
+      if (editingAccount.isNew) {
+        const { data, error } = await supabase
+          .from('trading_accounts')
+          .insert([{
+            account_name: editingAccount.account_name,
+            user_id: user.id,
+            broker: editingAccount.broker,
+            profit_calculation_method: editingAccount.profit_calculation_method,
+            account_balance: Number(editingAccount.account_balance)
+          }])
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
+        setTradingAccounts([data, ...tradingAccounts]);
+      } else {
+        const { data, error } = await supabase
+          .from('trading_accounts')
+          .update({
+            account_name: editingAccount.account_name,
+            broker: editingAccount.broker,
+            profit_calculation_method: editingAccount.profit_calculation_method,
+            account_balance: Number(editingAccount.account_balance)
+          })
+          .eq('id', editingAccount.id)
+          .select()
+          .single();
 
-      setTradingAccounts([data, ...tradingAccounts]);
-      setNewAccountName("");
-      setNewBroker("Coinbase");
-      setNewProfitCalcMethod("FIFO");
-      setNewAccountBalance("");
-      
+        if (error) throw error;
+        setTradingAccounts(
+          tradingAccounts.map(acc => acc.id === data.id ? data : acc)
+        );
+      }
+
+      setEditingAccount(null);
       toast({
         title: "Success",
-        description: "Trading account added successfully",
+        description: `Trading account ${editingAccount.isNew ? 'added' : 'updated'} successfully`,
       });
     } catch (error: any) {
-      console.error('Error adding trading account:', error);
+      console.error('Error saving trading account:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to add trading account",
+        description: error.message || `Failed to ${editingAccount.isNew ? 'add' : 'update'} trading account`,
         variant: "destructive",
       });
     }
   };
 
-  const handleDeleteTradingAccount = async (id: string) => {
+  const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
         .from('trading_accounts')
@@ -106,7 +158,6 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
       if (error) throw error;
 
       setTradingAccounts(tradingAccounts.filter(account => account.id !== id));
-      
       toast({
         title: "Success",
         description: "Trading account deleted successfully",
@@ -124,110 +175,183 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
   return (
     <Card className="p-6">
       <div className="space-y-6">
-        <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Trading Accounts</h3>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="accountName">Account Name</Label>
-              <Input
-                id="accountName"
-                placeholder="Enter account name"
-                value={newAccountName}
-                onChange={(e) => setNewAccountName(e.target.value)}
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="broker">Broker</Label>
-              <Select
-                value={newBroker}
-                onValueChange={(value) => setNewBroker(value as typeof BROKERS[number])}
-              >
-                <SelectTrigger id="broker">
-                  <SelectValue placeholder="Select broker" />
-                </SelectTrigger>
-                <SelectContent>
-                  {BROKERS.map((broker) => (
-                    <SelectItem key={broker} value={broker}>
-                      {broker}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="profitCalcMethod">Profit Calculation Method</Label>
-              <Select
-                value={newProfitCalcMethod}
-                onValueChange={(value) => setNewProfitCalcMethod(value as typeof PROFIT_CALC_METHODS[number])}
-              >
-                <SelectTrigger id="profitCalcMethod">
-                  <SelectValue placeholder="Select profit calculation method" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROFIT_CALC_METHODS.map((method) => (
-                    <SelectItem key={method} value={method}>
-                      {method}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="accountBalance">Account Balance</Label>
-              <Input
-                id="accountBalance"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Enter account balance"
-                value={newAccountBalance}
-                onChange={(e) => setNewAccountBalance(e.target.value)}
-              />
-            </div>
-
-            <Button onClick={handleAddTradingAccount} className="w-full">
-              Add Account
-            </Button>
-          </div>
+          <Button onClick={handleStartCreate} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Add Account
+          </Button>
         </div>
 
-        <div className="space-y-4">
-          {tradingAccounts.map((account) => (
-            <div key={account.id} className="border rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h4 className="font-medium">{account.account_name}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {account.broker} • {account.profit_calculation_method}
-                  </p>
-                  <p className="text-sm font-medium">
-                    Balance: ${account.account_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Created on {new Date(account.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="space-x-2">
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleDeleteTradingAccount(account.id)}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Account Name</TableHead>
+              <TableHead>Broker</TableHead>
+              <TableHead>Profit Calculation</TableHead>
+              <TableHead>Balance</TableHead>
+              <TableHead>Created</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {editingAccount?.isNew && (
+              <TableRow>
+                <TableCell>
+                  <Input
+                    value={editingAccount.account_name || ''}
+                    onChange={(e) => setEditingAccount({ ...editingAccount, account_name: e.target.value })}
+                    placeholder="Enter account name"
+                  />
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={editingAccount.broker}
+                    onValueChange={(value) => setEditingAccount({ ...editingAccount, broker: value as typeof BROKERS[number] })}
                   >
-                    Delete
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select broker" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BROKERS.map((broker) => (
+                        <SelectItem key={broker} value={broker}>
+                          {broker}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Select
+                    value={editingAccount.profit_calculation_method}
+                    onValueChange={(value) => setEditingAccount({ ...editingAccount, profit_calculation_method: value as typeof PROFIT_CALC_METHODS[number] })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PROFIT_CALC_METHODS.map((method) => (
+                        <SelectItem key={method} value={method}>
+                          {method}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={editingAccount.account_balance || ''}
+                    onChange={(e) => setEditingAccount({ ...editingAccount, account_balance: parseFloat(e.target.value) })}
+                    placeholder="Enter balance"
+                  />
+                </TableCell>
+                <TableCell>Now</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Button size="icon" variant="ghost" onClick={handleSave}>
+                    <Check className="h-4 w-4" />
                   </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-          {tradingAccounts.length === 0 && (
-            <p className="text-muted-foreground text-center py-4">
-              No trading accounts yet. Add your first one!
-            </p>
-          )}
-        </div>
+                  <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )}
+            {tradingAccounts.map((account) => (
+              <TableRow key={account.id}>
+                {editingAccount?.id === account.id ? (
+                  <>
+                    <TableCell>
+                      <Input
+                        value={editingAccount.account_name}
+                        onChange={(e) => setEditingAccount({ ...editingAccount, account_name: e.target.value })}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={editingAccount.broker}
+                        onValueChange={(value) => setEditingAccount({ ...editingAccount, broker: value as typeof BROKERS[number] })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {BROKERS.map((broker) => (
+                            <SelectItem key={broker} value={broker}>
+                              {broker}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={editingAccount.profit_calculation_method}
+                        onValueChange={(value) => setEditingAccount({ ...editingAccount, profit_calculation_method: value as typeof PROFIT_CALC_METHODS[number] })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PROFIT_CALC_METHODS.map((method) => (
+                            <SelectItem key={method} value={method}>
+                              {method}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={editingAccount.account_balance}
+                        onChange={(e) => setEditingAccount({ ...editingAccount, account_balance: parseFloat(e.target.value) })}
+                      />
+                    </TableCell>
+                    <TableCell>{new Date(account.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button size="icon" variant="ghost" onClick={handleSave}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </>
+                ) : (
+                  <>
+                    <TableCell>{account.account_name}</TableCell>
+                    <TableCell>{account.broker}</TableCell>
+                    <TableCell>{account.profit_calculation_method}</TableCell>
+                    <TableCell>
+                      ${account.account_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </TableCell>
+                    <TableCell>{new Date(account.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button size="icon" variant="ghost" onClick={() => handleStartEdit(account)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button size="icon" variant="ghost" onClick={() => handleDelete(account.id)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </>
+                )}
+              </TableRow>
+            ))}
+            {tradingAccounts.length === 0 && !editingAccount?.isNew && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center text-muted-foreground py-4">
+                  No trading accounts yet. Click "Add Account" to create your first one!
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </Card>
   );
