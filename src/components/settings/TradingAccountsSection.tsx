@@ -16,6 +16,7 @@ import { Plus } from "lucide-react";
 import { TradingAccountForm } from "./TradingAccountForm";
 import { TradingAccountRow } from "./TradingAccountRow";
 import { TradingAccount, EditingAccount } from "@/types/trading";
+import { useQuery } from "@tanstack/react-query";
 
 interface TradingAccountsSectionProps {
   tradingAccounts: TradingAccount[];
@@ -29,14 +30,29 @@ export const TradingAccountsSection = ({
   const { toast } = useToast();
   const [editingAccount, setEditingAccount] = useState<EditingAccount | null>(null);
 
+  // Fetch available brokers to get their IDs
+  const { data: brokers } = useQuery({
+    queryKey: ["availableBrokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brokers")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const handleStartEdit = (account: TradingAccount) => {
     setEditingAccount(account);
   };
 
   const handleStartCreate = () => {
+    // Use the first broker's ID as default, or null if no brokers available
+    const defaultBrokerId = brokers && brokers.length > 0 ? brokers[0].id : null;
+    
     setEditingAccount({
       isNew: true,
-      broker_id: "Coinbase",
+      broker_id: defaultBrokerId,
       profit_calculation_method: "FIFO",
       account_balance: 0,
     });
@@ -53,6 +69,15 @@ export const TradingAccountsSection = ({
       toast({
         title: "Error",
         description: "Please enter an account name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!editingAccount.broker_id) {
+      toast({
+        title: "Error",
+        description: "Please select a broker",
         variant: "destructive",
       });
       return;
