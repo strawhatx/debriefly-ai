@@ -57,31 +57,33 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Upload file to storage with user ID in the path
-      const filePath = `${user.id}/${crypto.randomUUID()}-${selectedFile.name}`;
-      const { error: uploadError } = await supabase.storage
+      // Create a unique file path including user ID and original filename
+      const timestamp = new Date().getTime();
+      const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
+      const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
+
+      // Upload file to storage
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('import_files')
         .upload(filePath, selectedFile);
 
       if (uploadError) throw uploadError;
 
       // Create import record with file information
-      const { data, error } = await supabase
+      const { error: importError } = await supabase
         .from('imports')
         .insert({
           user_id: user.id,
           trading_account_id: selectedAccount,
           import_type: selectedFile.type.includes('spreadsheetml') ? 'excel' : 'csv',
           status: 'pending',
-          original_filename: selectedFile.name,
+          original_filename: sanitizedFileName,
           file_path: filePath,
           file_size: selectedFile.size,
           file_type: selectedFile.type
-        })
-        .select()
-        .single();
+        });
 
-      if (error) throw error;
+      if (importError) throw importError;
 
       toast({
         title: "Import started",
