@@ -58,3 +58,13 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+/* Add gradient utilities */
+@layer utilities {
+  .bg-gradient-green {
+    @apply bg-gradient-to-r from-primary/90 to-primary/30;
+  }
+  .text-gradient-green {
+    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
+  }
+}
