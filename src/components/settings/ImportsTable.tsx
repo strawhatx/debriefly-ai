@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { filesize } from "filesize";
+import filesize from "filesize";
 
 interface Import {
   id: string;
@@ -63,7 +63,7 @@ export const ImportsTable = ({ imports }: ImportsTableProps) => {
             <TableCell>{import_.account_name}</TableCell>
             <TableCell>{import_.original_filename || '-'}</TableCell>
             <TableCell>
-              {import_.file_size ? filesize(import_.file_size).toString() : '-'}
+              {import_.file_size ? filesize(import_.file_size) : '-'}
             </TableCell>
             <TableCell>{import_.file_type || import_.import_type}</TableCell>
             <TableCell>
