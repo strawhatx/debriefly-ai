@@ -18,25 +18,9 @@ export const BrokerInfo = ({
   selectedBrokerId,
   syncMode = false
 }: BrokerInfoProps) => {
-  // Filter brokers based on the requested mode
-  const filteredBrokers = availableBrokers?.filter(broker => 
+  const filteredBrokers = availableBrokers.filter(broker => 
     syncMode ? broker.broker_sync_enabled : broker.file_upload_enabled
-  ) || [];
-
-  console.log('Available brokers:', availableBrokers);
-  console.log('Filtered brokers:', filteredBrokers);
-  console.log('Selected broker ID:', selectedBrokerId);
-
-  if (filteredBrokers.length === 0) {
-    return (
-      <div className="space-y-2">
-        <Label>Broker</Label>
-        <div className="text-sm text-muted-foreground">
-          No brokers available for {syncMode ? 'sync' : 'file upload'}.
-        </div>
-      </div>
-    );
-  }
+  );
 
   return (
     <div className="space-y-6">
@@ -79,3 +63,4 @@ export const BrokerInfo = ({
     </div>
   );
 };
+

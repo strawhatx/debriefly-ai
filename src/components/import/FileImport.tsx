@@ -14,9 +14,6 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
   const [selectedBrokerId, setSelectedBrokerId] = useState<string>("");
   const selectedBroker = availableBrokers?.find(b => b.id === selectedBrokerId);
 
-  console.log('FileImport - Available brokers:', availableBrokers);
-  console.log('FileImport - Selected broker ID:', selectedBrokerId);
-
   const { data: tradingAccounts } = useQuery({
     queryKey: ["tradingAccounts", selectedBrokerId],
     queryFn: async () => {
