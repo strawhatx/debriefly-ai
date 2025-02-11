@@ -1,7 +1,6 @@
 
 import { Card } from "@/components/ui/card";
 import TradingAccountsOverview from "@/components/dashboard/TradingAccountsOverview";
-import ProfitLossChart from "@/components/dashboard/ProfitLossChart";
 import TradeCalendar from "@/components/dashboard/TradeCalendar";
 import WinLossInsights from "@/components/dashboard/WinLossInsights";
 
@@ -16,17 +15,10 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <Card className="p-6">
-          <h2 className="text-2xl font-semibold mb-4">Profit/Loss Overview</h2>
-          <ProfitLossChart />
-        </Card>
-
-        <Card className="p-6">
           <h2 className="text-2xl font-semibold mb-4">Trading Calendar</h2>
           <TradeCalendar />
         </Card>
-      </div>
 
-      <div className="grid grid-cols-1 gap-8">
         <Card className="p-6">
           <h2 className="text-2xl font-semibold mb-4">Performance Insights</h2>
           <WinLossInsights />
