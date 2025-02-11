@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      imports: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          import_type: string
+          status: string
+          trading_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          import_type: string
+          status?: string
+          trading_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          import_type?: string
+          status?: string
+          trading_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imports_trading_account_id_fkey"
+            columns: ["trading_account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -62,6 +103,78 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      trades: {
+        Row: {
+          created_at: string
+          entry_date: string
+          entry_price: number
+          exit_date: string | null
+          exit_price: number | null
+          fees: number | null
+          id: string
+          import_id: string | null
+          notes: string | null
+          pnl: number | null
+          quantity: number
+          side: string
+          symbol: string
+          trading_account_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_date: string
+          entry_price: number
+          exit_date?: string | null
+          exit_price?: number | null
+          fees?: number | null
+          id?: string
+          import_id?: string | null
+          notes?: string | null
+          pnl?: number | null
+          quantity: number
+          side: string
+          symbol: string
+          trading_account_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_date?: string
+          entry_price?: number
+          exit_date?: string | null
+          exit_price?: number | null
+          fees?: number | null
+          id?: string
+          import_id?: string | null
+          notes?: string | null
+          pnl?: number | null
+          quantity?: number
+          side?: string
+          symbol?: string
+          trading_account_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trades_trading_account_id_fkey"
+            columns: ["trading_account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trading_accounts: {
         Row: {
