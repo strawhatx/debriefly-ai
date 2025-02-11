@@ -13,6 +13,9 @@ export const useBrokerData = (initialBrokerId: string = "") => {
     queryKey: ["tradingAccounts", selectedBroker],
     queryFn: async () => {
       if (!selectedBroker) return [];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const { data, error } = await supabase
         .from("trading_accounts")
         .select(`
@@ -24,7 +27,9 @@ export const useBrokerData = (initialBrokerId: string = "") => {
             description
           )
         `)
-        .eq("broker_id", selectedBroker);
+        .eq("broker_id", selectedBroker)
+        .eq("user_id", user.id);
+
       if (error) throw error;
       return data as TradingAccount[];
     },
@@ -66,4 +71,3 @@ export const useBrokerData = (initialBrokerId: string = "") => {
     handleFieldChange
   };
 };
-

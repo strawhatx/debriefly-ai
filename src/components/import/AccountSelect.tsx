@@ -40,6 +40,17 @@ export const AccountSelect = ({
     );
   }
 
+  if (!accounts || accounts.length === 0) {
+    return (
+      <div className="space-y-2">
+        <Label>Trading Account</Label>
+        <div className="text-sm text-muted-foreground">
+          No trading accounts found for this broker. Please create one in Settings first.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-2">
       <Label htmlFor="account">Trading Account</Label>
@@ -48,9 +59,9 @@ export const AccountSelect = ({
           <SelectValue placeholder="Select an account" />
         </SelectTrigger>
         <SelectContent>
-          {accounts?.map((account) => (
+          {accounts.map((account) => (
             <SelectItem key={account.id} value={account.id}>
-              {account.account_name} {account.broker?.name ? `(${account.broker.name})` : ''}
+              {account.account_name}
             </SelectItem>
           ))}
         </SelectContent>
