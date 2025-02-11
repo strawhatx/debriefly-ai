@@ -13,7 +13,7 @@ interface BrokerInfoProps {
 
 export const BrokerInfo = ({ 
   broker,
-  availableBrokers,
+  availableBrokers = [],
   onBrokerSelect,
   selectedBrokerId,
   syncMode = false
@@ -21,18 +21,33 @@ export const BrokerInfo = ({
   // Filter brokers based on the requested mode
   const filteredBrokers = availableBrokers?.filter(broker => 
     syncMode ? broker.broker_sync_enabled : broker.file_upload_enabled
-  );
+  ) || [];
+
+  console.log('Available brokers:', availableBrokers);
+  console.log('Filtered brokers:', filteredBrokers);
+  console.log('Selected broker ID:', selectedBrokerId);
+
+  if (filteredBrokers.length === 0) {
+    return (
+      <div className="space-y-2">
+        <Label>Broker</Label>
+        <div className="text-sm text-muted-foreground">
+          No brokers available for {syncMode ? 'sync' : 'file upload'}.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
         <Label>Broker</Label>
         <Select value={selectedBrokerId} onValueChange={onBrokerSelect}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
           <SelectContent>
-            {filteredBrokers?.map((broker) => (
+            {filteredBrokers.map((broker) => (
               <SelectItem key={broker.id} value={broker.id}>
                 {broker.name}
               </SelectItem>
