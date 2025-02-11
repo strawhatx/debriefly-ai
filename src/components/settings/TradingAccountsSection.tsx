@@ -112,7 +112,20 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          // If we hit the account limit, just cancel the creation
+          if (error.message.includes('Trading account limit reached')) {
+            toast({
+              title: "Account Limit Reached",
+              description: "You've reached the maximum number of trading accounts for your subscription tier. Please upgrade to add more accounts.",
+              variant: "destructive",
+            });
+            setEditingAccount(null);
+            return;
+          }
+          throw error;
+        }
+        
         setTradingAccounts([data, ...tradingAccounts]);
       } else {
         const { data, error } = await supabase
@@ -356,3 +369,4 @@ export const TradingAccountsSection = ({ tradingAccounts, setTradingAccounts }: 
     </Card>
   );
 };
+
