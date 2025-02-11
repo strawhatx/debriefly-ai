@@ -48,7 +48,7 @@ export const useFileImport = (selectedAccount: string) => {
           user_id: user.id,
           trading_account_id: selectedAccount,
           import_type: fileExtension === 'csv' ? 'csv' : 'excel',
-          status: 'uploaded',
+          status: 'pending',  // Using 'pending' as the initial status
           original_filename: sanitizedFileName,
           file_path: filePath,
           file_size: selectedFile.size,
