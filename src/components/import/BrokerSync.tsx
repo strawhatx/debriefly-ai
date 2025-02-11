@@ -3,26 +3,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-
-type BrokerField = {
-  id: string;
-  broker: string;
-  field_name: string;
-  field_type: 'text' | 'password' | 'api_key';
-  required: boolean;
-  display_name: string;
-  description: string | null;
-};
+import { AccountSelect } from "./AccountSelect";
+import { BrokerConnectionFields } from "./BrokerConnectionFields";
 
 export const BrokerSync = () => {
   const { toast } = useToast();
@@ -64,7 +47,7 @@ export const BrokerSync = () => {
         .select("*")
         .eq("broker", selectedAccountData.broker);
       if (error) throw error;
-      return data as BrokerField[];
+      return data;
     },
     enabled: !!selectedAccountData?.broker,
   });
@@ -143,40 +126,18 @@ export const BrokerSync = () => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="account">Trading Account</Label>
-        <Select value={selectedAccount} onValueChange={setSelectedAccount}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select an account" />
-          </SelectTrigger>
-          <SelectContent>
-            {tradingAccounts?.map((account) => (
-              <SelectItem key={account.id} value={account.id}>
-                {account.account_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <AccountSelect
+        accounts={tradingAccounts}
+        selectedAccount={selectedAccount}
+        onAccountChange={setSelectedAccount}
+      />
 
-      {brokerFields && brokerFields.length > 0 && (
-        <div className="space-y-4">
-          {brokerFields.map((field) => (
-            <div key={field.id} className="space-y-2">
-              <Label htmlFor={field.field_name}>
-                {field.display_name}
-                {field.required && <span className="text-red-500 ml-1">*</span>}
-              </Label>
-              <Input
-                id={field.field_name}
-                type={field.field_type === 'password' ? 'password' : 'text'}
-                value={formValues[field.field_name] || ''}
-                onChange={(e) => handleFieldChange(field.field_name, e.target.value)}
-                placeholder={field.description || ''}
-              />
-            </div>
-          ))}
-        </div>
+      {brokerFields && (
+        <BrokerConnectionFields
+          brokerFields={brokerFields}
+          formValues={formValues}
+          onFieldChange={handleFieldChange}
+        />
       )}
 
       <Button 
