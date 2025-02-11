@@ -29,6 +29,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log('Selected file:', file);
     if (file) {
       if (file.type !== 'text/csv' && !file.type.includes('spreadsheetml')) {
         toast({
@@ -54,8 +55,11 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
 
     try {
       setIsUploading(true);
+      console.log('Starting import process...');
+      
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
+      console.log('User authenticated:', user.id);
 
       // First create the import record with pending status
       const { data: importRecord, error: importError } = await supabase
@@ -72,21 +76,32 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
         .select()
         .single();
 
-      if (importError) throw importError;
+      if (importError) {
+        console.error('Error creating import record:', importError);
+        throw importError;
+      }
+      console.log('Import record created:', importRecord);
 
-      // Create a unique file path including import ID and original filename
+      // Create a unique file path including import ID and timestamp
       const timestamp = new Date().getTime();
       const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
       const filePath = `${importRecord.id}/${timestamp}-${sanitizedFileName}`;
+      console.log('File path:', filePath);
 
       // Upload file to storage
-      const { error: uploadError } = await supabase.storage
+      console.log('Starting file upload to storage...');
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('import_files')
         .upload(filePath, selectedFile);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError);
+        throw uploadError;
+      }
+      console.log('File uploaded successfully:', uploadData);
 
-      // Update import record with file path and status to trigger processing
+      // Update import record with file path and status
+      console.log('Updating import record status to uploaded...');
       const { error: updateError } = await supabase
         .from('imports')
         .update({
@@ -95,7 +110,10 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
         })
         .eq('id', importRecord.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error('Error updating import record:', updateError);
+        throw updateError;
+      }
 
       toast({
         title: "Import started",
@@ -109,7 +127,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       setSelectedFile(null);
       setSelectedAccount("");
     } catch (error: any) {
-      console.error('Error starting import:', error);
+      console.error('Error in import process:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to start import",
