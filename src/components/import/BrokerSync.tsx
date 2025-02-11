@@ -1,3 +1,4 @@
+
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +23,7 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
     brokerFields,
     isLoadingFields,
     handleFieldChange
-  } = useBrokerData(selectedBroker);
+  } = useBrokerData();
 
   const selectedBrokerData = availableBrokers?.find(b => b.id === selectedBroker);
 
@@ -125,3 +126,4 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
     </div>
   );
 };
+

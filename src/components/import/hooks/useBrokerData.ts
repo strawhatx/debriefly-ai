@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TradingAccount, BrokerField } from "../types";
 
-export const useBrokerData = (selectedBroker: string) => {
+export const useBrokerData = (initialBrokerId: string = "") => {
+  const [selectedBroker, setSelectedBroker] = useState<string>(initialBrokerId);
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [formValues, setFormValues] = useState<Record<string, string>>({});
 
@@ -52,6 +53,8 @@ export const useBrokerData = (selectedBroker: string) => {
   };
 
   return {
+    selectedBroker,
+    setSelectedBroker,
     selectedAccount,
     setSelectedAccount,
     formValues,
@@ -63,3 +66,4 @@ export const useBrokerData = (selectedBroker: string) => {
     handleFieldChange
   };
 };
+
