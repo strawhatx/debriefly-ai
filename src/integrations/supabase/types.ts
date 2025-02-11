@@ -48,6 +48,13 @@ export type Database = {
             foreignKeyName: "broker_connection_fields_broker_id_fkey"
             columns: ["broker_id"]
             isOneToOne: false
+            referencedRelation: "available_brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_connection_fields_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
             referencedRelation: "brokers"
             referencedColumns: ["id"]
           },
@@ -289,6 +296,13 @@ export type Database = {
             foreignKeyName: "trading_accounts_broker_id_fkey"
             columns: ["broker_id"]
             isOneToOne: false
+            referencedRelation: "available_brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trading_accounts_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
             referencedRelation: "brokers"
             referencedColumns: ["id"]
           },
@@ -296,7 +310,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      available_brokers: {
+        Row: {
+          asset_types: string[] | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          name: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

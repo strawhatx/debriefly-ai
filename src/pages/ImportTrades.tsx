@@ -5,10 +5,23 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileImport } from "@/components/import/FileImport";
 import { BrokerSync } from "@/components/import/BrokerSync";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const ImportTrades = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("file");
+
+  const { data: availableBrokers } = useQuery({
+    queryKey: ["availableBrokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("available_brokers")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <div className="p-6">
@@ -32,7 +45,7 @@ const ImportTrades = () => {
           <TabsContent value="file">
             <div className="grid grid-cols-2 gap-6">
               <Card className="p-6">
-                <FileImport />
+                <FileImport availableBrokers={availableBrokers} />
               </Card>
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">How to Import Trades</h3>
@@ -56,13 +69,14 @@ const ImportTrades = () => {
           <TabsContent value="broker">
             <div className="grid grid-cols-2 gap-6">
               <Card className="p-6">
-                <BrokerSync />
+                <BrokerSync availableBrokers={availableBrokers} />
               </Card>
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">How to Sync with Your Broker</h3>
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <p>To sync your trades directly from your broker:</p>
                   <ol className="list-decimal list-inside space-y-2">
+                    <li>Select your broker from the dropdown menu</li>
                     <li>Select the trading account you want to sync</li>
                     <li>Enter your broker API credentials</li>
                     <li>Click "Connect & Import" to start the sync process</li>
