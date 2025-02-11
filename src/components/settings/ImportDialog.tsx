@@ -57,33 +57,45 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Create a unique file path including user ID and original filename
-      const timestamp = new Date().getTime();
-      const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
-      const filePath = `${user.id}/${timestamp}-${sanitizedFileName}`;
-
-      // Upload file to storage
-      const { error: uploadError, data: uploadData } = await supabase.storage
-        .from('import_files')
-        .upload(filePath, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      // Create import record with file information
-      const { error: importError } = await supabase
+      // First create the import record with pending status
+      const { data: importRecord, error: importError } = await supabase
         .from('imports')
         .insert({
           user_id: user.id,
           trading_account_id: selectedAccount,
           import_type: selectedFile.type.includes('spreadsheetml') ? 'excel' : 'csv',
           status: 'pending',
-          original_filename: sanitizedFileName,
-          file_path: filePath,
+          original_filename: selectedFile.name.replace(/[^\x00-\x7F]/g, ''),
           file_size: selectedFile.size,
           file_type: selectedFile.type
-        });
+        })
+        .select()
+        .single();
 
       if (importError) throw importError;
+
+      // Create a unique file path including import ID and original filename
+      const timestamp = new Date().getTime();
+      const sanitizedFileName = selectedFile.name.replace(/[^\x00-\x7F]/g, '');
+      const filePath = `${importRecord.id}/${timestamp}-${sanitizedFileName}`;
+
+      // Upload file to storage
+      const { error: uploadError } = await supabase.storage
+        .from('import_files')
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      // Update import record with file path and status to trigger processing
+      const { error: updateError } = await supabase
+        .from('imports')
+        .update({
+          file_path: filePath,
+          status: 'uploaded'
+        })
+        .eq('id', importRecord.id);
+
+      if (updateError) throw updateError;
 
       toast({
         title: "Import started",
