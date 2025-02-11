@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { Broker } from "./BrokerSync";
+import { Broker } from "./types";
 
 interface FileImportProps {
   availableBrokers?: Broker[];

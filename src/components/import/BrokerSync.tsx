@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,70 +7,27 @@ import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-
-export interface Broker {
-  id: string;
-  name: string;
-  description?: string;
-  asset_types: string[];
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface BrokerSyncProps {
-  availableBrokers?: Broker[];
-}
+import { BrokerInfo } from "./BrokerInfo";
+import { useBrokerData } from "./hooks/useBrokerData";
+import { BrokerSyncProps } from "./types";
 
 export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
   const { toast } = useToast();
   const [selectedBroker, setSelectedBroker] = useState<string>("");
-  const [selectedAccount, setSelectedAccount] = useState<string>("");
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
-
-  const { data: tradingAccounts, isLoading: isLoadingAccounts } = useQuery({
-    queryKey: ["tradingAccounts", selectedBroker],
-    queryFn: async () => {
-      if (!selectedBroker) return [];
-      const { data, error } = await supabase
-        .from("trading_accounts")
-        .select(`
-          id,
-          account_name,
-          broker:brokers (
-            id,
-            name,
-            description
-          )
-        `)
-        .eq("broker_id", selectedBroker);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedBroker,
-  });
-
-  const { data: brokerFields, isLoading: isLoadingFields } = useQuery({
-    queryKey: ["brokerFields", selectedBroker],
-    queryFn: async () => {
-      if (!selectedBroker) return [];
-      const { data, error } = await supabase
-        .from("broker_connection_fields")
-        .select("*")
-        .eq("broker_id", selectedBroker);
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedBroker,
-  });
+  
+  const {
+    selectedAccount,
+    setSelectedAccount,
+    formValues,
+    setFormValues,
+    tradingAccounts,
+    isLoadingAccounts,
+    brokerFields,
+    isLoadingFields,
+    handleFieldChange
+  } = useBrokerData(selectedBroker);
 
   const selectedBrokerData = availableBrokers?.find(b => b.id === selectedBroker);
-
-  const handleFieldChange = (fieldName: string, value: string) => {
-    setFormValues(prev => ({
-      ...prev,
-      [fieldName]: value
-    }));
-  };
 
   const handleConnect = async () => {
     if (!selectedAccount || !brokerFields) {
@@ -83,7 +39,6 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
       return;
     }
 
-    // Check if all required fields are filled
     const missingFields = brokerFields
       .filter(field => field.required && !formValues[field.field_name]);
     
@@ -112,7 +67,6 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
         description: "Broker connection successful",
       });
 
-      // Create an import record
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -125,7 +79,6 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
           status: 'pending'
         });
 
-      // Reset form
       setFormValues({});
       setSelectedAccount("");
       setSelectedBroker("");
@@ -157,26 +110,7 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
         </Select>
       </div>
 
-      {selectedBrokerData && (
-        <div className="p-4 border rounded-md bg-muted">
-          <h3 className="font-medium mb-1">Selected Broker</h3>
-          <p className="text-sm text-muted-foreground">
-            {selectedBrokerData.name}
-            {selectedBrokerData.description && (
-              <span className="block mt-1 text-xs">
-                {selectedBrokerData.description}
-              </span>
-            )}
-          </p>
-          {selectedBrokerData.asset_types?.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs text-muted-foreground">
-                Supported assets: {selectedBrokerData.asset_types.join(', ')}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+      {selectedBrokerData && <BrokerInfo broker={selectedBrokerData} />}
 
       {selectedBroker && (
         <AccountSelect
