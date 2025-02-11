@@ -13,31 +13,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { Broker } from "./BrokerSync";
 
-type Broker = {
-  id: string;
-  name: string;
-  description: string;
-  asset_types: string[];
-};
+interface FileImportProps {
+  availableBrokers?: Broker[];
+}
 
-export const FileImport = () => {
+export const FileImport = ({ availableBrokers }: FileImportProps) => {
   const { toast } = useToast();
   const [selectedBrokerId, setSelectedBrokerId] = useState<string>("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const { data: brokers } = useQuery({
-    queryKey: ["brokers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brokers")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data as Broker[];
-    },
-  });
 
   const { data: tradingAccounts } = useQuery({
     queryKey: ["tradingAccounts", selectedBrokerId],
@@ -123,7 +109,7 @@ export const FileImport = () => {
             <SelectValue placeholder="Select a broker" />
           </SelectTrigger>
           <SelectContent>
-            {brokers?.map((broker) => (
+            {availableBrokers?.map((broker) => (
               <SelectItem key={broker.id} value={broker.id}>
                 {broker.name}
               </SelectItem>
