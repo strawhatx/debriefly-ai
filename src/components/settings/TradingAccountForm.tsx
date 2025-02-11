@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
-import { BROKERS, PROFIT_CALC_METHODS, EditingAccount } from "@/types/trading";
+import { PROFIT_CALC_METHODS, EditingAccount } from "@/types/trading";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TradingAccountFormProps {
   editingAccount: EditingAccount;
@@ -24,6 +26,17 @@ export const TradingAccountForm = ({
   onSave,
   onCancel,
 }: TradingAccountFormProps) => {
+  const { data: brokers } = useQuery({
+    queryKey: ["availableBrokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("brokers")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <>
       <td>
@@ -42,9 +55,9 @@ export const TradingAccountForm = ({
             <SelectValue placeholder="Select broker" />
           </SelectTrigger>
           <SelectContent>
-            {BROKERS.map((broker) => (
-              <SelectItem key={broker} value={broker}>
-                {broker}
+            {brokers?.map((broker) => (
+              <SelectItem key={broker.id} value={broker.id}>
+                {broker.name}
               </SelectItem>
             ))}
           </SelectContent>

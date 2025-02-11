@@ -1,15 +1,4 @@
 
-export const BROKERS = [
-  'Coinbase',
-  'Webull',
-  'Robinhood',
-  'Tradovate',
-  'Charles Schwab',
-  'Oanda',
-  'Forex.com',
-  'TradeStation'
-] as const;
-
 export const PROFIT_CALC_METHODS = ['FIFO', 'LIFO'] as const;
 
 export interface TradingAccount {
@@ -22,6 +11,8 @@ export interface TradingAccount {
   broker?: {
     id: string;
     name: string;
+    description?: string;
+    asset_types?: string[];
   };
 }
 
