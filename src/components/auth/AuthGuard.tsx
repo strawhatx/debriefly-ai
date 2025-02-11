@@ -1,13 +1,9 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-interface AuthGuardProps {
-  children: React.ReactNode;
-}
-
-const AuthGuard = ({ children }: AuthGuardProps) => {
+const AuthGuard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,7 +27,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     };
   }, [navigate]);
 
-  return <>{children}</>;
+  return <Outlet />;
 };
 
 export default AuthGuard;
