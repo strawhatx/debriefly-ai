@@ -24,6 +24,8 @@ export const extractStringFromRow = (row: Record<string, string>, fields: string
 
 export const normalizeLeverage = (leverageStr: string | number): number => {
   if (typeof leverageStr === 'number') return leverageStr;
+
+  if (isNullOrEmpty(leverageStr)) return 50;
   
   // Handle "X:1" format
   const result = leverageStr.split(':')[0]
@@ -41,3 +43,7 @@ export const normalizeLeverage = (leverageStr: string | number): number => {
   return 50;
 };
 
+
+const isNullOrEmpty = (str: string): boolean => {
+  return str === null || str.length === 0;
+}
