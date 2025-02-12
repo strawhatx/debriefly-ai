@@ -114,7 +114,9 @@ export const extractTradeData = async (
   console.log('Raw row data:', row);
   
   // Extract and log each field individually
-  const symbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || '';
+  const rawSymbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || '';
+  // Handle TradingView format [MARKET]:[Symbol]
+  const symbol = rawSymbol.includes(':') ? rawSymbol.split(':')[1] : rawSymbol;
   console.log('Symbol found:', symbol);
   
   const side = row['Side'] || row['SIDE'] || row['side'] || '';
