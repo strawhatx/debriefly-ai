@@ -404,6 +404,17 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_base_pnl: {
+        Args: {
+          p_asset_type: Database["public"]["Enums"]["asset_type"]
+          p_exit_price: number
+          p_entry_price: number
+          p_quantity: number
+          p_multiplier: number
+          p_is_short?: boolean
+        }
+        Returns: number
+      }
       get_matching_trades: {
         Args: {
           p_account_id: string
