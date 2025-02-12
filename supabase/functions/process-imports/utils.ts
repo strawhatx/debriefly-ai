@@ -49,13 +49,13 @@ export const parseCSVContent = (text: string): ImportRow[] => {
 
 export const extractTradeData = (row: ImportRow, userId: string, accountId: string, importId: string): TradeData => {
   const symbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || ''
-  const side = row['Side'] || row['SIDE'] || row['side'] || row['Type'] || row['TYPE'] || ''
+  const side = row['Side'] || row['SIDE'] || row['side'] || ''
   const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0'
-  const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || ''
+  const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || row['ENTRY PRICE']|| ''
   const entryTime = row['Placing Time'] || row['PLACING TIME'] || row['Entry Time'] || row['Time'] || row['DATE'] || new Date().toISOString()
   const closingTime = row['Closing Time'] || row['CLOSING TIME'] || row['Exit Time'] || null
-  const orderType = row['Type'] || row['ORDER TYPE'] || row['Order Type'] || null
-  const stopPrice = row['Stop Price'] || row['STOP PRICE'] || row['Stop'] || null
+  const orderType = row['Type'] || row['TYPE'] || row['ORDER TYPE'] || row['Order Type'] || null
+  const stopPrice = row['Stop Price'] || row['STOP PRICE'] || row['Stop'] || row['STOP'] || null
   const status = row['Status'] || row['STATUS'] || null
   const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0'
   const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null
