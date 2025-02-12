@@ -1,4 +1,3 @@
-
 import { ImportRow, TradeData } from './types.ts';
 
 export const normalizeSide = (side: string): string => {
@@ -54,6 +53,57 @@ export const parseCSVContent = (text: string): ImportRow[] => {
   return rows;
 }
 
+async function lookupSymbolOnPolygon(symbol: string): Promise<{ assetType: string; multiplier: number } | null> {
+  const polygonApiKey = Deno.env.get('POLYGON_API_KEY');
+  if (!polygonApiKey) {
+    console.error('Polygon API key not found');
+    return null;
+  }
+
+  try {
+    // First try to get ticker details
+    const response = await fetch(`https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=${polygonApiKey}`);
+    const data = await response.json();
+    
+    if (data.status === 'OK' && data.results) {
+      console.log('Polygon API response:', data.results);
+      
+      // Map Polygon market type to our asset types
+      let assetType = 'stock';
+      let multiplier = 1;
+      
+      switch (data.results.market) {
+        case 'stocks':
+          assetType = 'stock';
+          break;
+        case 'fx':
+          assetType = 'forex';
+          multiplier = 10000; // Standard for forex
+          break;
+        case 'crypto':
+          assetType = 'crypto';
+          break;
+        case 'options':
+          assetType = 'option';
+          multiplier = 100; // Standard for options
+          break;
+        case 'futures':
+          assetType = 'futures';
+          // Get contract size if available
+          multiplier = data.results.contract_unit_of_measure ? 
+            parseInt(data.results.contract_unit_of_measure) || 1 : 1;
+          break;
+      }
+
+      return { assetType, multiplier };
+    }
+  } catch (error) {
+    console.error('Error fetching from Polygon:', error);
+  }
+  
+  return null;
+}
+
 export const extractTradeData = async (
   row: ImportRow, 
   userId: string, 
@@ -84,18 +134,47 @@ export const extractTradeData = async (
   const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0';
   const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null;
 
+  const upperSymbol = symbol.trim().toUpperCase();
+
   // Look up symbol configuration
-  const { data: symbolConfig } = await db
+  let { data: symbolConfig } = await db
     .from('symbol_configs')
     .select('asset_type, multiplier')
-    .eq('symbol', symbol.toUpperCase())
+    .eq('symbol', upperSymbol)
     .single();
 
-  // Default values if no config found
+  // If not found in database, look up on Polygon and save to database
+  if (!symbolConfig) {
+    console.log(`Symbol ${upperSymbol} not found in database, looking up on Polygon...`);
+    const polygonData = await lookupSymbolOnPolygon(upperSymbol);
+    
+    if (polygonData) {
+      console.log(`Found ${upperSymbol} on Polygon:`, polygonData);
+      
+      // Save to database
+      const { data: newConfig, error } = await db
+        .from('symbol_configs')
+        .insert({
+          symbol: upperSymbol,
+          asset_type: polygonData.assetType,
+          multiplier: polygonData.multiplier
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error saving symbol config:', error);
+      } else {
+        symbolConfig = newConfig;
+      }
+    }
+  }
+
+  // Use configuration or defaults
   const assetType = symbolConfig?.asset_type || 'stock';
   const multiplier = symbolConfig?.multiplier || 1;
 
-  console.log(`Using asset type: ${assetType}, multiplier: ${multiplier} for symbol: ${symbol}`);
+  console.log(`Using asset type: ${assetType}, multiplier: ${multiplier} for symbol: ${upperSymbol}`);
 
   // Normalize side and calculate prices
   const normalizedSide = normalizeSide(side);
@@ -111,7 +190,7 @@ export const extractTradeData = async (
     user_id: userId,
     trading_account_id: accountId,
     import_id: importId,
-    symbol: symbol.trim().toUpperCase(),
+    symbol: upperSymbol,
     side: normalizedSide,
     quantity: parseFloat(quantity),
     entry_price,
