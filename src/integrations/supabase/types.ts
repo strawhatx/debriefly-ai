@@ -225,6 +225,7 @@ export type Database = {
           fees: number | null
           id: string
           import_id: string | null
+          leverage: number | null
           multiplier: number | null
           notes: string | null
           order_type: string | null
@@ -250,6 +251,7 @@ export type Database = {
           fees?: number | null
           id?: string
           import_id?: string | null
+          leverage?: number | null
           multiplier?: number | null
           notes?: string | null
           order_type?: string | null
@@ -275,6 +277,7 @@ export type Database = {
           fees?: number | null
           id?: string
           import_id?: string | null
+          leverage?: number | null
           multiplier?: number | null
           notes?: string | null
           order_type?: string | null
