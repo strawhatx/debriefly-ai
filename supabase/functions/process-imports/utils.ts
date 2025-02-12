@@ -48,6 +48,8 @@ export const parseCSVContent = (text: string): ImportRow[] => {
 }
 
 export const extractTradeData = (row: ImportRow, userId: string, accountId: string, importId: string): TradeData => {
+  console.log('Processing row:', row);
+  
   const symbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || ''
   const side = row['Side'] || row['SIDE'] || row['side'] || ''
   const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0'
@@ -64,8 +66,8 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
   const normalizedSide = normalizeSide(side)
   const entry_price = normalizedSide === 'sell' ? null : parseFloat(fillPrice)
   const exit_price = normalizedSide === 'sell' ? parseFloat(fillPrice) : null
-
-  return {
+  
+  const tradeData = {
     user_id: userId,
     trading_account_id: accountId,
     import_id: importId,
@@ -75,11 +77,14 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
     entry_price,
     exit_price,
     entry_date: new Date(entryTime).toISOString(),
+    exit_date: closingTime ? new Date(closingTime).toISOString() : null,
     order_type: orderType?.trim() || null,
     stop_price: stopPrice ? parseFloat(stopPrice) : null,
     status: status?.trim() || null,
     fees: commission ? parseFloat(commission) : 0,
-    exit_date: closingTime ? new Date(closingTime).toISOString() : null,
     external_id: orderId?.trim() || null
-  }
+  };
+
+  console.log('Extracted trade data:', tradeData);
+  return tradeData;
 }

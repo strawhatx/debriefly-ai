@@ -52,12 +52,13 @@ export interface TradeData {
   side: string;
   quantity: number;
   entry_price: number | null;
+  exit_price: number | null;
   entry_date: string;
+  exit_date: string | null;
   order_type: string | null;
   stop_price: number | null;
   status: string | null;
   fees: number;
-  closing_time: string | null;
   external_id: string | null;
 }
 

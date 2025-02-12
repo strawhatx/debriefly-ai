@@ -66,10 +66,17 @@ export class Database {
   }
 
   async insertTrade(tradeData: TradeData) {
-    const { error } = await this.client
+    console.log('Inserting trade with data:', tradeData);
+    const { error, data } = await this.client
       .from('trades')
       .insert(tradeData)
+      .select()
+      .single();
 
-    if (error) throw error
+    if (error) {
+      console.error('Error inserting trade:', error);
+      throw error;
+    }
+    console.log('Trade inserted successfully:', data);
   }
 }
