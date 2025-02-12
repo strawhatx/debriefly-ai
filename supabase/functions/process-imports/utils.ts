@@ -52,7 +52,6 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
   const side = row['Side'] || row['SIDE'] || row['side'] || ''
   const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0'
   const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || row['ENTRY PRICE']|| ''
-  const exitPrice = row['Exit Price'] || row['EXIT PRICE'] || row['Close Price'] || row['CLOSE PRICE'] || null
   const entryTime = row['Placing Time'] || row['PLACING TIME'] || row['Entry Time'] || row['Time'] || row['DATE'] || new Date().toISOString()
   const closingTime = row['Closing Time'] || row['CLOSING TIME'] || row['Exit Time'] || null
   const orderType = row['Type'] || row['TYPE'] || row['ORDER TYPE'] || row['Order Type'] || null
@@ -61,15 +60,20 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
   const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0'
   const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null
 
+  // For sell orders, the fill price is actually the exit price
+  const normalizedSide = normalizeSide(side)
+  const entry_price = normalizedSide === 'sell' ? null : parseFloat(fillPrice)
+  const exit_price = normalizedSide === 'sell' ? parseFloat(fillPrice) : null
+
   return {
     user_id: userId,
     trading_account_id: accountId,
     import_id: importId,
     symbol: symbol.trim(),
-    side: normalizeSide(side),
+    side: normalizedSide,
     quantity: parseFloat(quantity),
-    entry_price: fillPrice ? parseFloat(fillPrice) : null,
-    exit_price: exitPrice ? parseFloat(exitPrice) : null,
+    entry_price,
+    exit_price,
     entry_date: new Date(entryTime).toISOString(),
     order_type: orderType?.trim() || null,
     stop_price: stopPrice ? parseFloat(stopPrice) : null,
