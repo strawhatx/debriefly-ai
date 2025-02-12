@@ -368,7 +368,20 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_matching_trades: {
+        Args: {
+          p_account_id: string
+          p_symbol: string
+          p_quantity: number
+          p_calc_method: Database["public"]["Enums"]["profit_calc_method"]
+        }
+        Returns: {
+          id: string
+          quantity: number
+          entry_price: number
+          entry_date: string
+        }[]
+      }
     }
     Enums: {
       broker_field_type: "text" | "password" | "api_key"
