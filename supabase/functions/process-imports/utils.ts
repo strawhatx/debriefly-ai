@@ -1,4 +1,3 @@
-
 import { ImportRow, TradeData } from './types.ts';
 
 export const normalizeSide = (side: string): string => {
@@ -54,7 +53,13 @@ export const parseCSVContent = (text: string): ImportRow[] => {
   return rows;
 }
 
-export const extractTradeData = (row: ImportRow, userId: string, accountId: string, importId: string): TradeData => {
+export const extractTradeData = async (
+  row: ImportRow, 
+  userId: string, 
+  accountId: string, 
+  importId: string,
+  db: any // Supabase client instance
+): Promise<TradeData> => {
   console.log('Raw row data:', row);
   
   // Extract and log each field individually
@@ -77,6 +82,54 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
   const status = row['Status'] || row['STATUS'] || null;
   const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0';
   const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null;
+
+  // Get broker's asset type configuration
+  const { data: accountData } = await db
+    .from('trading_accounts')
+    .select('broker_id')
+    .eq('id', accountId)
+    .single();
+
+  if (!accountData) {
+    throw new Error('Trading account not found');
+  }
+
+  const { data: brokerData } = await db
+    .from('brokers')
+    .select('asset_type_config')
+    .eq('id', accountData.broker_id)
+    .single();
+
+  console.log('Broker asset type config:', brokerData?.asset_type_config);
+
+  // Default values
+  let assetType = 'stock';
+  let multiplier = 1;
+
+  // Try to get asset type and multiplier from broker config
+  if (brokerData?.asset_type_config) {
+    const config = brokerData.asset_type_config[symbol.toUpperCase()];
+    if (config) {
+      assetType = config.type;
+      multiplier = config.multiplier;
+      console.log(`Found asset config for ${symbol}:`, config);
+    } else {
+      // Try to match by pattern
+      const patterns = Object.keys(brokerData.asset_type_config).filter(k => k.includes('*'));
+      for (const pattern of patterns) {
+        const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
+        if (regex.test(symbol.toUpperCase())) {
+          const config = brokerData.asset_type_config[pattern];
+          assetType = config.type;
+          multiplier = config.multiplier;
+          console.log(`Matched pattern ${pattern} for ${symbol}:`, config);
+          break;
+        }
+      }
+    }
+  }
+
+  console.log(`Using asset type: ${assetType}, multiplier: ${multiplier} for symbol: ${symbol}`);
 
   // Normalize side and calculate prices
   const normalizedSide = normalizeSide(side);
@@ -103,7 +156,9 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
     stop_price: stopPrice ? parseFloat(stopPrice) : null,
     status: status?.trim() || null,
     fees: commission ? parseFloat(commission) : 0,
-    external_id: orderId?.trim() || null
+    external_id: orderId?.trim() || null,
+    asset_type: assetType,
+    multiplier: multiplier
   };
 
   console.log('Final trade data:', tradeData);

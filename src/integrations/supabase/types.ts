@@ -62,6 +62,7 @@ export type Database = {
       }
       brokers: {
         Row: {
+          asset_type_config: Json | null
           asset_types: string[]
           broker_sync_enabled: boolean
           created_at: string
@@ -72,6 +73,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          asset_type_config?: Json | null
           asset_types?: string[]
           broker_sync_enabled?: boolean
           created_at?: string
@@ -82,6 +84,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          asset_type_config?: Json | null
           asset_types?: string[]
           broker_sync_enabled?: boolean
           created_at?: string

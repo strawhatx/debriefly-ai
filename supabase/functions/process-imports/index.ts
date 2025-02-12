@@ -66,8 +66,14 @@ serve(async (req) => {
 
         for (const row of rows) {
           try {
-            // Extract trade data
-            const tradeData = extractTradeData(row, import_.user_id, import_.trading_account_id, import_.id)
+            // Extract trade data with DB client for asset type lookup
+            const tradeData = await extractTradeData(
+              row, 
+              import_.user_id, 
+              import_.trading_account_id, 
+              import_.id,
+              db.client
+            )
 
             // Skip cancelled orders with no fill price
             if (tradeData.status?.toLowerCase() === 'cancelled' && !tradeData.entry_price) {
