@@ -173,6 +173,18 @@ export type Database = {
         }
         Relationships: []
       }
+      service_role_key: {
+        Row: {
+          decrypted_secret: string | null
+        }
+        Insert: {
+          decrypted_secret?: string | null
+        }
+        Update: {
+          decrypted_secret?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           active: boolean
