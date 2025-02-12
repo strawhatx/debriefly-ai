@@ -214,54 +214,69 @@ export type Database = {
       }
       trades: {
         Row: {
+          closing_time: string | null
           created_at: string
           entry_date: string
           entry_price: number
           exit_date: string | null
           exit_price: number | null
+          external_id: string | null
           fees: number | null
           id: string
           import_id: string | null
           notes: string | null
+          order_type: string | null
           pnl: number | null
           quantity: number
           side: string
+          status: string | null
+          stop_price: number | null
           symbol: string
           trading_account_id: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          closing_time?: string | null
           created_at?: string
           entry_date: string
           entry_price: number
           exit_date?: string | null
           exit_price?: number | null
+          external_id?: string | null
           fees?: number | null
           id?: string
           import_id?: string | null
           notes?: string | null
+          order_type?: string | null
           pnl?: number | null
           quantity: number
           side: string
+          status?: string | null
+          stop_price?: number | null
           symbol: string
           trading_account_id: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          closing_time?: string | null
           created_at?: string
           entry_date?: string
           entry_price?: number
           exit_date?: string | null
           exit_price?: number | null
+          external_id?: string | null
           fees?: number | null
           id?: string
           import_id?: string | null
           notes?: string | null
+          order_type?: string | null
           pnl?: number | null
           quantity?: number
           side?: string
+          status?: string | null
+          stop_price?: number | null
           symbol?: string
           trading_account_id?: string
           updated_at?: string

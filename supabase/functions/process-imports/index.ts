@@ -97,26 +97,64 @@ serve(async (req) => {
 
         // Parse CSV data
         const text = await fileData.text()
-        console.log('CSV content preview:', text.substring(0, 200)) // Log first 200 chars of CSV
+        console.log('CSV content preview:', text.substring(0, 200))
 
-        // First, parse the header row to understand the column structure
+        // Parse header row
         const lines = text.trim().split('\n')
         const headerRow = lines[0].split(',')
         console.log('CSV Headers:', headerRow)
 
-        // Find the indices of required columns
+        // Find indices of all possible columns
         const columnIndices = {
-          date: headerRow.findIndex(col => col.toLowerCase().includes('date')),
           symbol: headerRow.findIndex(col => col.toLowerCase().includes('symbol')),
-          side: headerRow.findIndex(col => col.toLowerCase().includes('side') || col.toLowerCase().includes('type')),
-          quantity: headerRow.findIndex(col => col.toLowerCase().includes('quantity') || col.toLowerCase().includes('size')),
-          price: headerRow.findIndex(col => col.toLowerCase().includes('price'))
+          side: headerRow.findIndex(col => 
+            col.toLowerCase().includes('side') || 
+            col.toLowerCase().includes('direction') ||
+            col.toLowerCase().includes('buy/sell')
+          ),
+          orderType: headerRow.findIndex(col => 
+            col.toLowerCase().includes('type') || 
+            col.toLowerCase().includes('order type')
+          ),
+          quantity: headerRow.findIndex(col => 
+            col.toLowerCase().includes('quantity') || 
+            col.toLowerCase().includes('size') ||
+            col.toLowerCase().includes('amount')
+          ),
+          stopPrice: headerRow.findIndex(col => 
+            col.toLowerCase().includes('stop') || 
+            col.toLowerCase().includes('exit price')
+          ),
+          fillPrice: headerRow.findIndex(col => 
+            col.toLowerCase().includes('fill') || 
+            col.toLowerCase().includes('entry price') ||
+            col.toLowerCase().includes('execution price')
+          ),
+          status: headerRow.findIndex(col => col.toLowerCase().includes('status')),
+          commission: headerRow.findIndex(col => 
+            col.toLowerCase().includes('commission') || 
+            col.toLowerCase().includes('fee')
+          ),
+          closingTime: headerRow.findIndex(col => 
+            col.toLowerCase().includes('closing') || 
+            col.toLowerCase().includes('exit time') ||
+            col.toLowerCase().includes('close time')
+          ),
+          entryTime: headerRow.findIndex(col => 
+            col.toLowerCase().includes('entry time') ||
+            col.toLowerCase().includes('open time') ||
+            col.toLowerCase().includes('date')
+          ),
+          externalId: headerRow.findIndex(col => 
+            col.toLowerCase().includes('id') || 
+            col.toLowerCase().includes('trade id') ||
+            col.toLowerCase().includes('order id')
+          ),
         }
 
-        // Validate that we found all required columns
-        const missingColumns = Object.entries(columnIndices)
-          .filter(([_, index]) => index === -1)
-          .map(([col]) => col)
+        // Required columns
+        const requiredColumns = ['symbol', 'side', 'quantity', 'fillPrice', 'entryTime']
+        const missingColumns = requiredColumns.filter(col => columnIndices[col] === -1)
 
         if (missingColumns.length > 0) {
           throw new Error(`Required columns missing: ${missingColumns.join(', ')}`)
@@ -124,30 +162,52 @@ serve(async (req) => {
 
         console.log('Column mappings:', columnIndices)
 
-        // Parse the CSV with the correct column mapping
+        // Parse CSV
         const rows = await csv.parse(text, {
           skipFirstRow: true,
         })
 
         console.log(`Found ${rows.length} trades to process`)
         if (rows.length > 0) {
-          console.log('Sample row:', rows[0]) // Log first row for debugging
+          console.log('Sample row:', rows[0])
         }
 
-        // Process each row and insert into trades table
+        // Process rows
         for (const row of rows) {
+          const tradeData = {
+            user_id: import_.user_id,
+            trading_account_id: import_.trading_account_id,
+            import_id: import_.id,
+            symbol: row[columnIndices.symbol],
+            side: row[columnIndices.side].toLowerCase(),
+            quantity: parseFloat(row[columnIndices.quantity]),
+            entry_price: parseFloat(row[columnIndices.fillPrice]),
+            entry_date: new Date(row[columnIndices.entryTime]).toISOString(),
+          }
+
+          // Add optional fields if they exist
+          if (columnIndices.orderType !== -1) {
+            tradeData.order_type = row[columnIndices.orderType]
+          }
+          if (columnIndices.stopPrice !== -1) {
+            tradeData.stop_price = parseFloat(row[columnIndices.stopPrice])
+          }
+          if (columnIndices.status !== -1) {
+            tradeData.status = row[columnIndices.status]
+          }
+          if (columnIndices.commission !== -1) {
+            tradeData.fees = parseFloat(row[columnIndices.commission])
+          }
+          if (columnIndices.closingTime !== -1) {
+            tradeData.closing_time = new Date(row[columnIndices.closingTime]).toISOString()
+          }
+          if (columnIndices.externalId !== -1) {
+            tradeData.external_id = row[columnIndices.externalId]
+          }
+
           const { error: insertError } = await supabase
             .from('trades')
-            .insert({
-              user_id: import_.user_id,
-              trading_account_id: import_.trading_account_id,
-              import_id: import_.id,
-              entry_date: new Date(row[columnIndices.date]).toISOString(),
-              symbol: row[columnIndices.symbol],
-              side: row[columnIndices.side].toLowerCase(),
-              quantity: parseFloat(row[columnIndices.quantity]),
-              entry_price: parseFloat(row[columnIndices.price])
-            })
+            .insert(tradeData)
 
           if (insertError) {
             console.error('Error inserting trade:', insertError, 'Row data:', row)
