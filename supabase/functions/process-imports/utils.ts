@@ -82,19 +82,8 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
   const normalizedSide = normalizeSide(side);
   console.log('Normalized side:', normalizedSide);
   
-  let entry_price = null;
-  let exit_price = null;
-  
-  const parsedFillPrice = fillPrice ? parseFloat(fillPrice) : null;
-  console.log('Parsed fill price:', parsedFillPrice);
-  
-  if (parsedFillPrice !== null) {
-    if (normalizedSide === 'buy') {
-      entry_price = parsedFillPrice;
-    } else {
-      exit_price = parsedFillPrice;
-    }
-  }
+  let entry_price = fillPrice ? parseFloat(fillPrice) : null;
+  let exit_price = stopPrice ? parseFloat(stopPrice) : null;
   
   console.log('Calculated entry_price:', entry_price);
   console.log('Calculated exit_price:', exit_price);
