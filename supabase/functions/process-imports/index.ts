@@ -41,14 +41,14 @@ serve(async (req) => {
           broker_id
         )
       `)
-      .eq('status', 'pending')
+      .eq('status', 'uploaded')
 
     if (importId) {
       query.eq('id', importId)
     }
 
     const { data: imports, error: fetchError } = await query
-    console.log('Fetch response:', { data: imports, error: fetchError })
+    console.log('Fetch response:', { data: imports?.length, error: fetchError })
 
     if (fetchError) {
       console.error('Error fetching imports:', fetchError)
