@@ -185,46 +185,73 @@ serve(async (req) => {
           console.log('Sample row:', rows[0])
         }
 
+        // Function to normalize trade side
+        const normalizeSide = (side: string): string => {
+          const normalized = side.toLowerCase().trim()
+          if (normalized.includes('buy') || normalized === 'b') return 'buy'
+          if (normalized.includes('sell') || normalized === 's') return 'sell'
+          throw new Error(`Invalid trade side: ${side}`)
+        }
+
         // Process rows
         for (const row of rows) {
-          const tradeData = {
-            user_id: import_.user_id,
-            trading_account_id: import_.trading_account_id,
-            import_id: import_.id,
-            symbol: row[columnIndices.symbol]?.trim() || '',
-            side: (row[columnIndices.side] || '').toLowerCase().trim(),
-            quantity: parseFloat(row[columnIndices.quantity] || '0'),
-            entry_price: parseFloat(row[columnIndices.fillPrice] || '0'),
-            entry_date: new Date(row[columnIndices.entryTime] || new Date()).toISOString(),
+          const rawSide = row[columnIndices.side]
+          if (!rawSide) {
+            console.error('Missing side value for row:', row)
+            continue
           }
 
-          // Add optional fields if they exist and have values
-          if (columnIndices.orderType !== -1 && row[columnIndices.orderType]) {
-            tradeData.order_type = row[columnIndices.orderType].trim()
-          }
-          if (columnIndices.stopPrice !== -1 && row[columnIndices.stopPrice]) {
-            tradeData.stop_price = parseFloat(row[columnIndices.stopPrice])
-          }
-          if (columnIndices.status !== -1 && row[columnIndices.status]) {
-            tradeData.status = row[columnIndices.status].trim()
-          }
-          if (columnIndices.commission !== -1 && row[columnIndices.commission]) {
-            tradeData.fees = parseFloat(row[columnIndices.commission])
-          }
-          if (columnIndices.closingTime !== -1 && row[columnIndices.closingTime]) {
-            tradeData.closing_time = new Date(row[columnIndices.closingTime]).toISOString()
-          }
-          if (columnIndices.externalId !== -1 && row[columnIndices.externalId]) {
-            tradeData.external_id = row[columnIndices.externalId].trim()
-          }
+          try {
+            const tradeData = {
+              user_id: import_.user_id,
+              trading_account_id: import_.trading_account_id,
+              import_id: import_.id,
+              symbol: (row[columnIndices.symbol] || '').trim(),
+              side: normalizeSide(rawSide),
+              quantity: parseFloat(row[columnIndices.quantity] || '0'),
+              entry_price: parseFloat(row[columnIndices.fillPrice] || '0'),
+              entry_date: new Date(row[columnIndices.entryTime] || new Date()).toISOString(),
+            }
 
-          const { error: insertError } = await supabase
-            .from('trades')
-            .insert(tradeData)
+            // Validate required fields
+            if (!tradeData.symbol || !tradeData.quantity || !tradeData.entry_price) {
+              console.error('Missing required fields:', { row, tradeData })
+              continue
+            }
 
-          if (insertError) {
-            console.error('Error inserting trade:', insertError, 'Row data:', row)
-            throw new Error(`Error inserting trade: ${insertError.message}`)
+            // Add optional fields if they exist and have values
+            if (columnIndices.orderType !== -1 && row[columnIndices.orderType]) {
+              tradeData.order_type = row[columnIndices.orderType].trim()
+            }
+            if (columnIndices.stopPrice !== -1 && row[columnIndices.stopPrice]) {
+              tradeData.stop_price = parseFloat(row[columnIndices.stopPrice])
+            }
+            if (columnIndices.status !== -1 && row[columnIndices.status]) {
+              tradeData.status = row[columnIndices.status].trim()
+            }
+            if (columnIndices.commission !== -1 && row[columnIndices.commission]) {
+              tradeData.fees = parseFloat(row[columnIndices.commission])
+            }
+            if (columnIndices.closingTime !== -1 && row[columnIndices.closingTime]) {
+              tradeData.closing_time = new Date(row[columnIndices.closingTime]).toISOString()
+            }
+            if (columnIndices.externalId !== -1 && row[columnIndices.externalId]) {
+              tradeData.external_id = row[columnIndices.externalId].trim()
+            }
+
+            console.log('Inserting trade:', tradeData)
+
+            const { error: insertError } = await supabase
+              .from('trades')
+              .insert(tradeData)
+
+            if (insertError) {
+              console.error('Error inserting trade:', insertError, 'Row data:', row)
+              throw new Error(`Error inserting trade: ${insertError.message}`)
+            }
+          } catch (error) {
+            console.error('Error processing row:', error, row)
+            continue // Continue with next row instead of failing entire import
           }
         }
 
