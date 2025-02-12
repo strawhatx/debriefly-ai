@@ -214,6 +214,7 @@ export type Database = {
       }
       trades: {
         Row: {
+          asset_type: Database["public"]["Enums"]["asset_type"] | null
           closing_time: string | null
           created_at: string
           entry_date: string
@@ -224,6 +225,7 @@ export type Database = {
           fees: number | null
           id: string
           import_id: string | null
+          multiplier: number | null
           notes: string | null
           order_type: string | null
           pnl: number | null
@@ -237,6 +239,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          asset_type?: Database["public"]["Enums"]["asset_type"] | null
           closing_time?: string | null
           created_at?: string
           entry_date: string
@@ -247,6 +250,7 @@ export type Database = {
           fees?: number | null
           id?: string
           import_id?: string | null
+          multiplier?: number | null
           notes?: string | null
           order_type?: string | null
           pnl?: number | null
@@ -260,6 +264,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          asset_type?: Database["public"]["Enums"]["asset_type"] | null
           closing_time?: string | null
           created_at?: string
           entry_date?: string
@@ -270,6 +275,7 @@ export type Database = {
           fees?: number | null
           id?: string
           import_id?: string | null
+          multiplier?: number | null
           notes?: string | null
           order_type?: string | null
           pnl?: number | null
@@ -384,6 +390,7 @@ export type Database = {
       }
     }
     Enums: {
+      asset_type: "stock" | "option" | "future" | "forex" | "crypto"
       broker_field_type: "text" | "password" | "api_key"
       profit_calc_method: "FIFO" | "LIFO"
       subscription_tier: "free" | "premium"
