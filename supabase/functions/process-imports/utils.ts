@@ -1,3 +1,4 @@
+
 import { ImportRow, TradeData } from './types.ts';
 
 export const normalizeSide = (side: string): string => {
@@ -83,51 +84,16 @@ export const extractTradeData = async (
   const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0';
   const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null;
 
-  // Get broker's asset type configuration
-  const { data: accountData } = await db
-    .from('trading_accounts')
-    .select('broker_id')
-    .eq('id', accountId)
+  // Look up symbol configuration
+  const { data: symbolConfig } = await db
+    .from('symbol_configs')
+    .select('asset_type, multiplier')
+    .eq('symbol', symbol.toUpperCase())
     .single();
 
-  if (!accountData) {
-    throw new Error('Trading account not found');
-  }
-
-  const { data: brokerData } = await db
-    .from('brokers')
-    .select('asset_type_config')
-    .eq('id', accountData.broker_id)
-    .single();
-
-  console.log('Broker asset type config:', brokerData?.asset_type_config);
-
-  // Default values
-  let assetType = 'stock';
-  let multiplier = 1;
-
-  // Try to get asset type and multiplier from broker config
-  if (brokerData?.asset_type_config) {
-    const config = brokerData.asset_type_config[symbol.toUpperCase()];
-    if (config) {
-      assetType = config.type;
-      multiplier = config.multiplier;
-      console.log(`Found asset config for ${symbol}:`, config);
-    } else {
-      // Try to match by pattern
-      const patterns = Object.keys(brokerData.asset_type_config).filter(k => k.includes('*'));
-      for (const pattern of patterns) {
-        const regex = new RegExp('^' + pattern.replace('*', '.*') + '$');
-        if (regex.test(symbol.toUpperCase())) {
-          const config = brokerData.asset_type_config[pattern];
-          assetType = config.type;
-          multiplier = config.multiplier;
-          console.log(`Matched pattern ${pattern} for ${symbol}:`, config);
-          break;
-        }
-      }
-    }
-  }
+  // Default values if no config found
+  const assetType = symbolConfig?.asset_type || 'stock';
+  const multiplier = symbolConfig?.multiplier || 1;
 
   console.log(`Using asset type: ${assetType}, multiplier: ${multiplier} for symbol: ${symbol}`);
 
@@ -145,7 +111,7 @@ export const extractTradeData = async (
     user_id: userId,
     trading_account_id: accountId,
     import_id: importId,
-    symbol: symbol.trim(),
+    symbol: symbol.trim().toUpperCase(),
     side: normalizedSide,
     quantity: parseFloat(quantity),
     entry_price,

@@ -62,7 +62,6 @@ export type Database = {
       }
       brokers: {
         Row: {
-          asset_type_config: Json | null
           asset_types: string[]
           broker_sync_enabled: boolean
           created_at: string
@@ -73,7 +72,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          asset_type_config?: Json | null
           asset_types?: string[]
           broker_sync_enabled?: boolean
           created_at?: string
@@ -84,7 +82,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          asset_type_config?: Json | null
           asset_types?: string[]
           broker_sync_enabled?: boolean
           created_at?: string
@@ -212,6 +209,33 @@ export type Database = {
           tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      symbol_configs: {
+        Row: {
+          asset_type: Database["public"]["Enums"]["asset_type"]
+          created_at: string
+          id: string
+          multiplier: number
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string
+          id?: string
+          multiplier?: number
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          asset_type?: Database["public"]["Enums"]["asset_type"]
+          created_at?: string
+          id?: string
+          multiplier?: number
+          symbol?: string
+          updated_at?: string
         }
         Relationships: []
       }
