@@ -106,20 +106,26 @@ serve(async (req) => {
 
         // Find indices of all possible columns
         const columnIndices = {
-          symbol: headerRow.findIndex(col => col.toLowerCase().includes('symbol')),
+          symbol: headerRow.findIndex(col => 
+            col.toLowerCase().includes('symbol') ||
+            col.toLowerCase().includes('ticker')
+          ),
           side: headerRow.findIndex(col => 
             col.toLowerCase().includes('side') || 
             col.toLowerCase().includes('direction') ||
-            col.toLowerCase().includes('buy/sell')
+            col.toLowerCase().includes('buy/sell') ||
+            col.toLowerCase().includes('type')
           ),
           orderType: headerRow.findIndex(col => 
-            col.toLowerCase().includes('type') || 
-            col.toLowerCase().includes('order type')
+            col.toLowerCase().includes('order type') ||
+            col.toLowerCase().includes('order_type')
           ),
           quantity: headerRow.findIndex(col => 
             col.toLowerCase().includes('quantity') || 
             col.toLowerCase().includes('size') ||
-            col.toLowerCase().includes('amount')
+            col.toLowerCase().includes('amount') ||
+            col.toLowerCase().includes('qty') ||
+            col.toLowerCase().includes('volume')
           ),
           stopPrice: headerRow.findIndex(col => 
             col.toLowerCase().includes('stop') || 
@@ -128,7 +134,8 @@ serve(async (req) => {
           fillPrice: headerRow.findIndex(col => 
             col.toLowerCase().includes('fill') || 
             col.toLowerCase().includes('entry price') ||
-            col.toLowerCase().includes('execution price')
+            col.toLowerCase().includes('execution price') ||
+            col.toLowerCase().includes('price')
           ),
           status: headerRow.findIndex(col => col.toLowerCase().includes('status')),
           commission: headerRow.findIndex(col => 
@@ -143,7 +150,9 @@ serve(async (req) => {
           entryTime: headerRow.findIndex(col => 
             col.toLowerCase().includes('entry time') ||
             col.toLowerCase().includes('open time') ||
-            col.toLowerCase().includes('date')
+            col.toLowerCase().includes('date') ||
+            col.toLowerCase().includes('time') ||
+            col.toLowerCase().includes('placing time')
           ),
           externalId: headerRow.findIndex(col => 
             col.toLowerCase().includes('id') || 
@@ -151,6 +160,10 @@ serve(async (req) => {
             col.toLowerCase().includes('order id')
           ),
         }
+
+        // Log found column indices for debugging
+        console.log('Found column indices:', columnIndices)
+        console.log('Header row for reference:', headerRow)
 
         // Required columns
         const requiredColumns = ['symbol', 'side', 'quantity', 'fillPrice', 'entryTime']
