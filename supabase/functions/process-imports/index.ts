@@ -151,7 +151,7 @@ serve(async (req) => {
             const symbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || ''
             const side = row['Side'] || row['SIDE'] || row['side'] || row['Type'] || row['TYPE'] || ''
             const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0'
-            const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || '0'
+            const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || ''
             const entryTime = row['Placing Time'] || row['PLACING TIME'] || row['Entry Time'] || row['Time'] || row['DATE'] || new Date().toISOString()
             const closingTime = row['Closing Time'] || row['CLOSING TIME'] || row['Exit Time'] || null
             const orderType = row['Type'] || row['ORDER TYPE'] || row['Order Type'] || null
@@ -160,12 +160,19 @@ serve(async (req) => {
             const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0'
             const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null
 
+            // Skip cancelled orders with no fill price
+            if (status?.toLowerCase() === 'cancelled' && !fillPrice) {
+              console.log('Skipping cancelled order with no fill price:', { orderId, symbol })
+              continue
+            }
+
             console.log('Processing row:', {
               symbol,
               side,
               quantity,
               fillPrice,
-              entryTime
+              entryTime,
+              status
             })
 
             const tradeData = {
@@ -175,19 +182,24 @@ serve(async (req) => {
               symbol: symbol.trim(),
               side: normalizeSide(side),
               quantity: parseFloat(quantity),
-              entry_price: parseFloat(fillPrice),
+              entry_price: fillPrice ? parseFloat(fillPrice) : null,
               entry_date: new Date(entryTime).toISOString(),
               order_type: orderType?.trim() || null,
               stop_price: stopPrice ? parseFloat(stopPrice) : null,
               status: status?.trim() || null,
-              fees: parseFloat(commission),
+              fees: commission ? parseFloat(commission) : 0,
               closing_time: closingTime ? new Date(closingTime).toISOString() : null,
               external_id: orderId?.trim() || null
             }
 
-            // Validate required fields
+            // Skip orders with missing required fields
             if (!tradeData.symbol || !tradeData.quantity || !tradeData.entry_price) {
-              console.error('Missing required fields:', { row, tradeData })
+              console.log('Skipping trade with missing required fields:', { 
+                symbol: tradeData.symbol, 
+                quantity: tradeData.quantity, 
+                entry_price: tradeData.entry_price,
+                status: tradeData.status 
+              })
               continue
             }
 
