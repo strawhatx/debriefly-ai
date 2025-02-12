@@ -145,6 +145,10 @@ serve(async (req) => {
         }
 
         // Process rows
+        let processedCount = 0;
+        let skippedCount = 0;
+        let duplicateCount = 0;
+
         for (const row of rows) {
           try {
             // Try different possible column names for each field
@@ -163,6 +167,7 @@ serve(async (req) => {
             // Skip cancelled orders with no fill price
             if (status?.toLowerCase() === 'cancelled' && !fillPrice) {
               console.log('Skipping cancelled order with no fill price:', { orderId, symbol })
+              skippedCount++;
               continue
             }
 
@@ -200,11 +205,28 @@ serve(async (req) => {
                 entry_price: tradeData.entry_price,
                 status: tradeData.status 
               })
+              skippedCount++;
               continue
             }
 
-            console.log('Inserting trade:', tradeData)
+            // Check if trade already exists
+            const { data: existingTrade } = await supabase
+              .from('trades')
+              .select('id')
+              .eq('trading_account_id', tradeData.trading_account_id)
+              .eq('external_id', tradeData.external_id)
+              .single()
 
+            if (existingTrade) {
+              console.log('Skipping duplicate trade:', { 
+                external_id: tradeData.external_id, 
+                symbol: tradeData.symbol 
+              })
+              duplicateCount++;
+              continue
+            }
+
+            // Insert trade
             const { error: insertError } = await supabase
               .from('trades')
               .insert(tradeData)
@@ -213,18 +235,23 @@ serve(async (req) => {
               console.error('Error inserting trade:', insertError, 'Row data:', row)
               throw new Error(`Error inserting trade: ${insertError.message}`)
             }
+
+            processedCount++;
           } catch (error) {
             console.error('Error processing row:', error, row)
+            skippedCount++;
             continue // Continue with next row instead of failing entire import
           }
         }
 
-        // Update import status to completed
+        // Update import status to completed with summary
         console.log(`Completing import ${import_.id}`)
+        const summary = `Processed: ${processedCount}, Skipped: ${skippedCount}, Duplicates: ${duplicateCount}`
         const { error: completeError } = await supabase
           .from('imports')
           .update({ 
             status: 'completed',
+            error_message: summary,
             updated_at: new Date().toISOString()
           })
           .eq('id', import_.id)
@@ -234,7 +261,7 @@ serve(async (req) => {
           throw new Error(`Error completing import: ${completeError.message}`)
         }
 
-        console.log(`Successfully processed import ${import_.id}`)
+        console.log(`Successfully processed import ${import_.id}:`, summary)
       } catch (error) {
         console.error(`Error processing import ${import_.id}:`, error)
         
