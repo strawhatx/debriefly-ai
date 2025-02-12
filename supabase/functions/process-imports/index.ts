@@ -98,14 +98,41 @@ serve(async (req) => {
         // Parse CSV data
         const text = await fileData.text()
         console.log('CSV content preview:', text.substring(0, 200)) // Log first 200 chars of CSV
-        console.log('Parsing CSV data')
+
+        // First, parse the header row to understand the column structure
+        const lines = text.trim().split('\n')
+        const headerRow = lines[0].split(',')
+        console.log('CSV Headers:', headerRow)
+
+        // Find the indices of required columns
+        const columnIndices = {
+          date: headerRow.findIndex(col => col.toLowerCase().includes('date')),
+          symbol: headerRow.findIndex(col => col.toLowerCase().includes('symbol')),
+          side: headerRow.findIndex(col => col.toLowerCase().includes('side') || col.toLowerCase().includes('type')),
+          quantity: headerRow.findIndex(col => col.toLowerCase().includes('quantity') || col.toLowerCase().includes('size')),
+          price: headerRow.findIndex(col => col.toLowerCase().includes('price'))
+        }
+
+        // Validate that we found all required columns
+        const missingColumns = Object.entries(columnIndices)
+          .filter(([_, index]) => index === -1)
+          .map(([col]) => col)
+
+        if (missingColumns.length > 0) {
+          throw new Error(`Required columns missing: ${missingColumns.join(', ')}`)
+        }
+
+        console.log('Column mappings:', columnIndices)
+
+        // Parse the CSV with the correct column mapping
         const rows = await csv.parse(text, {
           skipFirstRow: true,
-          columns: ['date', 'symbol', 'side', 'quantity', 'price']
         })
 
         console.log(`Found ${rows.length} trades to process`)
-        console.log('Sample row:', rows[0]) // Log first row for debugging
+        if (rows.length > 0) {
+          console.log('Sample row:', rows[0]) // Log first row for debugging
+        }
 
         // Process each row and insert into trades table
         for (const row of rows) {
@@ -115,11 +142,11 @@ serve(async (req) => {
               user_id: import_.user_id,
               trading_account_id: import_.trading_account_id,
               import_id: import_.id,
-              entry_date: new Date(row.date).toISOString(),
-              symbol: row.symbol,
-              side: row.side.toLowerCase(),
-              quantity: parseFloat(row.quantity),
-              entry_price: parseFloat(row.price)
+              entry_date: new Date(row[columnIndices.date]).toISOString(),
+              symbol: row[columnIndices.symbol],
+              side: row[columnIndices.side].toLowerCase(),
+              quantity: parseFloat(row[columnIndices.quantity]),
+              entry_price: parseFloat(row[columnIndices.price])
             })
 
           if (insertError) {
