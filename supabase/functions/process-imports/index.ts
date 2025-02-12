@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import * as csv from 'https://deno.land/std@0.168.0/encoding/csv.ts'
@@ -97,18 +98,42 @@ serve(async (req) => {
         const text = await fileData.text()
         console.log('CSV content preview:', text.substring(0, 200))
 
-        // Parse CSV with column headers
-        const { data: rows, error: parseError } = await csv.parse(text, {
-          skipFirstRow: false,
-          columns: true  // This will use the first row as column headers
-        })
-
-        if (parseError) {
-          console.error('Error parsing CSV:', parseError)
-          throw new Error(`Error parsing CSV: ${parseError.message}`)
+        // Split the text into lines and remove empty lines
+        const lines = text.split('\n').filter(line => line.trim());
+        if (lines.length === 0) {
+          throw new Error('CSV file is empty');
         }
 
-        console.log('First row sample:', rows[0])
+        // Parse header row to get column names
+        const headers = lines[0].split(',').map(header => header.trim());
+        console.log('CSV Headers:', headers);
+
+        // Parse the remaining lines
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          // Split the line by comma, but handle quoted values
+          const values = line.match(/(?:^|,)("(?:[^"]*"")*[^"]*"|[^,]*)/g)
+            ?.map(value => {
+              // Remove leading comma if present
+              value = value.startsWith(',') ? value.slice(1) : value;
+              // Remove quotes and trim
+              return value.startsWith('"') && value.endsWith('"') 
+                ? value.slice(1, -1).trim().replace(/""/g, '"')
+                : value.trim();
+            }) || [];
+
+          // Create an object mapping headers to values
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index] || '';
+          });
+          rows.push(row);
+        }
+
+        console.log('First row sample:', rows[0]);
 
         // Function to normalize trade side
         const normalizeSide = (side: string): string => {
