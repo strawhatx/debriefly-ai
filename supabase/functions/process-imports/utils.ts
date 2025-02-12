@@ -52,6 +52,7 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
   const side = row['Side'] || row['SIDE'] || row['side'] || ''
   const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0'
   const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || row['ENTRY PRICE']|| ''
+  const exitPrice = row['Exit Price'] || row['EXIT PRICE'] || row['Close Price'] || row['CLOSE PRICE'] || null
   const entryTime = row['Placing Time'] || row['PLACING TIME'] || row['Entry Time'] || row['Time'] || row['DATE'] || new Date().toISOString()
   const closingTime = row['Closing Time'] || row['CLOSING TIME'] || row['Exit Time'] || null
   const orderType = row['Type'] || row['TYPE'] || row['ORDER TYPE'] || row['Order Type'] || null
@@ -68,12 +69,13 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
     side: normalizeSide(side),
     quantity: parseFloat(quantity),
     entry_price: fillPrice ? parseFloat(fillPrice) : null,
+    exit_price: exitPrice ? parseFloat(exitPrice) : null,
     entry_date: new Date(entryTime).toISOString(),
     order_type: orderType?.trim() || null,
     stop_price: stopPrice ? parseFloat(stopPrice) : null,
     status: status?.trim() || null,
     fees: commission ? parseFloat(commission) : 0,
-    closing_time: closingTime ? new Date(closingTime).toISOString() : null,
+    exit_date: closingTime ? new Date(closingTime).toISOString() : null,
     external_id: orderId?.trim() || null
   }
 }
