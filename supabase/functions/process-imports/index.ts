@@ -107,57 +107,57 @@ serve(async (req) => {
         // Find indices of all possible columns
         const columnIndices = {
           symbol: headerRow.findIndex(col => 
-            col.toLowerCase().includes('symbol') ||
-            col.toLowerCase().includes('ticker')
+            col?.toLowerCase?.()?.includes('symbol') ||
+            col?.toLowerCase?.()?.includes('ticker')
           ),
           side: headerRow.findIndex(col => 
-            col.toLowerCase().includes('side') || 
-            col.toLowerCase().includes('direction') ||
-            col.toLowerCase().includes('buy/sell') ||
-            col.toLowerCase().includes('type')
+            col?.toLowerCase?.()?.includes('side') || 
+            col?.toLowerCase?.()?.includes('direction') ||
+            col?.toLowerCase?.()?.includes('buy/sell') ||
+            col?.toLowerCase?.()?.includes('type')
           ),
           orderType: headerRow.findIndex(col => 
-            col.toLowerCase().includes('order type') ||
-            col.toLowerCase().includes('order_type')
+            col?.toLowerCase?.()?.includes('order type') ||
+            col?.toLowerCase?.()?.includes('order_type')
           ),
           quantity: headerRow.findIndex(col => 
-            col.toLowerCase().includes('quantity') || 
-            col.toLowerCase().includes('size') ||
-            col.toLowerCase().includes('amount') ||
-            col.toLowerCase().includes('qty') ||
-            col.toLowerCase().includes('volume')
+            col?.toLowerCase?.()?.includes('quantity') || 
+            col?.toLowerCase?.()?.includes('size') ||
+            col?.toLowerCase?.()?.includes('amount') ||
+            col?.toLowerCase?.()?.includes('qty') ||
+            col?.toLowerCase?.()?.includes('volume')
           ),
           stopPrice: headerRow.findIndex(col => 
-            col.toLowerCase().includes('stop') || 
-            col.toLowerCase().includes('exit price')
+            col?.toLowerCase?.()?.includes('stop') || 
+            col?.toLowerCase?.()?.includes('exit price')
           ),
           fillPrice: headerRow.findIndex(col => 
-            col.toLowerCase().includes('fill') || 
-            col.toLowerCase().includes('entry price') ||
-            col.toLowerCase().includes('execution price') ||
-            col.toLowerCase().includes('price')
+            col?.toLowerCase?.()?.includes('fill') || 
+            col?.toLowerCase?.()?.includes('entry price') ||
+            col?.toLowerCase?.()?.includes('execution price') ||
+            col?.toLowerCase?.()?.includes('price')
           ),
-          status: headerRow.findIndex(col => col.toLowerCase().includes('status')),
+          status: headerRow.findIndex(col => col?.toLowerCase?.()?.includes('status')),
           commission: headerRow.findIndex(col => 
-            col.toLowerCase().includes('commission') || 
-            col.toLowerCase().includes('fee')
+            col?.toLowerCase?.()?.includes('commission') || 
+            col?.toLowerCase?.()?.includes('fee')
           ),
           closingTime: headerRow.findIndex(col => 
-            col.toLowerCase().includes('closing') || 
-            col.toLowerCase().includes('exit time') ||
-            col.toLowerCase().includes('close time')
+            col?.toLowerCase?.()?.includes('closing') || 
+            col?.toLowerCase?.()?.includes('exit time') ||
+            col?.toLowerCase?.()?.includes('close time')
           ),
           entryTime: headerRow.findIndex(col => 
-            col.toLowerCase().includes('entry time') ||
-            col.toLowerCase().includes('open time') ||
-            col.toLowerCase().includes('date') ||
-            col.toLowerCase().includes('time') ||
-            col.toLowerCase().includes('placing time')
+            col?.toLowerCase?.()?.includes('entry time') ||
+            col?.toLowerCase?.()?.includes('open time') ||
+            col?.toLowerCase?.()?.includes('date') ||
+            col?.toLowerCase?.()?.includes('time') ||
+            col?.toLowerCase?.()?.includes('placing time')
           ),
           externalId: headerRow.findIndex(col => 
-            col.toLowerCase().includes('id') || 
-            col.toLowerCase().includes('trade id') ||
-            col.toLowerCase().includes('order id')
+            col?.toLowerCase?.()?.includes('id') || 
+            col?.toLowerCase?.()?.includes('trade id') ||
+            col?.toLowerCase?.()?.includes('order id')
           ),
         }
 
@@ -191,31 +191,31 @@ serve(async (req) => {
             user_id: import_.user_id,
             trading_account_id: import_.trading_account_id,
             import_id: import_.id,
-            symbol: row[columnIndices.symbol],
-            side: row[columnIndices.side].toLowerCase(),
-            quantity: parseFloat(row[columnIndices.quantity]),
-            entry_price: parseFloat(row[columnIndices.fillPrice]),
-            entry_date: new Date(row[columnIndices.entryTime]).toISOString(),
+            symbol: row[columnIndices.symbol]?.trim() || '',
+            side: (row[columnIndices.side] || '').toLowerCase().trim(),
+            quantity: parseFloat(row[columnIndices.quantity] || '0'),
+            entry_price: parseFloat(row[columnIndices.fillPrice] || '0'),
+            entry_date: new Date(row[columnIndices.entryTime] || new Date()).toISOString(),
           }
 
-          // Add optional fields if they exist
-          if (columnIndices.orderType !== -1) {
-            tradeData.order_type = row[columnIndices.orderType]
+          // Add optional fields if they exist and have values
+          if (columnIndices.orderType !== -1 && row[columnIndices.orderType]) {
+            tradeData.order_type = row[columnIndices.orderType].trim()
           }
-          if (columnIndices.stopPrice !== -1) {
+          if (columnIndices.stopPrice !== -1 && row[columnIndices.stopPrice]) {
             tradeData.stop_price = parseFloat(row[columnIndices.stopPrice])
           }
-          if (columnIndices.status !== -1) {
-            tradeData.status = row[columnIndices.status]
+          if (columnIndices.status !== -1 && row[columnIndices.status]) {
+            tradeData.status = row[columnIndices.status].trim()
           }
-          if (columnIndices.commission !== -1) {
+          if (columnIndices.commission !== -1 && row[columnIndices.commission]) {
             tradeData.fees = parseFloat(row[columnIndices.commission])
           }
-          if (columnIndices.closingTime !== -1) {
+          if (columnIndices.closingTime !== -1 && row[columnIndices.closingTime]) {
             tradeData.closing_time = new Date(row[columnIndices.closingTime]).toISOString()
           }
-          if (columnIndices.externalId !== -1) {
-            tradeData.external_id = row[columnIndices.externalId]
+          if (columnIndices.externalId !== -1 && row[columnIndices.externalId]) {
+            tradeData.external_id = row[columnIndices.externalId].trim()
           }
 
           const { error: insertError } = await supabase
