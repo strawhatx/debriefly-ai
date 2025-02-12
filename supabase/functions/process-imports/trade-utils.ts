@@ -43,7 +43,6 @@ export const normalizeLeverage = (leverageStr: string | number): number => {
   return 50;
 };
 
-
 const isNullOrEmpty = (str: string): boolean => {
   return str === null || str.length === 0;
 }
