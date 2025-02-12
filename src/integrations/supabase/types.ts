@@ -260,7 +260,6 @@ export type Database = {
           quantity: number
           side: string
           status: string | null
-          stop_price: number | null
           symbol: string
           trading_account_id: string
           updated_at: string
@@ -286,7 +285,6 @@ export type Database = {
           quantity: number
           side: string
           status?: string | null
-          stop_price?: number | null
           symbol: string
           trading_account_id: string
           updated_at?: string
@@ -312,7 +310,6 @@ export type Database = {
           quantity?: number
           side?: string
           status?: string | null
-          stop_price?: number | null
           symbol?: string
           trading_account_id?: string
           updated_at?: string
