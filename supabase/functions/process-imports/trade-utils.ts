@@ -26,9 +26,9 @@ export const normalizeLeverage = (leverageStr: string | number): number => {
   if (typeof leverageStr === 'number') return leverageStr;
   
   // Handle "X:1" format
-  const match = leverageStr.match(/^(\d+):1$/);
-  if (match) {
-    return parseInt(match[1], 10);
+  const result = leverageStr.split(':')[0]
+  if (result) {
+    return parseInt(result, 10);
   }
   
   // Try to parse as number
@@ -38,6 +38,6 @@ export const normalizeLeverage = (leverageStr: string | number): number => {
   }
   
   // Default leverage
-  return 1;
+  return 50;
 };
 

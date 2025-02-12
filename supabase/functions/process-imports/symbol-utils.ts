@@ -52,7 +52,8 @@ async function lookupSymbolOnPolygon(symbol: string): Promise<{ assetType: strin
 
 export const normalizeSymbol = (rawSymbol: string): string => {
   // Handle TradingView format [MARKET]:[Symbol]
-  const symbol = rawSymbol.includes(':') ? rawSymbol.split(':')[1] : rawSymbol;
+  const symbol = rawSymbol.includes(':') ? rawSymbol.split(/[:!]/)[1] : rawSymbol;
+
   return symbol.trim().toUpperCase();
 };
 
