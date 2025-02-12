@@ -29,9 +29,6 @@ export interface ImportRow {
   'Exit Time'?: string;
   'Order Type'?: string;
   'ORDER TYPE'?: string;
-  'Stop Price'?: string;
-  'STOP PRICE'?: string;
-  Stop?: string;
   Status?: string;
   STATUS?: string;
   Commission?: string;
@@ -42,6 +39,8 @@ export interface ImportRow {
   'ORDER ID'?: string;
   'Trade ID'?: string;
   ID?: string;
+  Leverage?: string;
+  LEVERAGE?: string;
 }
 
 export interface TradeData {
@@ -56,10 +55,12 @@ export interface TradeData {
   entry_date: string;
   exit_date: string | null;
   order_type: string | null;
-  stop_price: number | null;
   status: string | null;
   fees: number;
   external_id: string | null;
+  asset_type: string;
+  multiplier: number;
+  leverage: number;
 }
 
 export interface ImportSummary {
@@ -67,3 +68,4 @@ export interface ImportSummary {
   skippedCount: number;
   duplicateCount: number;
 }
+
