@@ -63,6 +63,16 @@ export const useFileImport = (selectedAccount: string) => {
       }
       console.log('Import record created:', importRecord);
 
+      // Call the edge function to process the import
+      const { error: processError } = await supabase.functions.invoke('process-imports', {
+        body: { import_id: importRecord.id }
+      });
+
+      if (processError) {
+        console.error('Error triggering import processing:', processError);
+        throw processError;
+      }
+
       toast({
         title: "Import started",
         description: "Your file is being processed",
