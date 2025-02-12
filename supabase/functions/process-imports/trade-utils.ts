@@ -21,3 +21,23 @@ export const extractStringFromRow = (row: Record<string, string>, fields: string
   const value = fields.reduce((acc, field) => acc || row[field], '');
   return value ? value.trim() : null;
 };
+
+export const normalizeLeverage = (leverageStr: string | number): number => {
+  if (typeof leverageStr === 'number') return leverageStr;
+  
+  // Handle "X:1" format
+  const match = leverageStr.match(/^(\d+):1$/);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
+  
+  // Try to parse as number
+  const num = parseFloat(leverageStr);
+  if (!isNaN(num)) {
+    return num;
+  }
+  
+  // Default leverage
+  return 1;
+};
+
