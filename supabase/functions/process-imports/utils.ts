@@ -16,6 +16,8 @@ export const parseCSVContent = (text: string): ImportRow[] => {
     throw new Error('CSV file is empty');
   }
 
+  console.log('CSV Headers:', lines[0]); // Log headers
+  
   // Parse header row to get column names
   const headers = lines[0].split(',').map(header => header.trim());
 
@@ -39,8 +41,13 @@ export const parseCSVContent = (text: string): ImportRow[] => {
     // Create an object mapping headers to values
     const row: ImportRow = {};
     headers.forEach((header, index) => {
-      row[header as keyof ImportRow] = values[index] || '';
+      if (values[index]) {
+        row[header as keyof ImportRow] = values[index];
+      }
     });
+    
+    // Log each row as it's parsed
+    console.log('Parsed CSV Row:', row);
     rows.push(row);
   }
 
@@ -48,24 +55,49 @@ export const parseCSVContent = (text: string): ImportRow[] => {
 }
 
 export const extractTradeData = (row: ImportRow, userId: string, accountId: string, importId: string): TradeData => {
-  console.log('Processing row:', row);
+  console.log('Raw row data:', row);
   
-  const symbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || ''
-  const side = row['Side'] || row['SIDE'] || row['side'] || ''
-  const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0'
-  const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || row['ENTRY PRICE']|| ''
-  const entryTime = row['Placing Time'] || row['PLACING TIME'] || row['Entry Time'] || row['Time'] || row['DATE'] || new Date().toISOString()
-  const closingTime = row['Closing Time'] || row['CLOSING TIME'] || row['Exit Time'] || null
-  const orderType = row['Type'] || row['TYPE'] || row['ORDER TYPE'] || row['Order Type'] || null
-  const stopPrice = row['Stop Price'] || row['STOP PRICE'] || row['Stop'] || row['STOP'] || null
-  const status = row['Status'] || row['STATUS'] || null
-  const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0'
-  const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null
+  // Extract and log each field individually
+  const symbol = row['Symbol'] || row['SYMBOL'] || row['symbol'] || '';
+  console.log('Symbol found:', symbol);
+  
+  const side = row['Side'] || row['SIDE'] || row['side'] || '';
+  console.log('Side found:', side);
+  
+  const quantity = row['Qty'] || row['QTY'] || row['Quantity'] || row['QUANTITY'] || row['Size'] || row['SIZE'] || '0';
+  console.log('Quantity found:', quantity);
+  
+  const fillPrice = row['Fill Price'] || row['FILL PRICE'] || row['Price'] || row['PRICE'] || row['Entry Price'] || row['ENTRY PRICE'] || '';
+  console.log('Fill Price found:', fillPrice);
+  
+  const entryTime = row['Placing Time'] || row['PLACING TIME'] || row['Entry Time'] || row['Time'] || row['DATE'] || new Date().toISOString();
+  const closingTime = row['Closing Time'] || row['CLOSING TIME'] || row['Exit Time'] || null;
+  const orderType = row['Type'] || row['TYPE'] || row['ORDER TYPE'] || row['Order Type'] || null;
+  const stopPrice = row['Stop Price'] || row['STOP PRICE'] || row['Stop'] || row['STOP'] || null;
+  const status = row['Status'] || row['STATUS'] || null;
+  const commission = row['Commission'] || row['COMMISSION'] || row['Fee'] || row['FEE'] || '0';
+  const orderId = row['Order ID'] || row['ORDER ID'] || row['Trade ID'] || row['ID'] || null;
 
-  // For sell orders, the fill price is actually the exit price
-  const normalizedSide = normalizeSide(side)
-  const entry_price = normalizedSide === 'sell' ? null : parseFloat(fillPrice)
-  const exit_price = normalizedSide === 'sell' ? parseFloat(fillPrice) : null
+  // Normalize side and calculate prices
+  const normalizedSide = normalizeSide(side);
+  console.log('Normalized side:', normalizedSide);
+  
+  let entry_price = null;
+  let exit_price = null;
+  
+  const parsedFillPrice = fillPrice ? parseFloat(fillPrice) : null;
+  console.log('Parsed fill price:', parsedFillPrice);
+  
+  if (parsedFillPrice !== null) {
+    if (normalizedSide === 'buy') {
+      entry_price = parsedFillPrice;
+    } else {
+      exit_price = parsedFillPrice;
+    }
+  }
+  
+  console.log('Calculated entry_price:', entry_price);
+  console.log('Calculated exit_price:', exit_price);
   
   const tradeData = {
     user_id: userId,
@@ -85,6 +117,6 @@ export const extractTradeData = (row: ImportRow, userId: string, accountId: stri
     external_id: orderId?.trim() || null
   };
 
-  console.log('Extracted trade data:', tradeData);
+  console.log('Final trade data:', tradeData);
   return tradeData;
 }
