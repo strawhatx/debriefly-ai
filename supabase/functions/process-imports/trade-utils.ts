@@ -22,6 +22,12 @@ export const extractStringFromRow = (row: Record<string, string>, fields: string
   return value ? value.trim() : null;
 };
 
+export const normalizeSymbol = (rawSymbol: string): string => {
+  // Handle TradingView format [MARKET]:[Symbol]
+  const symbol = rawSymbol.includes(':') ? rawSymbol.split(':')[1] : rawSymbol;
+  return symbol.trim().toUpperCase();
+};
+
 export const normalizeLeverage = (leverageStr: string | number): number => {
   if (typeof leverageStr === 'number') return leverageStr;
 

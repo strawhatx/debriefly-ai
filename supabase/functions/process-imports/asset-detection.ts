@@ -7,10 +7,6 @@ interface AssetConfig {
 let CURRENCY_CODES: Set<string> = new Set();
 let FUTURES_MULTIPLIERS: Map<string, number> = new Map();
 
-const COMMON_FUTURES = new Set([
-  'ES', 'NQ', 'CL', 'GC', 'SI', 'ZB', 'ZN', 'ZF', 'ZC', 'ZS', 'ZW'
-]);
-
 async function loadCurrencyCodes(supabase: any) {
   try {
     const { data, error } = await supabase
@@ -41,17 +37,6 @@ async function loadFuturesMultipliers(supabase: any) {
     console.log(`Loaded ${FUTURES_MULTIPLIERS.size} futures multipliers from database`);
   } catch (error) {
     console.error('Error loading futures multipliers:', error);
-  }
-}
-
-async function fetchMultiplierFromTradeovate(symbol: string): Promise<number | null> {
-  try {
-    // TODO: Implement Tradeovate API call here
-    // This is a placeholder for the API integration
-    return null;
-  } catch (error) {
-    console.error(`Error fetching multiplier for ${symbol} from Tradeovate:`, error);
-    return null;
   }
 }
 
