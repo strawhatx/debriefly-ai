@@ -1,7 +1,7 @@
 
 import { ImportRow, TradeData } from './types.ts';
 import { normalizeSide, extractDateFromRow, extractNumberFromRow, extractStringFromRow, normalizeLeverage } from './trade-utils.ts';
-import { lookupOrCreateSymbolConfig } from './symbol-utils.ts';
+import { detectAssetType } from './asset-detection.ts';
 export { parseCSVContent } from './csv-parser.ts';
 
 export const extractTradeData = async (
@@ -13,9 +13,12 @@ export const extractTradeData = async (
 ): Promise<TradeData> => {
   console.log('Raw row data:', row);
   
-  // Get symbol configuration
+  // Extract and normalize symbol
   const rawSymbol = extractStringFromRow(row, ['Symbol', 'SYMBOL', 'symbol']) || '';
-  const symbolConfig = await lookupOrCreateSymbolConfig(rawSymbol, db);
+  const symbol = rawSymbol.toUpperCase().trim();
+  
+  // Detect asset type and multiplier
+  const { assetType, multiplier } = detectAssetType(symbol);
   
   // Extract trade data
   const side = extractStringFromRow(row, ['Side', 'SIDE', 'side']) || '';
@@ -31,14 +34,14 @@ export const extractTradeData = async (
   const external_id = extractStringFromRow(row, ['Order ID', 'ORDER ID', 'Trade ID', 'ID']);
 
   // Extract and normalize leverage
-  const rawLeverage = extractStringFromRow(row, ['Leverage', 'LEVERAGE']);
+  const rawLeverage = extractStringFromRow(row, ['Leverage', 'LEVERAGE']) || '1';
   const leverage = normalizeLeverage(rawLeverage);
 
   const tradeData = {
     user_id: userId,
     trading_account_id: accountId,
     import_id: importId,
-    symbol: symbolConfig.symbol,
+    symbol,
     side: normalizeSide(side),
     quantity,
     entry_price,
@@ -49,12 +52,11 @@ export const extractTradeData = async (
     status,
     fees,
     external_id,
-    asset_type: symbolConfig.assetType,
-    multiplier: symbolConfig.multiplier,
+    asset_type: assetType,
+    multiplier,
     leverage
   };
 
   console.log('Final trade data:', tradeData);
   return tradeData;
 };
-
