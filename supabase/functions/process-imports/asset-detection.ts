@@ -79,6 +79,8 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
   const normalizedSymbol = symbol.toUpperCase().trim();
   const market = extractMarket(normalizedSymbol);
   const cleanSymbol = extractCleanSymbol(normalizedSymbol);
+
+  console.log(`symbol: ${cleanSymbol}`)
   
   // Futures detection
   const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
