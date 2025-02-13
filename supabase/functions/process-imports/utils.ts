@@ -35,7 +35,7 @@ export const extractTradeData = async (
   const external_id = extractStringFromRow(row, ['Order ID', 'ORDER ID', 'Trade ID', 'ID']);
 
   // Extract and normalize leverage
-  const rawLeverage = extractStringFromRow(row, ['Leverage', 'LEVERAGE']) || '1';
+  const rawLeverage = extractStringFromRow(row, ['Leverage', 'LEVERAGE']) || '0';
   const leverage = normalizeLeverage(rawLeverage);
 
   const tradeData = {
