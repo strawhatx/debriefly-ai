@@ -84,8 +84,9 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
   
   // Futures detection
   const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
-  if (futuresRegex.test(cleanSymbol) || 
-      (cleanSymbol.length <= 3 && COMMON_FUTURES.has(cleanSymbol))) {
+  console.log(`symbol: ${cleanSymbol}`)
+  
+  if (futuresRegex.test(cleanSymbol)) {
     const rootSymbol = extractFuturesRoot(cleanSymbol);
     const multiplier = await getMultiplierForFuture(rootSymbol, supabase);
     return {

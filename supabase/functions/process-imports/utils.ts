@@ -24,7 +24,10 @@ export const extractTradeData = async (
   const side = extractStringFromRow(row, ['Side', 'SIDE', 'side']) || '';
   const quantity = extractNumberFromRow(row, ['Qty', 'QTY', 'Quantity', 'QUANTITY', 'Size', 'SIZE']);
   const entry_price = extractNumberFromRow(row, ['Fill Price', 'FILL PRICE', 'Price', 'PRICE', 'Entry Price', 'ENTRY PRICE']);
+  
   const exit_price = extractNumberFromRow(row, ['Stop Price', 'STOP PRICE', 'Exit Price', ' EXIT PRICE', 'Stop', 'Stop']);
+  exit_price = exit_price === 0? null: exit_price
+  
   const fees = extractNumberFromRow(row, ['Commission', 'COMMISSION', 'Fee', 'FEE']);
   
   const entry_date = extractDateFromRow(row, ['Placing Time', 'PLACING TIME', 'Entry Time', 'Time', 'DATE']);
