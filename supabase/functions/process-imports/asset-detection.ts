@@ -1,4 +1,3 @@
-
 interface AssetConfig {
   assetType: 'stock' | 'option' | 'future' | 'forex' | 'crypto';
   multiplier: number;
@@ -6,6 +5,7 @@ interface AssetConfig {
 }
 
 let CURRENCY_CODES: Set<string> = new Set();
+let FUTURES_MULTIPLIERS: Map<string, number> = new Map();
 
 const COMMON_FUTURES = new Set([
   'ES', 'NQ', 'CL', 'GC', 'SI', 'ZB', 'ZN', 'ZF', 'ZC', 'ZS', 'ZW'
@@ -23,31 +23,94 @@ async function loadCurrencyCodes(supabase: any) {
     console.log(`Loaded ${CURRENCY_CODES.size} currency codes from database`);
   } catch (error) {
     console.error('Error loading currency codes:', error);
-    // Fallback to common major currencies if database fetch fails
     CURRENCY_CODES = new Set(['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']);
   }
 }
 
+async function loadFuturesMultipliers(supabase: any) {
+  try {
+    const { data, error } = await supabase
+      .from('futures_multipliers')
+      .select('symbol, multiplier');
+    
+    if (error) throw error;
+    
+    FUTURES_MULTIPLIERS = new Map(
+      data.map((row: { symbol: string; multiplier: number }) => [row.symbol, row.multiplier])
+    );
+    console.log(`Loaded ${FUTURES_MULTIPLIERS.size} futures multipliers from database`);
+  } catch (error) {
+    console.error('Error loading futures multipliers:', error);
+  }
+}
+
+async function fetchMultiplierFromTradeovate(symbol: string): Promise<number | null> {
+  try {
+    // TODO: Implement Tradeovate API call here
+    // This is a placeholder for the API integration
+    return null;
+  } catch (error) {
+    console.error(`Error fetching multiplier for ${symbol} from Tradeovate:`, error);
+    return null;
+  }
+}
+
+async function getMultiplierForFuture(symbol: string, supabase: any): Promise<number> {
+  // First check our local cache
+  const cachedMultiplier = FUTURES_MULTIPLIERS.get(symbol);
+  if (cachedMultiplier) {
+    return cachedMultiplier;
+  }
+
+  // If not in cache, try to fetch from Tradeovate
+  const tradeovateMultiplier = await fetchMultiplierFromTradeovate(symbol);
+  if (tradeovateMultiplier) {
+    // Store the new multiplier in the database
+    const { error } = await supabase
+      .from('futures_multipliers')
+      .upsert({ 
+        symbol, 
+        multiplier: tradeovateMultiplier,
+        updated_at: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error('Error storing multiplier:', error);
+    } else {
+      // Update local cache
+      FUTURES_MULTIPLIERS.set(symbol, tradeovateMultiplier);
+    }
+    
+    return tradeovateMultiplier;
+  }
+
+  // If all else fails, return a default multiplier
+  return 1;
+}
+
 export async function initializeAssetDetection(supabase: any) {
-  await loadCurrencyCodes(supabase);
+  await Promise.all([
+    loadCurrencyCodes(supabase),
+    loadFuturesMultipliers(supabase)
+  ]);
 }
 
 function extractMarket(symbol: string): string | undefined {
-  // Check for market prefix (e.g., "NASDAQ:AAPL", "NYSE:GME")
   const parts = symbol.split(':');
-  if (parts.length === 2) {
-    return parts[0];
-  }
-  return undefined;
+  return parts.length === 2 ? parts[0] : undefined;
 }
 
 function extractCleanSymbol(symbol: string): string {
-  // Extract everything after the colon if it exists
   const parts = symbol.split(':');
   return parts.length === 2 ? parts[1] : symbol;
 }
 
-export function detectAssetType(symbol: string): AssetConfig {
+function extractFuturesRoot(symbol: string): string {
+  // Remove any month/year codes to get the root symbol
+  return symbol.replace(/[FGHJKMNQUVXZ]\d{1,2}[!]?$/, '');
+}
+
+export async function detectAssetType(symbol: string, supabase: any): Promise<AssetConfig> {
   const normalizedSymbol = symbol.toUpperCase().trim();
   const market = extractMarket(normalizedSymbol);
   const cleanSymbol = extractCleanSymbol(normalizedSymbol);
@@ -56,9 +119,11 @@ export function detectAssetType(symbol: string): AssetConfig {
   const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
   if (futuresRegex.test(cleanSymbol) || 
       (cleanSymbol.length <= 3 && COMMON_FUTURES.has(cleanSymbol))) {
+    const rootSymbol = extractFuturesRoot(cleanSymbol);
+    const multiplier = await getMultiplierForFuture(rootSymbol, supabase);
     return {
       assetType: 'future',
-      multiplier: 1, // This will need to be adjusted based on the specific contract
+      multiplier,
       market
     };
   }
