@@ -4,28 +4,32 @@ interface AssetConfig {
   multiplier: number;
 }
 
-const CURRENCY_CODES = new Set([
-  'AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN', 
-  'BAM', 'BBD', 'BDT', 'BGN', 'BHD', 'BIF', 'BMD', 'BND', 'BOB', 'BRL', 
-  'BSD', 'BTN', 'BWP', 'BYR', 'BZD', 'CAD', 'CDF', 'CHF', 'CLP', 'CNY', 
-  'COP', 'CRC', 'CUP', 'CVE', 'CZK', 'DJF', 'DKK', 'DOP', 'DZD', 'EEK', 
-  'EGP', 'ERN', 'ETB', 'EUR', 'FJD', 'FKP', 'GBP', 'GEL', 'GHS', 'GIP', 
-  'GMD', 'GNF', 'GTQ', 'GYD', 'HKD', 'HNL', 'HRK', 'HTG', 'HUF', 'IDR', 
-  'ILS', 'INR', 'IQD', 'IRR', 'ISK', 'JMD', 'JOD', 'JPY', 'KES', 'KGS', 
-  'KHR', 'KMF', 'KPW', 'KRW', 'KWD', 'KYD', 'KZT', 'LAK', 'LBP', 'LKR', 
-  'LRD', 'LSL', 'LTL', 'LVL', 'LYD', 'MAD', 'MDL', 'MGA', 'MKD', 'MMK', 
-  'MNT', 'MOP', 'MRO', 'MUR', 'MVR', 'MWK', 'MXN', 'MYR', 'MZN', 'NAD', 
-  'NGN', 'NIO', 'NOK', 'NPR', 'NZD', 'OMR', 'PAB', 'PEN', 'PGK', 'PHP', 
-  'PKR', 'PLN', 'PYG', 'QAR', 'RON', 'RSD', 'RUB', 'RWF', 'SAR', 'SBD', 
-  'SCR', 'SDG', 'SEK', 'SGD', 'SHP', 'SLL', 'SOS', 'SRD', 'STD', 'SVC', 
-  'SYP', 'SZL', 'THB', 'TJS', 'TND', 'TOP', 'TRY', 'TTD', 'TWD', 'TZS', 
-  'UAH', 'UGX', 'USD', 'UYU', 'UZS', 'VED', 'VEF', 'VES', 'VND', 'VUV', 
-  'WST', 'XAF', 'XCD', 'XOF', 'XPF', 'YER', 'ZAR', 'ZMK', 'ZWD'
-]);
+let CURRENCY_CODES: Set<string> = new Set();
 
 const COMMON_FUTURES = new Set([
   'ES', 'NQ', 'CL', 'GC', 'SI', 'ZB', 'ZN', 'ZF', 'ZC', 'ZS', 'ZW'
 ]);
+
+async function loadCurrencyCodes(supabase: any) {
+  try {
+    const { data, error } = await supabase
+      .from('currency_codes')
+      .select('code');
+    
+    if (error) throw error;
+    
+    CURRENCY_CODES = new Set(data.map((row: { code: string }) => row.code));
+    console.log(`Loaded ${CURRENCY_CODES.size} currency codes from database`);
+  } catch (error) {
+    console.error('Error loading currency codes:', error);
+    // Fallback to common major currencies if database fetch fails
+    CURRENCY_CODES = new Set(['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']);
+  }
+}
+
+export async function initializeAssetDetection(supabase: any) {
+  await loadCurrencyCodes(supabase);
+}
 
 export function detectAssetType(symbol: string): AssetConfig {
   const normalizedSymbol = symbol.toUpperCase().trim();

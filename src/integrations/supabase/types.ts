@@ -93,6 +93,27 @@ export type Database = {
         }
         Relationships: []
       }
+      currency_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       imports: {
         Row: {
           created_at: string
