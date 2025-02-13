@@ -62,29 +62,9 @@ async function getMultiplierForFuture(symbol: string, supabase: any): Promise<nu
     return cachedMultiplier;
   }
 
-  // If not in cache, try to fetch from Tradeovate
-  const tradeovateMultiplier = await fetchMultiplierFromTradeovate(symbol);
-  if (tradeovateMultiplier) {
-    // Store the new multiplier in the database
-    const { error } = await supabase
-      .from('futures_multipliers')
-      .upsert({ 
-        symbol, 
-        multiplier: tradeovateMultiplier,
-        updated_at: new Date().toISOString()
-      });
+  // If not in cache, log it temp to addit later
+  console.log(`WARNING:  symbol not found: ${symbol}`, error);
 
-    if (error) {
-      console.error('Error storing multiplier:', error);
-    } else {
-      // Update local cache
-      FUTURES_MULTIPLIERS.set(symbol, tradeovateMultiplier);
-    }
-    
-    return tradeovateMultiplier;
-  }
-
-  // If all else fails, return a default multiplier
   return 1;
 }
 
