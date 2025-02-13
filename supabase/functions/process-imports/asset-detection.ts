@@ -33,32 +33,24 @@ export async function initializeAssetDetection(supabase: any) {
 }
 
 function extractMarket(symbol: string): string | undefined {
-  // Check for market prefix (e.g., "NASDAQ:", "NYSE:", etc.)
-  const marketMatch = symbol.match(/^([A-Z]+):/);
-  if (marketMatch) {
-    return marketMatch[1];
+  // Check for market prefix (e.g., "NASDAQ:AAPL", "NYSE:GME")
+  const parts = symbol.split(':');
+  if (parts.length === 2) {
+    return parts[0];
   }
-
-  // Check for futures markets (e.g., "COMEX_MINI", "NYMEX", etc.)
-  const futuresMarketMatch = symbol.match(/^([A-Z_]+)_/);
-  if (futuresMarketMatch) {
-    return futuresMarketMatch[1];
-  }
-
-  // Check for common crypto exchanges
-  if (symbol.includes('BINANCE_')) return 'BINANCE';
-  if (symbol.includes('COINBASE_')) return 'COINBASE';
-  if (symbol.includes('FTX_')) return 'FTX';
-
   return undefined;
+}
+
+function extractCleanSymbol(symbol: string): string {
+  // Extract everything after the colon if it exists
+  const parts = symbol.split(':');
+  return parts.length === 2 ? parts[1] : symbol;
 }
 
 export function detectAssetType(symbol: string): AssetConfig {
   const normalizedSymbol = symbol.toUpperCase().trim();
   const market = extractMarket(normalizedSymbol);
-  
-  // Clean symbol by removing market prefix if present
-  const cleanSymbol = normalizedSymbol.replace(/^[A-Z_]+[:_]/, '');
+  const cleanSymbol = extractCleanSymbol(normalizedSymbol);
   
   // Futures detection
   const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
