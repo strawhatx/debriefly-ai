@@ -212,33 +212,6 @@ export type Database = {
         }
         Relationships: []
       }
-      symbol_configs: {
-        Row: {
-          asset_type: Database["public"]["Enums"]["asset_type"]
-          created_at: string
-          id: string
-          multiplier: number
-          symbol: string
-          updated_at: string
-        }
-        Insert: {
-          asset_type?: Database["public"]["Enums"]["asset_type"]
-          created_at?: string
-          id?: string
-          multiplier?: number
-          symbol: string
-          updated_at?: string
-        }
-        Update: {
-          asset_type?: Database["public"]["Enums"]["asset_type"]
-          created_at?: string
-          id?: string
-          multiplier?: number
-          symbol?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       trades: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"] | null
