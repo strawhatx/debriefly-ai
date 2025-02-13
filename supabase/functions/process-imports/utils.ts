@@ -24,6 +24,7 @@ export const extractTradeData = async (
   const side = extractStringFromRow(row, ['Side', 'SIDE', 'side']) || '';
   const quantity = extractNumberFromRow(row, ['Qty', 'QTY', 'Quantity', 'QUANTITY', 'Size', 'SIZE']);
   const entry_price = extractNumberFromRow(row, ['Fill Price', 'FILL PRICE', 'Price', 'PRICE', 'Entry Price', 'ENTRY PRICE']);
+  const exit_price = extractNumberFromRow(row, ['Stop Price', 'STOP PRICE', 'Exit Price', ' EXIT PRICE', 'Stop', 'Stop']);
   const fees = extractNumberFromRow(row, ['Commission', 'COMMISSION', 'Fee', 'FEE']);
   
   const entry_date = extractDateFromRow(row, ['Placing Time', 'PLACING TIME', 'Entry Time', 'Time', 'DATE']);
@@ -45,7 +46,7 @@ export const extractTradeData = async (
     side: normalizeSide(side),
     quantity,
     entry_price,
-    exit_price: null,
+    exit_price,
     entry_date,
     exit_date,
     order_type,
