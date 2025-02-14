@@ -76,6 +76,7 @@ serve(async (req) => {
           throw new Error('No data found in import file')
         }
         console.log('First row sample:', rows[0])
+        console.log('Total rows to process:', rows.length)
 
         // Process rows
         const summary: ImportSummary = {
@@ -86,6 +87,8 @@ serve(async (req) => {
 
         for (const row of rows) {
           try {
+            console.log('Processing row:', row)
+            
             // Extract trade data with DB client for asset type lookup
             const tradeData = await extractTradeData(
               row, 
@@ -94,16 +97,27 @@ serve(async (req) => {
               import_.id,
               db.client
             )
+            
+            console.log('Extracted trade data:', tradeData)
 
             // Skip cancelled orders with no fill price
             if (tradeData.status?.toLowerCase() === 'cancelled' && !tradeData.entry_price) {
               console.log('Skipping cancelled order with no fill price:', { 
                 external_id: tradeData.external_id, 
-                symbol: tradeData.symbol 
+                symbol: tradeData.symbol,
+                status: tradeData.status,
+                entry_price: tradeData.entry_price
               })
               summary.skippedCount++
               continue
             }
+
+            // Log all required fields before validation
+            console.log('Validating required fields:', {
+              symbol: tradeData.symbol,
+              quantity: tradeData.quantity,
+              entry_price: tradeData.entry_price
+            })
 
             // Skip orders with missing required fields
             if (!tradeData.symbol || !tradeData.quantity || !tradeData.entry_price) {
@@ -133,8 +147,10 @@ serve(async (req) => {
             }
 
             // Insert trade
+            console.log('Attempting to insert trade:', tradeData)
             await db.insertTrade(tradeData)
             summary.processedCount++
+            console.log('Trade successfully inserted')
           } catch (error) {
             console.error('Error processing row:', error, row)
             summary.skippedCount++
