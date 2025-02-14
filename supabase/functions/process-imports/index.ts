@@ -10,6 +10,7 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -21,17 +22,29 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing environment variables')
+      console.error('Missing environment variables:', { supabaseUrl: !!supabaseUrl, supabaseKey: !!supabaseKey })
+      throw new Error('Missing required environment variables')
     }
 
     const db = new Database(supabaseUrl, supabaseKey)
     
-    const body = await req.json()
+    let body
+    try {
+      body = await req.json()
+    } catch (error) {
+      console.error('Error parsing request body:', error)
+      throw new Error('Invalid request body')
+    }
+
     const importId = body.import_id
+    if (!importId) {
+      console.error('Missing import_id in request body')
+      throw new Error('Missing import_id in request')
+    }
     console.log('Processing import ID:', importId)
 
     const imports = await db.getImportsToProcess(importId)
-    console.log('Fetch response:', { data: imports?.length })
+    console.log('Fetch response:', { imports_count: imports?.length })
 
     if (!imports || imports.length === 0) {
       console.log('No pending imports found')
@@ -51,10 +64,17 @@ serve(async (req) => {
         // Download and parse file
         console.log('Downloading file:', import_.file_path)
         const fileData = await db.downloadImportFile(import_.file_path)
+        if (!fileData) {
+          throw new Error('Failed to download import file')
+        }
+
         const text = await fileData.text()
         console.log('CSV content preview:', text.substring(0, 200))
 
         const rows = parseCSVContent(text)
+        if (!rows || rows.length === 0) {
+          throw new Error('No data found in import file')
+        }
         console.log('First row sample:', rows[0])
 
         // Process rows
@@ -81,7 +101,7 @@ serve(async (req) => {
                 external_id: tradeData.external_id, 
                 symbol: tradeData.symbol 
               })
-              summary.skippedCount++;
+              summary.skippedCount++
               continue
             }
 
@@ -93,7 +113,7 @@ serve(async (req) => {
                 entry_price: tradeData.entry_price,
                 status: tradeData.status 
               })
-              summary.skippedCount++;
+              summary.skippedCount++
               continue
             }
 
@@ -108,16 +128,16 @@ serve(async (req) => {
                 external_id: tradeData.external_id, 
                 symbol: tradeData.symbol 
               })
-              summary.duplicateCount++;
+              summary.duplicateCount++
               continue
             }
 
             // Insert trade
             await db.insertTrade(tradeData)
-            summary.processedCount++;
+            summary.processedCount++
           } catch (error) {
             console.error('Error processing row:', error, row)
-            summary.skippedCount++;
+            summary.skippedCount++
             continue
           }
         }
