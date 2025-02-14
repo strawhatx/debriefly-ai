@@ -79,9 +79,9 @@ export class Database {
       .select('id')
       .eq('trading_account_id', accountId)
       .eq('external_id', externalId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') { // Ignore not found error
+    if (error) {
       console.error('Error checking existing trade:', error);
       throw error;
     }
@@ -92,13 +92,18 @@ export class Database {
   async insertTrade(tradeData: TradeData) {
     console.log('Inserting trade:', tradeData);
     
-    const { error } = await this.client
+    const { data, error } = await this.client
       .from('trades')
-      .insert([tradeData]);
+      .insert(tradeData)
+      .select()
+      .single();
 
     if (error) {
       console.error('Error inserting trade:', error);
       throw error;
     }
+    
+    console.log('Trade inserted successfully:', data);
+    return data;
   }
 }
