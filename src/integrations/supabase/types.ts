@@ -119,6 +119,7 @@ export type Database = {
           created_at: string
           id: string
           multiplier: number
+          name: string | null
           symbol: string
           updated_at: string
         }
@@ -126,6 +127,7 @@ export type Database = {
           created_at?: string
           id?: string
           multiplier: number
+          name?: string | null
           symbol: string
           updated_at?: string
         }
@@ -133,6 +135,7 @@ export type Database = {
           created_at?: string
           id?: string
           multiplier?: number
+          name?: string | null
           symbol?: string
           updated_at?: string
         }
