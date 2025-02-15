@@ -7,7 +7,7 @@ import { BrokerInfo } from "./BrokerInfo";
 import { AccountSelect } from "./AccountSelect";
 import { FileUploader } from "./FileUploader";
 import { ImportButton } from "./ImportButton";
-import { useFileImport } from "./useFileImport";
+import { useFileImport } from "./hooks/useFileImport";
 
 interface FileImportProps {
   availableBrokers?: Broker[];
