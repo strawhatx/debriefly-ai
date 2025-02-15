@@ -15,13 +15,16 @@ export const FIELD_MAPPING = {
 }
 
 export interface ImportRow {
+  user_id: string;
+  trading_account_id: string;
+  import_id: string;
   symbol: string;
   side: string;
   quantity: number;
-  fill_price: number | null;
+  fill_price: number;
   stop_price: number | null;
   entry_date: string;
-  close_date: string | null;
+  closing_date: string | null;
   order_type: string | null;
   status: string | null;
   fees: number;
@@ -29,23 +32,24 @@ export interface ImportRow {
   leverage: number;
 }
 
-export interface TradeData {
-  id: string;
+export interface Position {
   user_id: string;
   trading_account_id: string;
-  import_id: string;
   symbol: string;
-  side: string;
+  position_type: string;
   quantity: number;
   fill_price: number | null;
   stop_price: number | null;
   entry_date: string;
-  close_date: string | null;
+  closing_date: string | null;
   order_type: string | null;
   status: string | null;
   fees: number;
   external_id: string | null;
   leverage: number;
+  multiplier: number;
+  entry_trade_id: number;
+  close_trade_id: number;
 }
 
 export interface ImportSummary {

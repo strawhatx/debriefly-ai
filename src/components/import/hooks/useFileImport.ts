@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as Papa from 'papaparse'; // For CSV parsing
 import { mapTradeData } from "../utils/utils";
-import { TradeData } from "../utils/types";
+import { ImportRow, Position } from "../utils/types";
 
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
@@ -35,7 +35,6 @@ export const useFileImport = (selectedAccount: string) => {
         .from('import_files').upload(filePath, selectedFile);
 
       if (uploadError) {
-        console.error('Storage upload error:', uploadError);
         throw new Error(`Failed to upload file: ${uploadError.message}`);
       }
 
@@ -59,10 +58,8 @@ export const useFileImport = (selectedAccount: string) => {
       setErrorId(importRecord.id);
 
       if (importError) {
-        console.error('Error creating import record:', importError);
-        throw importError;
+        throw new Error(`Error creating import record: ${importError}`);
       }
-      console.log('Import record created:', importRecord);
 
       // Read and parse the CSV file
       Papa.parse(selectedFile, {
@@ -75,7 +72,7 @@ export const useFileImport = (selectedAccount: string) => {
           });
 
           //set status to procesing
-          await supabase.from('imports').update({ status: 'PROCESSING' }).eq("id", importRecord.id);
+          const { error } =  await supabase.from('imports').update({ status: 'PROCESSING' }).eq("id", importRecord.id);
 
           // Insert trades into Supabase
           await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
@@ -106,65 +103,62 @@ export const useFileImport = (selectedAccount: string) => {
     const transformedTrades = trades.map(trade => mapTradeData(trade, rawHeaders, user_id, account_id, import_id));
 
     // Insert trades into Supabase
-    const { data, error } = await supabase.from('trade_history').insert(transformedTrades);
+    const { data, error } = await supabase.from('trade_history').insert(transformedTrades).select();
 
     if (error) {
-      console.error('Error inserting trades:', error);
-      return;
+      throw new Error(`Error inserting trades:${error}`);
     }
 
-    console.log('Trades successfully uploaded.');
-
-    const positions = processTradesIntoPositions(transformedTrades);
+    const positions = processTradesIntoPositions(data);
 
     const { error: insertError } = await supabase.from('positions').insert(positions);
     if (insertError) console.error(insertError);
   };
 
-  const processTradesIntoPositions = (trades: TradeData[]) => {
-    const openLongPositions: TradeData[] = [];
-    const openShortPositions: TradeData[] = [];
+  const processTradesIntoPositions = (trades: any[]) => {
+    const openLongPositions: Position[] = [];
+    const openShortPositions: Position[] = [];
     const closedPositions: any[] = [];
 
     trades
-      .filter((trade) => trade.status === 'filled')
+      .filter((trade) => trade.status.toUpperCase() === 'FILLED')
       .sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime())
       .forEach((trade) => {
-        const price = trade.entry_price; // Fill price
-        const stopPrice = trade.exit_price; // Stop price (optional)
+        const price = trade.fill_price; // Fill price
+        const stopPrice = trade.stop_price; // Stop price (optional)
         const quantity = trade.quantity;
 
-        if (trade.side === 'Buy') {
+        if (trade.side === 'BUY') {
           // Check if this is closing a short or opening a long
           if (openShortPositions.length > 0) {
             const entry = openShortPositions.shift()!; // Close short
             const pnl = (entry.fill_price - price) * quantity;
             closedPositions.push({
               ...commonPositionFields(entry, trade),
-              side: 'Short',
-              entry_price: entry.fill_price,
-              exit_price: price,
+              position_type: 'SHORT',
+              fill_price: entry.fill_price,
+              stop_price: price,
               pnl,
             });
           } else {
             // Open long position
-            openLongPositions.push(trade);
+            openLongPositions.push({...trade,  position_type: 'LONG'});
           }
-        } else if (trade.side === 'Sell') {
+        } else if (trade.side === 'SELL') {
           // Check if this is closing a long or opening a short
           if (openLongPositions.length > 0) {
             const entry = openLongPositions.shift()!; // Close long
             const pnl = (price - entry.fill_price) * quantity;
             closedPositions.push({
               ...commonPositionFields(entry, trade),
-              side: 'Long',
+              position_type: 'LONG',
               fill_price: entry.fill_price,
               stop_price: price,
               pnl,
             });
           } else {
             // Open short position
-            openShortPositions.push(trade);
+            openShortPositions.push({...trade,  position_type: 'SHORT'});
           }
         }
       });
@@ -172,21 +166,19 @@ export const useFileImport = (selectedAccount: string) => {
     return closedPositions;
   };
 
-  const commonPositionFields = (entry: TradeData, exit: TradeData) => ({
+  const commonPositionFields = (entry: any, exit: any) => ({
     user_id: entry.user_id,
     trading_account_id: entry.trading_account_id,
     symbol: entry.symbol,
-    position_type: entry.position_type,
     quantity: entry.quantity,
-    fill_date: entry.entry_date,
-    exit_date: exit.entry_date,
+    entry_date: entry.entry_date,
+    closing_date: exit.entry_date,
     fees: (entry.fees || 0) + (exit.fees || 0),
     leverage: entry.leverage,
-    status: 'closed',
+    status: 'CLOSED',
     entry_trade_id: entry.id,
-    exit_trade_id: exit.id,
+    close_trade_id: exit.id,
     multiplier: entry.multiplier
-
   });
 
   return {
