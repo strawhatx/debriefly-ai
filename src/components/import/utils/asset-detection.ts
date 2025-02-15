@@ -48,7 +48,7 @@ async function getMultiplierForFuture(symbol: string, supabase: any): Promise<nu
   }
 
   // If not in cache, log it temp to addit later
-  console.log(`WARNING:  symbol not found: ${symbol}`, error);
+  console.log(`WARNING:  symbol not found: ${symbol}`);
 
   return 1;
 }
