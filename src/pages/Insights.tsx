@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -68,7 +67,9 @@ const Insights = () => {
                           Session on {new Date(insight.session_date).toLocaleDateString()}
                         </h3>
                         <p className="text-muted-foreground mt-1">
-                          {JSON.parse(insight.content).summary}
+                          {typeof insight.content === 'string' 
+                            ? JSON.parse(insight.content).summary 
+                            : insight.content.summary}
                         </p>
                       </div>
                       {insight.positions && (

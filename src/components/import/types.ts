@@ -28,7 +28,7 @@ export interface BrokerField {
   id: string;
   broker_id: string;
   field_name: string;
-  field_type: 'text' | 'password' | 'api_key';
+  field_type: 'TEXT' | 'PASSWORD' | 'APIKEY';
   required: boolean;
   display_name: string;
   description: string | null;

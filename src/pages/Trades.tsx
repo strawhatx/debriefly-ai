@@ -31,7 +31,7 @@ const Trades = () => {
       if (!user) throw new Error("Not authenticated");
 
       let query = supabase
-        .from("trades")
+        .from("trade_history")
         .select(`
           *,
           trading_accounts (

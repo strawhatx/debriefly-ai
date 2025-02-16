@@ -65,13 +65,13 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
       const { data: importRecord, error: importError } = await supabase
         .from('imports')
         .insert({
-          user_id: user.id,
-          trading_account_id: selectedAccount,
           import_type: selectedFile.type.includes('spreadsheetml') ? 'excel' : 'csv',
-          status: 'pending',
+          trading_account_id: selectedAccount,
+          status: 'PENDING',
           original_filename: selectedFile.name.replace(/[^\x00-\x7F]/g, ''),
           file_size: selectedFile.size,
-          file_type: selectedFile.type
+          file_type: selectedFile.type,
+          user_id: user.id
         })
         .select()
         .single();
@@ -106,7 +106,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
         .from('imports')
         .update({
           file_path: filePath,
-          status: 'uploaded'
+          status: 'UPLOADED'
         })
         .eq('id', importRecord.id);
 

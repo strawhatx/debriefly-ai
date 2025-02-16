@@ -74,7 +74,7 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
           user_id: user.id,
           trading_account_id: selectedAccount,
           import_type: 'broker_sync',
-          status: 'pending'
+          status: 'PENDING'
         });
 
       setFormValues({});
