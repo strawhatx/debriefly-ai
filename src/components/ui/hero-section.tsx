@@ -82,3 +82,28 @@ export function HeroSection({
               </Button>
             ))}
           </div>
+
+          {/* Image with Glow */}
+          <div className="relative pt-12">
+            <MockupFrame
+              className="animate-appear opacity-0 delay-700"
+              size="small"
+            >
+              <Mockup type="responsive">
+                <img
+                  src={image.light}
+                  alt={image.alt}
+                  className="w-full h-auto"
+                />
+              </Mockup>
+            </MockupFrame>
+            <Glow
+              variant="top"
+              className="animate-appear-zoom opacity-0 delay-1000"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
