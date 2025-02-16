@@ -57,7 +57,7 @@ const Trades = () => {
         fill_price: trade.fill_price,
         quantity: trade.quantity,
         side: trade.side,
-        pnl: trade.pnl || null,
+        pnl: null, // Set PnL to null since it's not in the trade_history table
         fees: trade.fees || 0,
         trading_accounts: {
           account_name: trade.trading_accounts.account_name
