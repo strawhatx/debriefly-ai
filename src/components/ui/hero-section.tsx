@@ -13,6 +13,7 @@ interface HeroAction {
   href: string;
   icon?: React.ReactNode;
   variant?: "default" | "glow";
+  onClick?: () => void;
 }
 
 interface HeroProps {
@@ -75,10 +76,39 @@ export function HeroSection({
           <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
             {actions.map((action, index) => (
               <Button key={index} variant={action.variant} size="lg" asChild>
-                <a href={action.href} className="flex items-center gap-2">
+                <a
+                  href={action.href}
+                  className="flex items-center gap-2"
+                  onClick={action.onClick}
+                >
                   {action.icon}
                   {action.text}
                 </a>
               </Button>
             ))}
           </div>
+
+          {/* Image with Glow */}
+          <div className="relative pt-12">
+            <MockupFrame
+              className="animate-appear opacity-0 delay-700"
+              size="small"
+            >
+              <Mockup type="responsive">
+                <img
+                  src={image.light}
+                  alt={image.alt}
+                  className="w-full h-auto"
+                />
+              </Mockup>
+            </MockupFrame>
+            <Glow
+              variant="top"
+              className="animate-appear-zoom opacity-0 delay-1000"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
