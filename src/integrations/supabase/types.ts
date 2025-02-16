@@ -194,6 +194,54 @@ export type Database = {
           },
         ]
       }
+      insights: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          position_id: string | null
+          session_date: string | null
+          type: Database["public"]["Enums"]["insight_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          position_id?: string | null
+          session_date?: string | null
+          type: Database["public"]["Enums"]["insight_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          position_id?: string | null
+          session_date?: string | null
+          type?: Database["public"]["Enums"]["insight_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insights_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insights_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       positions: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"] | null
@@ -509,6 +557,7 @@ export type Database = {
         | "PROCESSING"
         | "COMPLETED"
         | "FAILED"
+      insight_type: "debrief" | "pattern" | "suggestion"
       profit_calc_method: "FIFO" | "LIFO"
       subscription_tier: "FREE" | "PREMIUM"
     }
