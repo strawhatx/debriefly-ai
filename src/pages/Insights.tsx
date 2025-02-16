@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -5,6 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import WinLossInsights from "@/components/dashboard/WinLossInsights";
 import { Loader2 } from "lucide-react";
+
+interface InsightContent {
+  summary: string;
+  [key: string]: any;
+}
 
 const Insights = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<string>("week");
@@ -37,6 +43,18 @@ const Insights = () => {
     },
   });
 
+  const getInsightSummary = (content: any): string => {
+    if (typeof content === 'string') {
+      try {
+        const parsed = JSON.parse(content) as InsightContent;
+        return parsed.summary || 'No summary available';
+      } catch {
+        return 'Invalid content format';
+      }
+    }
+    return (content as InsightContent).summary || 'No summary available';
+  };
+
   return (
     <div className="p-8 space-y-6">
       <h1 className="text-4xl font-bold">Trading Insights</h1>
@@ -67,9 +85,7 @@ const Insights = () => {
                           Session on {new Date(insight.session_date).toLocaleDateString()}
                         </h3>
                         <p className="text-muted-foreground mt-1">
-                          {typeof insight.content === 'string' 
-                            ? JSON.parse(insight.content).summary 
-                            : insight.content.summary}
+                          {getInsightSummary(insight.content)}
                         </p>
                       </div>
                       {insight.positions && (

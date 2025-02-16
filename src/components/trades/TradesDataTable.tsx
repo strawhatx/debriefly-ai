@@ -18,16 +18,16 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { format } from "date-fns";
 
-interface Trade {
+export interface Trade {
   id: string;
   symbol: string;
   entry_date: string;
-  exit_date: string | null;
-  entry_price: number;
-  exit_price: number | null;
+  closing_date: string | null;
+  fill_price: number;
   quantity: number;
   side: string;
   pnl: number | null;
+  fees: number;
   trading_accounts: {
     account_name: string;
   };
@@ -96,8 +96,8 @@ export const TradesDataTable = ({
               <TableHead>Entry Date</TableHead>
               <TableHead>Exit Date</TableHead>
               <TableHead>Entry Price</TableHead>
-              <TableHead>Exit Price</TableHead>
               <TableHead>Quantity</TableHead>
+              <TableHead>Fees</TableHead>
               <TableHead className="text-right">P&L</TableHead>
             </TableRow>
           </TableHeader>
@@ -124,15 +124,13 @@ export const TradesDataTable = ({
                     {format(new Date(trade.entry_date), "MMM d, yyyy HH:mm")}
                   </TableCell>
                   <TableCell>
-                    {trade.exit_date
-                      ? format(new Date(trade.exit_date), "MMM d, yyyy HH:mm")
+                    {trade.closing_date
+                      ? format(new Date(trade.closing_date), "MMM d, yyyy HH:mm")
                       : "-"}
                   </TableCell>
-                  <TableCell>${trade.entry_price.toFixed(2)}</TableCell>
-                  <TableCell>
-                    {trade.exit_price ? `$${trade.exit_price.toFixed(2)}` : "-"}
-                  </TableCell>
+                  <TableCell>${trade.fill_price.toFixed(2)}</TableCell>
                   <TableCell>{trade.quantity}</TableCell>
+                  <TableCell>${trade.fees.toFixed(2)}</TableCell>
                   <TableCell className="text-right">
                     {trade.pnl !== null ? (
                       <span

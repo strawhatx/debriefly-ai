@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { TradesDataTable } from "@/components/trades/TradesDataTable";
+import { TradesDataTable, Trade } from "@/components/trades/TradesDataTable";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -24,7 +24,7 @@ const Trades = () => {
     },
   });
 
-  const { data: trades, isLoading } = useQuery({
+  const { data: tradeHistory, isLoading } = useQuery({
     queryKey: ["trades", selectedAccount],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -47,7 +47,24 @@ const Trades = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+
+      // Map the trade history to our Trade interface
+      const trades: Trade[] = data.map(trade => ({
+        id: trade.id,
+        symbol: trade.symbol,
+        entry_date: trade.entry_date,
+        closing_date: trade.closing_date,
+        fill_price: trade.fill_price,
+        quantity: trade.quantity,
+        side: trade.side,
+        pnl: trade.pnl || null,
+        fees: trade.fees || 0,
+        trading_accounts: {
+          account_name: trade.trading_accounts.account_name
+        }
+      }));
+
+      return trades;
     },
     enabled: true,
   });
@@ -58,7 +75,7 @@ const Trades = () => {
       <div className="space-y-6">
         <Card className="p-6">
           <TradesDataTable 
-            trades={trades || []} 
+            trades={tradeHistory || []} 
             isLoading={isLoading}
             tradingAccounts={tradingAccounts || []}
             selectedAccount={selectedAccount}
