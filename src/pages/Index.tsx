@@ -1,10 +1,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChartLine, ChartBar, DollarSign, User, ArrowRight } from "lucide-react";
+import { ChartLine, ChartBar, DollarSign, User, ArrowRight, Github } from "lucide-react";
 import LoginForm from "@/components/LoginForm";
 import { useToast } from "@/components/ui/use-toast";
-import HeroSection from "@/components/landing/HeroSection";
+import { HeroSection } from "@/components/ui/hero-section";
 import FeatureCard from "@/components/landing/FeatureCard";
 import ChallengesSection from "@/components/landing/ChallengesSection";
 import DetailedFeatures from "@/components/landing/DetailedFeatures";
@@ -24,7 +24,36 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <HeroSection onGetStarted={handleGetStarted} isLoginVisible={isLoginVisible} />
+      <HeroSection
+        badge={{
+          text: "Now in public beta",
+          action: {
+            text: "Learn more",
+            href: "/blog",
+          },
+        }}
+        title="AI-Powered Trade Analysis"
+        description="Transform your trading with personalized AI insights and automated performance tracking"
+        actions={[
+          {
+            text: "Get Started",
+            href: "#",
+            variant: "default",
+            onClick: handleGetStarted,
+          },
+          {
+            text: "GitHub",
+            href: "https://github.com",
+            variant: "glow",
+            icon: <Github className="h-5 w-5" />,
+          },
+        ]}
+        image={{
+          light: "https://images.unsplash.com/photo-1642790106117-e829e14a795f",
+          dark: "https://images.unsplash.com/photo-1642790106117-e829e14a795f",
+          alt: "Trading platform dashboard",
+        }}
+      />
 
       <div className="container mx-auto px-4">
         {!isLoginVisible ? (

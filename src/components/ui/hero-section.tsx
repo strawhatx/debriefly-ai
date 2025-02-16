@@ -12,8 +12,8 @@ interface HeroAction {
   text: string;
   href: string;
   icon?: React.ReactNode;
-  variant?: "default";
-  onClick?: () => void;
+  variant?: "default" | "glow";
+  onClick?: () => void;  // Added onClick property
 }
 
 interface HeroProps {
@@ -75,12 +75,8 @@ export function HeroSection({
           {/* Actions */}
           <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
             {actions.map((action, index) => (
-              <Button key={index} variant={action.variant} size="lg" asChild>
-                <a
-                  href={action.href}
-                  className="flex items-center gap-2"
-                  onClick={action.onClick}
-                >
+              <Button key={index} variant={action.variant} size="lg" asChild onClick={action.onClick}>
+                <a href={action.href} className="flex items-center gap-2">
                   {action.icon}
                   {action.text}
                 </a>

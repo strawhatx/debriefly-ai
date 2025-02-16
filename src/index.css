@@ -25,8 +25,6 @@
     --input: 160 3.7% 15.9%;
     --ring: 142 76% 36%;
     --radius: 0.75rem;
-    --brand: 27 96% 61%;
-    --brand-foreground: 31 97% 72%;
   }
  
   .dark {
@@ -49,8 +47,6 @@
     --border: 142 76% 36%;
     --input: 160 3.7% 15.9%;
     --ring: 142 76% 36%;
-    --brand: 31 97% 72%;
-    --brand-foreground: 27 96% 61%;
   }
 }
 
@@ -63,17 +59,12 @@
   }
 }
 
+/* Add gradient utilities */
 @layer utilities {
-  .delay-100 {
-    animation-delay: 100ms;
+  .bg-gradient-green {
+    @apply bg-gradient-to-r from-primary/90 to-primary/30;
   }
-  .delay-300 {
-    animation-delay: 300ms;
-  }
-  .delay-700 {
-    animation-delay: 700ms;
-  }
-  .delay-1000 {
-    animation-delay: 1000ms;
+  .text-gradient-green {
+    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
   }
 }
