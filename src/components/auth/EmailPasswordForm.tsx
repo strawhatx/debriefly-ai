@@ -30,6 +30,7 @@ const EmailPasswordForm = ({
       <Input
         type="email"
         placeholder="Email"
+        className="border-gray-600"
         value={formData.email}
         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         required
@@ -39,6 +40,7 @@ const EmailPasswordForm = ({
       <Input
         type="password"
         placeholder="Password"
+        className="border-gray-600"
         value={formData.password}
         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         required
@@ -48,6 +50,7 @@ const EmailPasswordForm = ({
       <div className="space-y-2">
         <Input
           type="password"
+          className="border-gray-600"
           placeholder="Confirm Password"
           value={formData.confirmPassword}
           onChange={(e) =>

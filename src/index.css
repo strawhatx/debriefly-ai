@@ -2,51 +2,61 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
-    --background: 160 0% 0%;
+    --background: theme(colors.gray.900);
     --foreground: 160 0% 98%;
-    --card: 160 0% 3%;
+    --card: theme(colors.gray.800);
     --card-foreground: 160 0% 98%;
     --popover: 160 0% 3%;
     --popover-foreground: 160 0% 98%;
-    --primary: 142 76% 36%;
+    --primary: theme(colors.emerald.600);
     --primary-foreground: 160 0% 98%;
     --secondary: 160 3.7% 15.9%;
     --secondary-foreground: 160 0% 98%;
     --muted: 160 3.7% 15.9%;
     --muted-foreground: 160 5% 64.9%;
-    --accent: 142 76% 36%;
+    --accent: theme(colors.emerald.600);
     --accent-foreground: 160 0% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 160 0% 98%;
-    --border: 142 76% 36%;
+    --border: theme(colors.gray.800);
     --input: 160 3.7% 15.9%;
-    --ring: 142 76% 36%;
+    --ring: theme(colors.gray.600);
     --radius: 0.75rem;
   }
+}
  
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-600;
+}
+
+@layer base {
+  :root {
+    --brand: 27 96% 61%;
+    --brand-foreground: 31 97% 72%;
+  }
   .dark {
-    --background: 160 0% 0%;
-    --foreground: 160 0% 98%;
-    --card: 160 0% 3%;
-    --card-foreground: 160 0% 98%;
-    --popover: 160 0% 3%;
-    --popover-foreground: 160 0% 98%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 160 0% 98%;
-    --secondary: 160 3.7% 15.9%;
-    --secondary-foreground: 160 0% 98%;
-    --muted: 160 3.7% 15.9%;
-    --muted-foreground: 160 5% 64.9%;
-    --accent: 142 76% 36%;
-    --accent-foreground: 160 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 160 0% 98%;
-    --border: 142 76% 36%;
-    --input: 160 3.7% 15.9%;
-    --ring: 142 76% 36%;
+    --brand: 31 97% 72%;
   }
 }
 
@@ -55,16 +65,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
-  }
-}
-
-/* Add gradient utilities */
-@layer utilities {
-  .bg-gradient-green {
-    @apply bg-gradient-to-r from-primary/90 to-primary/30;
-  }
-  .text-gradient-green {
-    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
+    @apply bg-background text-foreground;
   }
 }

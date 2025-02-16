@@ -33,7 +33,7 @@ const GoogleSignInButton = ({ isLoading }: GoogleSignInButtonProps) => {
     <Button 
       type="button" 
       variant="outline" 
-      className="w-full"
+      className="w-full border-gray-600"
       onClick={handleGoogleSignIn}
       disabled={isLoading}
     >

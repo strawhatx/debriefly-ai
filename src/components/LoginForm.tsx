@@ -81,7 +81,7 @@ const LoginForm = () => {
   };
 
   return (
-    <Card className="p-6 space-y-6 animate-fade-up">
+    <Card className="p-6 space-y-6 animate-fade-up bg-gray-800 border-gray-800">
       <AuthHeader isSignUp={isSignUp} />
       
       <GoogleSignInButton isLoading={isLoading} />
@@ -91,7 +91,7 @@ const LoginForm = () => {
           <Separator />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or continue with email</span>
+          <span className="bg-gray-800 px-2 text-muted-foreground">Or continue with email</span>
         </div>
       </div>
 
