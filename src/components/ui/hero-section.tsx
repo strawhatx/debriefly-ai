@@ -13,7 +13,7 @@ interface HeroAction {
   href: string;
   icon?: React.ReactNode;
   variant?: "default" | "glow";
-  onClick?: () => void;  // Added onClick property
+  onClick?: () => void;
 }
 
 interface HeroProps {
@@ -42,15 +42,10 @@ export function HeroSection({
   image,
 }: HeroProps) {
   return (
-    <section
-      className={cn(
-        "bg-background text-foreground",
-        "py-12 sm:py-24 md:py-32 px-4",
-        "fade-bottom overflow-hidden pb-0"
-      )}
-    >
-      <div className="mx-auto flex max-w-container flex-col gap-12 pt-16 sm:gap-24">
-        <div className="flex flex-col items-center gap-6 text-center sm:gap-12">
+    <section className="relative overflow-hidden bg-gradient-to-b from-background/50 to-background py-12 sm:py-24 md:py-32">
+      <div className="absolute inset-0 bg-grid-white/10 bg-[size:16px_16px] [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
+      <div className="container relative z-10 mx-auto px-4">
+        <div className="mx-auto flex max-w-4xl flex-col items-center gap-8 text-center">
           {/* Badge */}
           {badge && (
             <Badge variant="outline" className="animate-appear gap-2">
@@ -63,17 +58,17 @@ export function HeroSection({
           )}
 
           {/* Title */}
-          <h1 className="relative z-10 inline-block animate-appear bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-4xl font-semibold leading-tight text-transparent drop-shadow-2xl sm:text-6xl sm:leading-tight md:text-8xl md:leading-tight">
+          <h1 className="animate-appear bg-gradient-to-b from-foreground to-foreground/80 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl sm:leading-tight md:text-7xl">
             {title}
           </h1>
 
           {/* Description */}
-          <p className="text-md relative z-10 max-w-[550px] animate-appear font-medium text-muted-foreground opacity-0 delay-100 sm:text-xl">
+          <p className="animate-appear text-lg text-muted-foreground opacity-0 delay-100 sm:text-xl">
             {description}
           </p>
 
           {/* Actions */}
-          <div className="relative z-10 flex animate-appear justify-center gap-4 opacity-0 delay-300">
+          <div className="flex animate-appear justify-center gap-4 opacity-0 delay-200">
             {actions.map((action, index) => (
               <Button key={index} variant={action.variant} size="lg" asChild onClick={action.onClick}>
                 <a href={action.href} className="flex items-center gap-2">
@@ -85,22 +80,22 @@ export function HeroSection({
           </div>
 
           {/* Image with Glow */}
-          <div className="relative pt-12">
+          <div className="relative mt-12 w-full max-w-5xl">
             <MockupFrame
-              className="animate-appear opacity-0 delay-700"
+              className="animate-appear opacity-0 delay-300"
               size="small"
             >
               <Mockup type="responsive">
                 <img
                   src={image.light}
                   alt={image.alt}
-                  className="w-full h-auto"
+                  className="w-full h-auto rounded-lg shadow-2xl"
                 />
               </Mockup>
             </MockupFrame>
             <Glow
               variant="top"
-              className="animate-appear-zoom opacity-0 delay-1000"
+              className="animate-appear-zoom opacity-0 delay-400"
             />
           </div>
         </div>
