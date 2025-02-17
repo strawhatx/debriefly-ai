@@ -54,7 +54,7 @@ const LoginForm = () => {
           title: "Success",
           description: "Account created and logged in successfully",
         });
-        navigate("/dashboard");
+        navigate("/app/dashboard");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: formData.email,
@@ -67,7 +67,7 @@ const LoginForm = () => {
           title: "Welcome back",
           description: "You have been logged in successfully",
         });
-        navigate("/dashboard");
+        navigate("/app/dashboard");
       }
     } catch (error: any) {
       toast({

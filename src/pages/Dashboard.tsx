@@ -46,7 +46,7 @@ const Dashboard = () => {
           <Button 
             size="sm" 
             className="gap-2 text-sm h-9"
-            onClick={() => navigate("/import")}
+            onClick={() => navigate("/app/trade-entry")}
           >
             <Import className="w-3.5 h-3.5" />
             Import Trades

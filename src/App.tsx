@@ -11,14 +11,13 @@ import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import Pricing from "./pages/Pricing";
+import StrategyOptimization from "./pages/StrategyOptimization";
 import Dashboard from "./pages/Dashboard";
-import Journal from "./pages/Journal";
+import Debrief from "./pages/Debrief";
 import Trades from "./pages/Trades";
-import Insights from "./pages/Insights";
-import Replay from "./pages/Replay";
+import BehaviorialPatterns from "./pages/BehaviorialPatterns";
 import Settings from "./pages/Settings";
-import ImportTrades from "./pages/ImportTrades";
+import TradeEntry from "./pages/TradeEntry";
 import Sidebar from "./components/Sidebar";
 import Navigation from "./components/Navigation";
 
@@ -47,17 +46,16 @@ const App = () => {
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/pricing" element={<Pricing />} />
                   
                   {/* Protected routes */}
                   <Route element={<AuthGuard />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/journal" element={<Journal />} />
-                    <Route path="/trades" element={<Trades />} />
-                    <Route path="/insights" element={<Insights />} />
-                    <Route path="/replay" element={<Replay />} />
+                    <Route path="/app/dashboard" element={<Dashboard />} />
+                    <Route path="/app/debrief" element={<Debrief />} />
+                    <Route path="/app/trades" element={<Trades />} />
+                    <Route path="/app/strategy-optimization" element={<StrategyOptimization />} />
+                    <Route path="/app/behavioral-patterns" element={<BehaviorialPatterns />} />
                     <Route path="/settings" element={<Settings />} />
-                    <Route path="/import" element={<ImportTrades />} />
+                    <Route path="/app/trade-entry" element={<TradeEntry />} />
                   </Route>
 
                   <Route path="*" element={<NotFound />} />

@@ -14,11 +14,11 @@ import { BarChart2, BookOpen, Play, Settings, User, Grid, ChartLine } from "luci
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navigationItems = [
-  { title: "Dashboard", icon: Grid, url: "/dashboard" },
-  { title: "Trading Journal", icon: BookOpen, url: "/journal" },
-  { title: "Trades", icon: BarChart2, url: "/trades" },
+  { title: "Dashboard", icon: Grid, url: "/app/dashboard" },
+  { title: "Trading Journal", icon: BookOpen, url: "/app/debrief" },
+  { title: "Trades", icon: BarChart2, url: "/app/trades" },
   { title: "Insights", icon: ChartLine, url: "/insights" },
-  { title: "Replay", icon: Play, url: "/replay" },
+  { title: "Replay", icon: Play, url: "/app/strategy-optimization" },
 ];
 
 const Sidebar = () => {
