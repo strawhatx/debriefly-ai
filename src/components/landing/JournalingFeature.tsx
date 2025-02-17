@@ -10,7 +10,7 @@ const features = [
     icon: XMarkIcon,
   },
   {
-    name: 'Blind to Behavior Patterns',
+    name: 'Blind to Behavior Patterns.',
     description: 'FOMO, Revenge Trades—hard to see them yourself.',
     icon: XMarkIcon,
   },
@@ -23,24 +23,24 @@ const features = [
 
 export const JournalingFeature = () => {
   return (
-    <div className="overflow-hidden bg-white py-24 sm:py-32">
+    <section className="overflow-hidden py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
           <div className="lg:pt-4 lg:pr-8">
             <div className="lg:max-w-lg">
-              <h2 className="text-base/7 font-semibold text-emerald-600">Challenge the Status Quo</h2>
-              <p className="mt-2 text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl">
+              <h2 className="text-base/7 font-semibold text-primary">Challenge the Status Quo</h2>
+              <p className="mt-2 text-4xl font-semibold tracking-tight text-pretty sm:text-5xl">
               Journaling Alone Won’t Make You a Better Trader
               </p>
-              <p className="mt-6 text-lg/8 text-gray-600">
+              <p className="mt-6 text-lg/8 text-gray-400">
               You don’t need more logs. You need real insights.
               We combine AI analysis + trading psychology to show you what really drives your wins & losses.
               </p>
-              <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-600 lg:max-w-none">
+              <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-400 lg:max-w-none">
                 {features.map((feature) => (
                   <div key={feature.name} className="relative pl-9">
-                    <dt className="inline font-semibold text-gray-900">
-                      <feature.icon aria-hidden="true" className="absolute top-1 left-1 size-5 text-iemerald-600" />
+                    <dt className="inline font-semibold text-gray-100">
+                      <feature.icon aria-hidden="true" className="absolute top-1 left-1 size-5 text-destructive" />
                       {feature.name}
                     </dt>{' '}
                     <dd className="inline">{feature.description}</dd>
@@ -58,7 +58,7 @@ export const JournalingFeature = () => {
           />
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 

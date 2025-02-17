@@ -6,24 +6,32 @@
 @layer base {
   :root {
     --background: theme(colors.gray.900);
-    --foreground: 160 0% 98%;
+    --foreground: theme(colors.gray.100);
+
     --card: theme(colors.gray.800);
-    --card-foreground: 160 0% 98%;
-    --popover: 160 0% 3%;
-    --popover-foreground: 160 0% 98%;
-    --primary: theme(colors.emerald.600);
-    --primary-foreground: 160 0% 98%;
-    --secondary: 160 3.7% 15.9%;
-    --secondary-foreground: 160 0% 98%;
-    --muted: 160 3.7% 15.9%;
-    --muted-foreground: 160 5% 64.9%;
-    --accent: theme(colors.emerald.600);
-    --accent-foreground: 160 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 160 0% 98%;
+    --card-foreground: theme(colors.gray.100);
+
+    --popover: theme(colors.gray.900);
+    --popover-foreground: theme(colors.gray.100);
+
+    --primary: theme(colors.emerald.400);
+    --primary-foreground: theme(colors.gray.700);
+
+    --secondary: theme(colors.gray.800);
+    --secondary-foreground: theme(colors.gray.100);
+
+    --muted: theme(colors.gray.800);
+    --muted-foreground: theme(colors.gray.200);
+
+    --accent: theme(colors.emerald.400);
+    --accent-foreground: theme(colors.gray.600);
+
+    --destructive: theme(colors.red.500);
+    --destructive-foreground: theme(colors.gray.100);
+
     --border: theme(colors.gray.800);
-    --input: 160 3.7% 15.9%;
-    --ring: theme(colors.gray.600);
+    --input: theme(colors.gray.200);
+    --ring: theme(colors.emerald.400);
     --radius: 0.75rem;
   }
 }

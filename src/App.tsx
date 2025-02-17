@@ -36,7 +36,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <SidebarProvider>
-            <div className="min-h-screen flex w-full">
+            <div className="min-h-screen bg-background flex w-full">
               {!isAuthPage && !isLandingPage && <Sidebar />}
               <main className="flex-1">
                 {isLandingPage && <Navigation />}

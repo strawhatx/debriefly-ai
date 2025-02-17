@@ -29,7 +29,7 @@ const Login = () => {
   }, [navigate]);
 
   return (
-    <div className="h-screen flex items-center bg-gray-900 justify-center p-4">
+    <div className="h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <LoginForm />
       </div>
