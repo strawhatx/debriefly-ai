@@ -20,14 +20,33 @@ import Settings from "./pages/Settings";
 import TradeEntry from "./pages/TradeEntry";
 import Sidebar from "./components/Sidebar";
 import Navigation from "./components/Navigation";
+import { Header } from "./components/Header";
 
 const queryClient = new QueryClient();
 
+const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="min-h-screen bg-background flex w-full">
+      <main className="flex-1">
+        <Header />
+        {children}
+      </main>
+    </div>
+  )
+}
+
+const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="min-h-screen bg-background flex w-full">
+      <Sidebar />
+      <main className="flex-1">
+        {children}
+      </main>
+    </div>
+  )
+}
+
 const App = () => {
-  const isAuthPage = window.location.pathname === "/login";
-  const isLandingPage = ["/", "/blog", "/contact", "/pricing"].includes(
-    window.location.pathname
-  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -36,32 +55,67 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <SidebarProvider>
-            <div className="min-h-screen bg-background flex w-full">
-              {!isAuthPage && !isLandingPage && <Sidebar />}
-              <main className="flex-1">
-                {isLandingPage && <Navigation />}
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/login" element={<Login />} />
-                  
-                  {/* Protected routes */}
-                  <Route element={<AuthGuard />}>
-                    <Route path="/app/dashboard" element={<Dashboard />} />
-                    <Route path="/app/debrief" element={<Debrief />} />
-                    <Route path="/app/trades" element={<Trades />} />
-                    <Route path="/app/strategy-optimization" element={<StrategyOptimization />} />
-                    <Route path="/app/behavioral-patterns" element={<BehaviorialPatterns />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/app/trade-entry" element={<TradeEntry />} />
-                  </Route>
 
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-            </div>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={
+                <NavbarLayout>
+                  <Index />
+                </NavbarLayout>
+              } />
+              <Route path="/blog" element={
+                <NavbarLayout>
+                  <Blog />
+                </NavbarLayout>
+              } />
+              <Route path="/contact" element={
+                <NavbarLayout>
+                  <Contact />
+                </NavbarLayout>
+              } />
+              <Route path="/login" element={<Login />} />
+
+              {/* Protected routes */}
+              <Route element={<AuthGuard />}>
+                <Route path="/app/dashboard" element={
+                  <SidebarLayout>
+                    <Dashboard />
+                  </SidebarLayout>
+                } />
+                <Route path="/app/debrief" element={
+                  <SidebarLayout>
+                    <Debrief />
+                  </SidebarLayout>
+                } />
+                <Route path="/app/trades" element={
+                  <SidebarLayout>
+                    <Trades />
+                  </SidebarLayout>
+                } />
+                <Route path="/app/strategy-optimization" element={
+                  <SidebarLayout>
+                    <StrategyOptimization />
+                  </SidebarLayout>
+                } />
+                <Route path="/app/behavioral-patterns" element={
+                  <SidebarLayout>
+                    <BehaviorialPatterns />
+                  </SidebarLayout>
+                } />
+                <Route path="/settings" element={
+                  <SidebarLayout>
+                    <Settings />
+                  </SidebarLayout>
+                } />
+                <Route path="/app/trade-entry" element={
+                  <SidebarLayout>
+                    <TradeEntry />
+                  </SidebarLayout>
+                } />
+              </Route>
+
+              <Route path="*" element={<NotFound />} />
+            </Routes>
           </SidebarProvider>
         </BrowserRouter>
       </TooltipProvider>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Edit } from "lucide-react";
 
 interface AvatarUploadProps {
   profile: any;
@@ -60,11 +61,21 @@ export const AvatarUpload = ({ profile, setProfile }: AvatarUploadProps) => {
   };
 
   return (
-    <div className="flex items-center gap-8">
-      <Avatar className="h-24 w-24">
-        <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} />
-        <AvatarFallback>{profile?.full_name?.charAt(0) || "U"}</AvatarFallback>
-      </Avatar>
+    <div className="flex flex-col items-center gap-8">
+      <div className="relative">
+        <Avatar className="relative h-32 w-32 mx-auto mb-2">
+          <AvatarImage src={profile?.avatar_url || "/placeholder.svg"} />
+          <AvatarFallback>{profile?.full_name?.charAt(0) || "U"}</AvatarFallback>
+        </Avatar> 
+        <button
+          className="absolute bottom-3 right-3 p-2 bg-emerald-600 rounded-full hover:bg-emerald-700 transition-colors"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploadingAvatar}
+        >
+          <Edit className="w-4 h-4" />
+        </button>
+      </div>
+
       <div>
         <input
           type="file"
@@ -73,7 +84,8 @@ export const AvatarUpload = ({ profile, setProfile }: AvatarUploadProps) => {
           accept="image/*"
           onChange={handleAvatarUpload}
         />
-        <Button 
+        <Button
+          variant="link"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadingAvatar}
         >

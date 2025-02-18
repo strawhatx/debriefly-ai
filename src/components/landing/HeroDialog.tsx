@@ -18,7 +18,7 @@ export const HeroDialog = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="text-sm/6 font-semibold border-emerald-400">
+        <Button variant="outline" className="text-sm/6 font-semibold border-primary hover:border-emerald-200">
           🔍 See How It Works
         </Button>
       </DialogTrigger>

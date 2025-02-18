@@ -3,15 +3,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { 
   User, 
-  Shield, 
   CreditCard, 
   ChartBar,
   Upload,
+  Bell,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ProfileSection } from "@/components/settings/ProfileSection";
-import { SecuritySection } from "@/components/settings/SecuritySection";
+import { NotificationSection } from "@/components/settings/NotificationSection";
 import { SubscriptionSection } from "@/components/settings/SubscriptionSection";
 import { TradingAccountsSection } from "@/components/settings/TradingAccountsSection";
 import { ImportHistorySection } from "@/components/settings/ImportHistorySection";
@@ -95,8 +95,8 @@ const Settings = () => {
             Profile
           </TabsTrigger>
           <TabsTrigger value="security" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Security
+            <Bell className="h-4 w-4" />
+            Notifications
           </TabsTrigger>
           <TabsTrigger value="subscription" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" />
@@ -117,7 +117,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="security">
-          <SecuritySection />
+          <NotificationSection />
         </TabsContent>
 
         <TabsContent value="subscription">

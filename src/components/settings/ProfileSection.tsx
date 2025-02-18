@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AvatarUpload } from "./AvatarUpload";
+import { ProfilePasswordDialog } from "./ProfilePasswordDialog";
 
 interface ProfileSectionProps {
   profile: any;
@@ -43,29 +44,50 @@ export const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => 
   };
 
   return (
-    <Card className="p-6">
-      <div className="space-y-8">
-        <AvatarUpload profile={profile} setProfile={setProfile} />
-        <div className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Full Name</Label>
-            <Input 
-              value={profile?.full_name || ""} 
-              onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-              placeholder="Enter your full name" 
-            />
-          </div>
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Username</Label>
-            <Input 
-              value={profile?.username || ""} 
-              onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-              placeholder="Enter your username" 
-            />
-          </div>
-          <Button onClick={handleProfileUpdate}>Save Changes</Button>
-        </div>
+    <div className="grid grid-cols-3 gap-8">
+      {/* Profile Picture */}
+      <div className="col-span-1">
+        <Card className="p-6">
+          <AvatarUpload profile={profile} setProfile={setProfile} />
+        </Card>
       </div>
-    </Card>
+
+      <div className="col-span-2">
+        <Card className="p-6">
+        <h2 className="text-xl font-semibold mb-6">Personal Details</h2>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm mb-2 block">Full Name</Label>
+              <Input
+                className="border-gray-600"
+                value={profile?.full_name || ""}
+                onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div>
+              <Label className="text-sm mb-2 block">Email</Label>
+              <Input
+                type="email"
+                className="border-gray-600"
+                value={profile?.email || ""}
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm  mb-2">
+                Password
+              </label>
+              <ProfilePasswordDialog onChangeComplete={} />
+            </div>
+            <Button onClick={handleProfileUpdate}>Save Changes</Button>
+          </div>
+        </Card>
+      </div>
+
+    </div>
+
   );
 };

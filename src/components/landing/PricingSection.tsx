@@ -80,7 +80,7 @@ export const PricingSection = () => {
           >
             <h3
               id={tier.id}
-              className={classNames(tier.featured ? 'text-emerald-400' : 'text-emerald-600', 'text-base/7 font-semibold')}
+              className={classNames(tier.featured ? 'text-primary' : 'text-emerald-600', 'text-base/7 font-semibold')}
             >
               {tier.name}
             </h3>
@@ -109,7 +109,7 @@ export const PricingSection = () => {
                 <li key={feature} className="flex gap-x-3">
                   <CheckIcon
                     aria-hidden="true"
-                    className={classNames(tier.featured ? 'text-emerald-400' : 'text-emerald-600', 'h-6 w-5 flex-none')}
+                    className={classNames(tier.featured ? 'text-primary' : 'text-emerald-600', 'h-6 w-5 flex-none')}
                   />
                   {feature}
                 </li>
@@ -123,8 +123,8 @@ export const PricingSection = () => {
                 aria-disabled={!tier.isActive}
                 className={classNames(
                   tier.featured
-                    ? 'bg-emerald-500 text-white shadow-xs hover:bg-emerald-400 focus-visible:outline-emerald-500'
-                    : 'text-emerald-600 ring-1 ring-emerald-400 ring-inset hover:ring-emerald-300 focus-visible:outline-emerald-600',
+                    ? 'bg-primary text-white shadow-xs hover:bg-primary focus-visible:outline-primary'
+                    : 'text-white ring-1 ring-primary ring-inset hover:ring-emerald-300 focus-visible:outline-primary',
                   'mt-8 block rounded-md px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
                 )}
               >
@@ -134,13 +134,13 @@ export const PricingSection = () => {
 
             {!tier.isActive && (
               <Button
-                variant='link'
+                variant='default'
                 aria-describedby={tier.id}
                 disabled
                 className={classNames(
                   tier.featured
-                    ? 'bg-emerald-500 text-white shadow-xs hover:bg-emerald-400 focus-visible:outline-emerald-500'
-                    : 'text-emerald-400 ring-1 ring-emerald-400 ring-inset hover:ring-emerald-300 focus-visible:outline-emerald-400',
+                    ? 'bg-primary text-black shadow-xs hover:bg-primary focus-visible:outline-emerald-500'
+                    : 'text-black ring-1 ring-primary ring-inset hover:ring-primaryfocus-visible:outline-primary',
                   'mt-8 block w-full rounded-md px-3.5 py-2.5 text-center text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10',
                 )}
               >
