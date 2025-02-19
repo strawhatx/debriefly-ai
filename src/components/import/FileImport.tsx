@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Broker } from "./types";
@@ -19,9 +19,7 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { setBroker } = useBrokerStore((state) => ({
-    setBroker: state.updateSelectedBroker,
-  }));
+  const setBroker = useBrokerStore((state) => state.update);
 
   const { isUploading, handleImport } = useFileImport(selectedAccount);
 
@@ -57,7 +55,6 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
     setSelectedBrokerId(brokerId);
 
     setBroker(availableBrokers?.find(b => b.id === selectedBrokerId)|| null)
-
   };
 
   return (

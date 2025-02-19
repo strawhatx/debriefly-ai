@@ -8,6 +8,7 @@ import { BrokerSync } from "@/components/import/BrokerSync";
 import { Broker } from "@/components/import/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { FileImportDescription } from "@/components/import/FileImportDescription";
 
 const ImportTrades = () => {
   const navigate = useNavigate();
@@ -54,20 +55,7 @@ const ImportTrades = () => {
                 <FileImport availableBrokers={availableBrokers} />
               </Card>
               <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">How to Import Trades</h3>
-                <div className="space-y-4 text-sm text-muted-foreground">
-                  <p>Follow these steps to import your trades:</p>
-                  <ol className="list-decimal list-inside space-y-2">
-                    <li>Select your broker from the dropdown menu</li>
-                    <li>Choose the trading account where you want to import the trades</li>
-                    <li>Upload your trade history file (CSV or Excel format)</li>
-                    <li>Click "Start Import" to begin the process</li>
-                  </ol>
-                  <p>
-                    Your trades will be processed in the background. You can check the
-                    import status in the settings page under "Import History".
-                  </p>
-                </div>
+                <FileImportDescription />
               </Card>
             </div>
           </TabsContent>

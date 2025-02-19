@@ -3,17 +3,15 @@ import { Broker } from '@/components/import/types';
 import { create } from 'zustand';
 
 interface BrokerState {
-    selectedBroker: Broker | null;
+    selected: Broker | null;
 
-    updateSelectedBroker:(selected: Broker) => void,
+    update:(selected: Broker) => void,
 }
 
 const useBrokerStore = create<BrokerState>((set) => ({
-    selectedBroker: null,
+    selected: null,
 
-    updateSelectedBroker: async (selected: Broker) => {
-        set({ selectedBroker: selected });
-    },
+    update: (selected) => set({ selected }),
 }));
 
 export default useBrokerStore;

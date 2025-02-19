@@ -1,9 +1,7 @@
 import useBrokerStore from "@/store/broker";
 
-export const FileImportzDescription = () => {
-  const { broker } = useBrokerStore((state) => ({
-    broker: state.selectedBroker,
-  }));
+export const FileImportDescription = () => {
+  const broker  = useBrokerStore((state) => state.selected);
 
   return (
     <>

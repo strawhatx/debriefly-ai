@@ -4,15 +4,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BrokerInfoProps {
-  broker?: Broker;
   availableBrokers?: Broker[];
   onBrokerSelect: (brokerId: string) => void;
   selectedBrokerId: string;
   syncMode?: boolean;
 }
 
-export const BrokerInfo = ({
-  broker, availableBrokers = [], onBrokerSelect, selectedBrokerId, syncMode = false
+export const BrokerInfo = ({availableBrokers = [], onBrokerSelect, selectedBrokerId, syncMode = false
 }: BrokerInfoProps) => {
 
   const filteredBrokers = availableBrokers.filter(broker =>
@@ -35,6 +33,5 @@ export const BrokerInfo = ({
         </SelectContent>
       </Select>
     </div>
-
   );
 };
