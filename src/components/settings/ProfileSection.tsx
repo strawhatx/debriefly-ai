@@ -45,7 +45,6 @@ export const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => 
 
   return (
     <div className="grid grid-cols-3 gap-8">
-      {/* Profile Picture */}
       <div className="col-span-1">
         <Card className="p-6">
           <AvatarUpload profile={profile} setProfile={setProfile} />
@@ -80,13 +79,12 @@ export const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => 
               <label className="block text-sm  mb-2">
                 Password
               </label>
-              <ProfilePasswordDialog onChangeComplete={} />
+              <ProfilePasswordDialog />
             </div>
             <Button onClick={handleProfileUpdate}>Save Changes</Button>
           </div>
         </Card>
       </div>
-
     </div>
 
   );

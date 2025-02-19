@@ -5,9 +5,11 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
-export const SecuritySection = () => {
+export const NotificationSection = () => {
   const { toast } = useToast();
-
+  const [notifications, setNotifications] = useState({
+    dailySession: true, weeklyPerformance: true, betaUpdates: false, psychologyTips: true
+  });
 
   return (
     <Card className="p-6">

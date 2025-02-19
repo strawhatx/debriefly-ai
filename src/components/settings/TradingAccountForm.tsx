@@ -90,7 +90,6 @@ export const TradingAccountForm = ({
           placeholder="Enter balance"
         />
       </td>
-      <td>{editingAccount.isNew ? 'Now' : new Date(editingAccount.created_at || '').toLocaleDateString()}</td>
       <td className="text-right space-x-2">
         <Button size="icon" variant="ghost" onClick={onSave}>
           <Check className="h-4 w-4" />

@@ -8,6 +8,7 @@ import { AccountSelect } from "./AccountSelect";
 import { FileUploader } from "./FileUploader";
 import { ImportButton } from "./ImportButton";
 import { useFileImport } from "./hooks/useFileImport";
+import useBrokerStore from "@/store/broker";
 
 interface FileImportProps {
   availableBrokers?: Broker[];
@@ -17,15 +18,18 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
   const [selectedBrokerId, setSelectedBrokerId] = useState<string>("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  
-  const selectedBroker = availableBrokers?.find(b => b.id === selectedBrokerId);
+
+  const { setBroker } = useBrokerStore((state) => ({
+    setBroker: state.updateSelectedBroker,
+  }));
+
   const { isUploading, handleImport } = useFileImport(selectedAccount);
 
   const { data: tradingAccounts } = useQuery({
     queryKey: ["tradingAccounts", selectedBrokerId],
     queryFn: async () => {
       if (!selectedBrokerId) return [];
-      
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -49,12 +53,18 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
     }
   };
 
+  const handleBrokerSelect = (brokerId: string) => {
+    setSelectedBrokerId(brokerId);
+
+    setBroker(availableBrokers?.find(b => b.id === selectedBrokerId)|| null)
+
+  };
+
   return (
     <div className="space-y-6">
-      <BrokerInfo 
-        broker={selectedBroker}
+      <BrokerInfo
         availableBrokers={availableBrokers}
-        onBrokerSelect={setSelectedBrokerId}
+        onBrokerSelect={handleBrokerSelect}
         selectedBrokerId={selectedBrokerId}
       />
 
@@ -65,10 +75,10 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
             selectedAccount={selectedAccount}
             onAccountChange={setSelectedAccount}
           />
-          
+
           <FileUploader onFileSelect={setSelectedFile} />
 
-          <ImportButton 
+          <ImportButton
             onClick={handleStartImport}
             isUploading={isUploading}
           />

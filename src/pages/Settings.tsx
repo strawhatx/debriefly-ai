@@ -15,6 +15,7 @@ import { NotificationSection } from "@/components/settings/NotificationSection";
 import { SubscriptionSection } from "@/components/settings/SubscriptionSection";
 import { TradingAccountsSection } from "@/components/settings/TradingAccountsSection";
 import { ImportHistorySection } from "@/components/settings/ImportHistorySection";
+import { SignOutButton } from "@/components/auth/SignOutButton";
 
 const Settings = () => {
   const { toast } = useToast();
@@ -87,7 +88,11 @@ const Settings = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8">Settings</h1>
+      <div className="flex justify-between">
+        <h2 className="text-2xl font-bold mb-8">Settings</h2>
+        <SignOutButton />
+      </div>
+      
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="mb-8">
           <TabsTrigger value="profile" className="flex items-center gap-2">

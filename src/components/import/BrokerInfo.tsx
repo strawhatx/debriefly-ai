@@ -11,55 +11,30 @@ interface BrokerInfoProps {
   syncMode?: boolean;
 }
 
-export const BrokerInfo = ({ 
-  broker,
-  availableBrokers = [],
-  onBrokerSelect,
-  selectedBrokerId,
-  syncMode = false
+export const BrokerInfo = ({
+  broker, availableBrokers = [], onBrokerSelect, selectedBrokerId, syncMode = false
 }: BrokerInfoProps) => {
-  const filteredBrokers = availableBrokers.filter(broker => 
+
+  const filteredBrokers = availableBrokers.filter(broker =>
     syncMode ? broker.broker_sync_enabled : broker.file_upload_enabled
   );
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label>Broker</Label>
-        <Select value={selectedBrokerId} onValueChange={onBrokerSelect}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select a broker" />
-          </SelectTrigger>
-          <SelectContent>
-            {filteredBrokers.map((broker) => (
-              <SelectItem key={broker.id} value={broker.id}>
-                {broker.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {broker && (
-        <div className="p-4 border rounded-md bg-muted">
-          <h3 className="font-medium mb-1">Selected Broker</h3>
-          <p className="text-sm text-muted-foreground">
-            {broker.name}
-            {broker.description && (
-              <span className="block mt-1 text-xs">
-                {broker.description}
-              </span>
-            )}
-          </p>
-          {broker.asset_types?.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs text-muted-foreground">
-                Supported assets: {broker.asset_types.join(', ')}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+    <div className="space-y-2">
+      <Label>Broker</Label>
+      <Select value={selectedBrokerId} onValueChange={onBrokerSelect}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Select a broker" />
+        </SelectTrigger>
+        <SelectContent>
+          {filteredBrokers.map((broker) => (
+            <SelectItem key={broker.id} value={broker.id}>
+              {broker.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
+
   );
 };

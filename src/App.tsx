@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AuthGuard from "@/components/auth/AuthGuard";
 import Index from "./pages/Index";
-import Blog from "./pages/Blog";
+import { Blog } from "./pages/Blog";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";

@@ -16,13 +16,12 @@ export const TradingAccountRow = ({
 }: TradingAccountRowProps) => {
   return (
     <>
-      <td>{account.account_name}</td>
-      <td>{account.broker?.name || 'N/A'}</td>
-      <td>{account.profit_calculation_method}</td>
-      <td>
+      <td className="px-4">{account.account_name}</td>
+      <td className="px-4"> {account.broker?.name || 'N/A'}</td>
+      <td className="px-4">{account.profit_calculation_method}</td>
+      <td className="px-4">
         ${account.account_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </td>
-      <td>{new Date(account.created_at).toLocaleDateString()}</td>
       <td className="text-right space-x-2">
         <Button size="icon" variant="ghost" onClick={() => onEdit(account)}>
           <Pencil className="h-4 w-4" />

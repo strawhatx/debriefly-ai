@@ -17,7 +17,7 @@ import { AccountSelect } from "@/components/import/AccountSelect";
 
 export const ProfilePasswordDialog = () => {
   const { toast } = useToast();
-  const [passwordOpen, setPasswordOpen] = useState(false); const { toast } = useToast();
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -70,9 +70,6 @@ export const ProfilePasswordDialog = () => {
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6">
-        <h3 className="text-lg font-semibold">Change Password</h3>
         <div className="space-y-4">
           <div>
             <Label className="text-sm font-medium mb-2 block">Current Password</Label>
@@ -106,7 +103,6 @@ export const ProfilePasswordDialog = () => {
           </div>
           <Button onClick={handlePasswordUpdate}>Update Password</Button>
         </div>
-      </div>
       </DialogContent>
     </Dialog>
   );
