@@ -5,7 +5,7 @@ import { create } from 'zustand';
 interface BrokerState {
     selected: Broker | null;
 
-    update:(selected: Broker) => void,
+    update: (selected: Broker) => void,
 }
 
 const useBrokerStore = create<BrokerState>((set) => ({

@@ -4,7 +4,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as Papa from 'papaparse'; // For CSV parsing
 import { mapTradeData } from "../utils/utils";
-import { ImportRow, Position } from "../utils/types";
+import { Position } from "../utils/types";
+import { detectAssetType } from "../utils/asset-detection";
 
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
@@ -72,7 +73,7 @@ export const useFileImport = (selectedAccount: string) => {
           });
 
           //set status to procesing
-          const { error } =  await supabase.from('imports').update({ status: 'PROCESSING' }).eq("id", importRecord.id);
+          const { data, error } = await supabase.from('imports').update({ tatus: 'PROCESSING' }).match({ id: importRecord.id})
 
           // Insert trades into Supabase
           await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
@@ -90,7 +91,7 @@ export const useFileImport = (selectedAccount: string) => {
       });
 
       //set status to failed w/message
-      await supabase.from('imports').update({ status: 'FAILED', error_message: error.message || "Failed to start import" }).eq("id", errorId);
+      await supabase.from('imports').update({ status: 'FAILED', error_message: error.message || "Failed to start import" }).match({ id: errorId})
       return false;
     }
     finally {
@@ -166,7 +167,10 @@ export const useFileImport = (selectedAccount: string) => {
     return closedPositions;
   };
 
-  const commonPositionFields = (entry: any, exit: any) => ({
+  const commonPositionFields = async (entry: any, exit: any) => {
+    const asset = await detectAssetType(entry.symbol)
+
+    return {
     user_id: entry.user_id,
     trading_account_id: entry.trading_account_id,
     symbol: entry.symbol,
@@ -178,8 +182,9 @@ export const useFileImport = (selectedAccount: string) => {
     status: 'CLOSED',
     entry_trade_id: entry.id,
     close_trade_id: exit.id,
-    multiplier: entry.multiplier
-  });
+    asset_type: asset.assetType,
+    multiplier: asset.multiplier,
+  }};
 
   return {
     isUploading,

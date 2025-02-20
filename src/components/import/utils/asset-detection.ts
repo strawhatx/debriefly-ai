@@ -1,5 +1,7 @@
+import { supabase } from "@/integrations/supabase/client";
+
 interface AssetConfig {
-  assetType: 'stock' | 'option' | 'future' | 'forex' | 'crypto';
+  assetType: 'STOCK' | 'OPTIONS' | 'FUTURES' | 'FOREX' | 'CRYPTO';
   multiplier: number;
   market?: string;
 }
@@ -7,7 +9,7 @@ interface AssetConfig {
 let CURRENCY_CODES: Set<string> = new Set();
 let FUTURES_MULTIPLIERS: Map<string, number> = new Map();
 
-async function loadCurrencyCodes(supabase: any) {
+async function loadCurrencyCodes() {
   try {
     const { data, error } = await supabase
       .from('currency_codes')
@@ -23,7 +25,7 @@ async function loadCurrencyCodes(supabase: any) {
   }
 }
 
-async function loadFuturesMultipliers(supabase: any) {
+async function loadFuturesMultipliers() {
   try {
     const { data, error } = await supabase
       .from('futures_multipliers')
@@ -40,7 +42,7 @@ async function loadFuturesMultipliers(supabase: any) {
   }
 }
 
-async function getMultiplierForFuture(symbol: string, supabase: any): Promise<number> {
+async function getMultiplierForFuture(symbol: string): Promise<number> {
   // First check our local cache
   const cachedMultiplier = FUTURES_MULTIPLIERS.get(symbol);
   if (cachedMultiplier) {
@@ -53,10 +55,10 @@ async function getMultiplierForFuture(symbol: string, supabase: any): Promise<nu
   return 1;
 }
 
-export async function initializeAssetDetection(supabase: any) {
+async function initializeAssetDetection() {
   await Promise.all([
-    loadCurrencyCodes(supabase),
-    loadFuturesMultipliers(supabase)
+    loadCurrencyCodes(),
+    loadFuturesMultipliers()
   ]);
 }
 
@@ -75,12 +77,14 @@ function extractFuturesRoot(symbol: string): string {
   return symbol.replace(/[FGHJKMNQUVXZ]\d{1,2}[!]?$/, '');
 }
 
-export async function detectAssetType(symbol: string, supabase: any): Promise<AssetConfig> {
+export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   const normalizedSymbol = symbol.toUpperCase().trim();
   const market = extractMarket(normalizedSymbol);
   const cleanSymbol = extractCleanSymbol(normalizedSymbol);
 
   console.log(`symbol: ${cleanSymbol}`)
+
+  await initializeAssetDetection();
   
   // Futures detection
   const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
@@ -88,9 +92,9 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
   
   if (futuresRegex.test(cleanSymbol)) {
     const rootSymbol = extractFuturesRoot(cleanSymbol);
-    const multiplier = await getMultiplierForFuture(rootSymbol, supabase);
+    const multiplier = await getMultiplierForFuture(rootSymbol);
     return {
-      assetType: 'future',
+      assetType: 'FUTURES',
       multiplier,
       market
     };
@@ -100,7 +104,7 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
   const optionsRegex = /^[A-Z]+(\d{6}[CP]\d+)$/;
   if (optionsRegex.test(cleanSymbol) || cleanSymbol.length > 10) {
     return {
-      assetType: 'option',
+      assetType: 'OPTIONS',
       multiplier: 100,
       market
     };
@@ -114,7 +118,7 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
     const [base, quote] = cleanSymbol.split('/');
     if (CURRENCY_CODES.has(base) && CURRENCY_CODES.has(quote)) {
       return {
-        assetType: 'forex',
+        assetType: 'FOREX',
         multiplier: 100000,
         market
       };
@@ -126,7 +130,7 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
     const quote = cleanSymbol.slice(3, 6);
     if (CURRENCY_CODES.has(base) && CURRENCY_CODES.has(quote)) {
       return {
-        assetType: 'forex',
+        assetType: 'FOREX',
         multiplier: 100000,
         market
       };
@@ -139,7 +143,7 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
   if (cryptoRegex.test(cleanSymbol) || 
       commonCryptos.some(crypto => cleanSymbol.includes(crypto))) {
     return {
-      assetType: 'crypto',
+      assetType: 'CRYPTO',
       multiplier: 1,
       market
     };
@@ -147,7 +151,7 @@ export async function detectAssetType(symbol: string, supabase: any): Promise<As
 
   // Default to stock if no other patterns match
   return {
-    assetType: 'stock',
+    assetType: 'STOCK',
     multiplier: 1,
     market
   };

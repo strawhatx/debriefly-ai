@@ -53,8 +53,10 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
 
   const handleBrokerSelect = (brokerId: string) => {
     setSelectedBrokerId(brokerId);
+    
+    var result = availableBrokers?.find(b => b.id === brokerId)
 
-    setBroker(availableBrokers?.find(b => b.id === selectedBrokerId)|| null)
+    setBroker(result)
   };
 
   return (

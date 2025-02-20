@@ -6,7 +6,7 @@ export const FileImportDescription = () => {
   return (
     <>
       {broker && (
-        <div className="p-4 border rounded-md bg-muted">
+        <div className="p-4 mb-4 border rounded-md bg-gray-700/70">
           <h3 className="font-medium mb-1">Selected Broker</h3>
           <p className="text-sm text-muted-foreground">
             {broker.name}

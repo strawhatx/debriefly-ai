@@ -16,7 +16,7 @@ export const HeroSection = () => {
           className="relative left-[calc(50%-11rem)] aspect-1155/678 w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-linear-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
         />
       </div>
-      <div className="mx-auto max-w-2xl pt-32 pb-10 md:pt-48 lg:pt-50">
+      <div className="mx-auto max-w-2xl pt-32 pb-10 md:pt-28 lg:pt-30">
         <div className="hidden sm:mb-8 sm:flex sm:justify-center">
           <div className="relative rounded-full px-3 py-1 text-sm/6 ring-1 ring-ring hover:ring-emerald-200">
             Announcing our next round of funding.{' '}
