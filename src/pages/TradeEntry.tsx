@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,12 +9,15 @@ import { Broker } from "@/components/import/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FileImportDescription } from "@/components/import/FileImportDescription";
+import useAssetStore from "@/store/assets";
 
 const ImportTrades = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>("file");
+  const [activeTab, setActiveTab] = useState<string>("file");  
+  const {currency_codes, futures_multipliers, get_currency_codes, get_futures_multipliers } = useAssetStore()
+  const hasHydrated = useAssetStore.persist.hasHydrated()
 
-  const { data: availableBrokers, isLoading } = useQuery<Broker[]>({
+  const { data: availableBrokers} = useQuery<Broker[]>({
     queryKey: ["availableBrokers"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -29,6 +32,29 @@ const ImportTrades = () => {
       return data as Broker[];
     },
   });
+
+  // for later use
+  useEffect(() => {
+    if (hasHydrated) {
+      console.log('✅ State has been hydrated from storage!')
+
+      // Only load initial data if state is still the default (or empty)
+      if (currency_codes.size === 0) {
+        get_currency_codes()
+      } 
+      else {
+        console.log('Currency: Using persisted state:', currency_codes)
+      }
+
+      // Only load initial data if state is still the default (or empty)
+      if (futures_multipliers.size === 0) {
+        get_futures_multipliers()
+      } 
+      else {
+        console.log('Futures: Using persisted state:', futures_multipliers)
+      }
+    }
+  }, [hasHydrated])
 
   return (
     <div className="p-6">

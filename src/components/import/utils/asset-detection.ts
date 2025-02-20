@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import useAssetStore from "@/store/assets";
 
 interface AssetConfig {
   assetType: 'STOCK' | 'OPTIONS' | 'FUTURES' | 'FOREX' | 'CRYPTO';
@@ -6,45 +7,11 @@ interface AssetConfig {
   market?: string;
 }
 
-let CURRENCY_CODES: Set<string> = new Set();
-let FUTURES_MULTIPLIERS: Map<string, number> = new Map();
+const {currency_codes, futures_multipliers}  = useAssetStore();
 
-async function loadCurrencyCodes() {
-  try {
-    const { data, error } = await supabase
-      .from('currency_codes')
-      .select('code');
-    
-    if (error) throw error;
-    
-    CURRENCY_CODES = new Set(data.map((row: { code: string }) => row.code));
-    console.log(`Loaded ${CURRENCY_CODES.size} currency codes from database`);
-  } catch (error) {
-    console.error('Error loading currency codes:', error);
-    CURRENCY_CODES = new Set(['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD']);
-  }
-}
-
-async function loadFuturesMultipliers() {
-  try {
-    const { data, error } = await supabase
-      .from('futures_multipliers')
-      .select('symbol, multiplier');
-    
-    if (error) throw error;
-    
-    FUTURES_MULTIPLIERS = new Map(
-      data.map((row: { symbol: string; multiplier: number }) => [row.symbol, row.multiplier])
-    );
-    console.log(`Loaded ${FUTURES_MULTIPLIERS.size} futures multipliers from database`);
-  } catch (error) {
-    console.error('Error loading futures multipliers:', error);
-  }
-}
-
-async function getMultiplierForFuture(symbol: string): Promise<number> {
+function getMultiplierForFuture(symbol: string): number {
   // First check our local cache
-  const cachedMultiplier = FUTURES_MULTIPLIERS.get(symbol);
+  const cachedMultiplier = futures_multipliers.get(symbol);
   if (cachedMultiplier) {
     return cachedMultiplier;
   }
@@ -53,13 +20,6 @@ async function getMultiplierForFuture(symbol: string): Promise<number> {
   console.log(`WARNING:  symbol not found: ${symbol}`);
 
   return 1;
-}
-
-async function initializeAssetDetection() {
-  await Promise.all([
-    loadCurrencyCodes(),
-    loadFuturesMultipliers()
-  ]);
 }
 
 function extractMarket(symbol: string): string | undefined {
@@ -82,9 +42,7 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   const market = extractMarket(normalizedSymbol);
   const cleanSymbol = extractCleanSymbol(normalizedSymbol);
 
-  console.log(`symbol: ${cleanSymbol}`)
-
-  await initializeAssetDetection();
+  console.log(`symbol: ${cleanSymbol}`);
   
   // Futures detection
   const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
@@ -92,7 +50,7 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   
   if (futuresRegex.test(cleanSymbol)) {
     const rootSymbol = extractFuturesRoot(cleanSymbol);
-    const multiplier = await getMultiplierForFuture(rootSymbol);
+    const multiplier = getMultiplierForFuture(rootSymbol);
     return {
       assetType: 'FUTURES',
       multiplier,
@@ -116,7 +74,7 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   
   if (forexWithSlashRegex.test(cleanSymbol)) {
     const [base, quote] = cleanSymbol.split('/');
-    if (CURRENCY_CODES.has(base) && CURRENCY_CODES.has(quote)) {
+    if (currency_codes.has(base) && currency_codes.has(quote)) {
       return {
         assetType: 'FOREX',
         multiplier: 100000,
@@ -128,7 +86,7 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   if (forexNoSlashRegex.test(cleanSymbol)) {
     const base = cleanSymbol.slice(0, 3);
     const quote = cleanSymbol.slice(3, 6);
-    if (CURRENCY_CODES.has(base) && CURRENCY_CODES.has(quote)) {
+    if (currency_codes.has(base) && currency_codes.has(quote)) {
       return {
         assetType: 'FOREX',
         multiplier: 100000,

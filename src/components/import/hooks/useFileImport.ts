@@ -73,7 +73,7 @@ export const useFileImport = (selectedAccount: string) => {
           });
 
           //set status to procesing
-          const { data, error } = await supabase.from('imports').update({ tatus: 'PROCESSING' }).match({ id: importRecord.id})
+          const { data, error } = await supabase.from('imports').update({ status: 'PROCESSING' }).match({ id: importRecord.id})
 
           // Insert trades into Supabase
           await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
@@ -129,13 +129,16 @@ export const useFileImport = (selectedAccount: string) => {
         const stopPrice = trade.stop_price; // Stop price (optional)
         const quantity = trade.quantity;
 
+
         if (trade.side === 'BUY') {
           // Check if this is closing a short or opening a long
           if (openShortPositions.length > 0) {
             const entry = openShortPositions.shift()!; // Close short
             const pnl = (entry.fill_price - price) * quantity;
+            const common = commonPositionFields(entry, trade);
+            
             closedPositions.push({
-              ...commonPositionFields(entry, trade),
+              ...common,
               position_type: 'SHORT',
               fill_price: entry.fill_price,
               stop_price: price,
@@ -145,13 +148,16 @@ export const useFileImport = (selectedAccount: string) => {
             // Open long position
             openLongPositions.push({...trade,  position_type: 'LONG'});
           }
-        } else if (trade.side === 'SELL') {
+        } 
+        else if (trade.side === 'SELL') {
           // Check if this is closing a long or opening a short
           if (openLongPositions.length > 0) {
             const entry = openLongPositions.shift()!; // Close long
             const pnl = (price - entry.fill_price) * quantity;
+            const common = commonPositionFields(entry, trade);
+
             closedPositions.push({
-              ...commonPositionFields(entry, trade),
+              ...common,
               position_type: 'LONG',
               fill_price: entry.fill_price,
               stop_price: price,
@@ -167,8 +173,8 @@ export const useFileImport = (selectedAccount: string) => {
     return closedPositions;
   };
 
-  const commonPositionFields = async (entry: any, exit: any) => {
-    const asset = await detectAssetType(entry.symbol)
+  const commonPositionFields = (entry: any, exit: any) => {
+    const asset = detectAssetType(entry.symbol)
 
     return {
     user_id: entry.user_id,

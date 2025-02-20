@@ -1,7 +1,7 @@
 
 import { FIELD_MAPPING, ImportRow } from './types.ts';
 
-export const mapTradeData = async (row: {}, rawHeaders: {}, userId: string, accountId: string, importId: string): ImportRow => {
+export const mapTradeData = (row: {}, rawHeaders: {}, userId: string, accountId: string, importId: string): ImportRow => {
 
   const mappedHeaders = mapHeaders(rawHeaders);
 
