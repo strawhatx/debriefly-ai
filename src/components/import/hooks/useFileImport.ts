@@ -6,11 +6,13 @@ import * as Papa from 'papaparse'; // For CSV parsing
 import { mapTradeData } from "../utils/utils";
 import { Position } from "../utils/types";
 import { detectAssetType } from "../utils/asset-detection";
+import useAssetStore from "@/store/assets";
 
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [errorId, setErrorId] = useState("");
+  const { currency_codes, futures_multipliers} = useAssetStore()
 
   const handleImport = async (selectedFile: File | null) => {
     if (!selectedAccount || !selectedFile) {
@@ -120,63 +122,80 @@ export const useFileImport = (selectedAccount: string) => {
     const openLongPositions: Position[] = [];
     const openShortPositions: Position[] = [];
     const closedPositions: any[] = [];
-
+    
     trades
       .filter((trade) => trade.status.toUpperCase() === 'FILLED')
       .sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime())
       .forEach((trade) => {
-        const price = trade.fill_price; // Fill price
-        const stopPrice = trade.stop_price; // Stop price (optional)
-        const quantity = trade.quantity;
-
-
+        const price = trade.fill_price;
+        let remainingQuantity = trade.quantity;
+        const {multiplier, assetType } = detectAssetType(trade.symbol, currency_codes, futures_multipliers);// Default to 1 if not provided
+    
         if (trade.side === 'BUY') {
-          // Check if this is closing a short or opening a long
-          if (openShortPositions.length > 0) {
-            const entry = openShortPositions.shift()!; // Close short
-            const pnl = (entry.fill_price - price) * quantity;
+          while (remainingQuantity > 0 && openShortPositions.length > 0) {
+            const entry = openShortPositions.shift()!;
+            const closeQty = Math.min(entry.quantity, remainingQuantity);
+            const pnl = (entry.fill_price - price) * closeQty * multiplier;
             const common = commonPositionFields(entry, trade);
-            
+    
             closedPositions.push({
               ...common,
               position_type: 'SHORT',
+              multiplier,
+              asset_type: assetType,
               fill_price: entry.fill_price,
               stop_price: price,
               pnl,
+              quantity: closeQty,
             });
-          } else {
-            // Open long position
-            openLongPositions.push({...trade,  position_type: 'LONG'});
+    
+            remainingQuantity -= closeQty;
+    
+            if (entry.quantity > closeQty) {
+              openShortPositions.unshift({ ...entry, quantity: entry.quantity - closeQty });
+            }
+          }
+    
+          if (remainingQuantity > 0) {
+            openLongPositions.push({ ...trade, position_type: 'LONG', quantity: remainingQuantity });
           }
         } 
         else if (trade.side === 'SELL') {
-          // Check if this is closing a long or opening a short
-          if (openLongPositions.length > 0) {
-            const entry = openLongPositions.shift()!; // Close long
-            const pnl = (price - entry.fill_price) * quantity;
+          while (remainingQuantity > 0 && openLongPositions.length > 0) {
+            const entry = openLongPositions.shift()!;
+            const closeQty = Math.min(entry.quantity, remainingQuantity);
+            const pnl = (price - entry.fill_price) * closeQty * multiplier;
             const common = commonPositionFields(entry, trade);
-
+    
             closedPositions.push({
               ...common,
               position_type: 'LONG',
+              multiplier,
+              asset_type: assetType,
               fill_price: entry.fill_price,
               stop_price: price,
               pnl,
+              quantity: closeQty,
             });
-          } else {
-            // Open short position
-            openShortPositions.push({...trade,  position_type: 'SHORT'});
+    
+            remainingQuantity -= closeQty;
+    
+            if (entry.quantity > closeQty) {
+              openLongPositions.unshift({ ...entry, quantity: entry.quantity - closeQty });
+            }
+          }
+    
+          if (remainingQuantity > 0) {
+            openShortPositions.push({ ...trade, position_type: 'SHORT', quantity: remainingQuantity });
           }
         }
       });
-
+    
     return closedPositions;
+    
   };
 
-  const commonPositionFields = (entry: any, exit: any) => {
-    const asset = detectAssetType(entry.symbol)
-
-    return {
+  const commonPositionFields = (entry: any, exit: any) => ({
     user_id: entry.user_id,
     trading_account_id: entry.trading_account_id,
     symbol: entry.symbol,
@@ -188,9 +207,7 @@ export const useFileImport = (selectedAccount: string) => {
     status: 'CLOSED',
     entry_trade_id: entry.id,
     close_trade_id: exit.id,
-    asset_type: asset.assetType,
-    multiplier: asset.multiplier,
-  }};
+  });
 
   return {
     isUploading,

@@ -11,7 +11,7 @@ export const FIELD_MAPPING = {
   exit_date:['CLOSING TIME', 'EXIT TIME', 'EXIT DATE'],
   status: ['STATUS', 'ORDER STATUS'],
   external_id: ['ORDER ID', 'TRADE ID', 'ID'],
-  leverage: ['Leverage', 'LEVERAGE']
+  leverage: ['LEVERAGE']
 }
 
 export interface ImportRow {

@@ -1,5 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
-import useAssetStore from "@/store/assets";
+
 
 interface AssetConfig {
   assetType: 'STOCK' | 'OPTIONS' | 'FUTURES' | 'FOREX' | 'CRYPTO';
@@ -7,13 +6,12 @@ interface AssetConfig {
   market?: string;
 }
 
-const {currency_codes, futures_multipliers}  = useAssetStore();
-
-function getMultiplierForFuture(symbol: string): number {
+function getMultiplierForFuture(symbol: string, futures_multipliers: any[]): number {
   // First check our local cache
-  const cachedMultiplier = futures_multipliers.get(symbol);
-  if (cachedMultiplier) {
-    return cachedMultiplier;
+  const result = futures_multipliers.find((row) => row.symbol === symbol);
+  
+  if (result) {
+    return result.multiplier;
   }
 
   // If not in cache, log it temp to addit later
@@ -34,23 +32,22 @@ function extractCleanSymbol(symbol: string): string {
 
 function extractFuturesRoot(symbol: string): string {
   // Remove any month/year codes to get the root symbol
-  return symbol.replace(/[FGHJKMNQUVXZ]\d{1,2}[!]?$/, '');
+  return symbol.replace(/([1-2]!|[FGHJKMNQUVXZ](\d{1,4}|[1-9]))$/, '');
 }
 
-export async function detectAssetType(symbol: string): Promise<AssetConfig> {
+export function detectAssetType(symbol: string, currency_codes: any[], futures_multipliers: any[]): AssetConfig {
   const normalizedSymbol = symbol.toUpperCase().trim();
   const market = extractMarket(normalizedSymbol);
   const cleanSymbol = extractCleanSymbol(normalizedSymbol);
 
   console.log(`symbol: ${cleanSymbol}`);
-  
+
   // Futures detection
-  const futuresRegex = /^[A-Z]{1,3}[FGHJKMNQUVXZ]\d{1,2}[!]?$/;
-  console.log(`symbol: ${cleanSymbol}`)
-  
+  const futuresRegex = /^[A-Z]{1,3}([1-2]!|[FGHJKMNQUVXZ](\d{1,4}|[1-9]))$/;
+
   if (futuresRegex.test(cleanSymbol)) {
     const rootSymbol = extractFuturesRoot(cleanSymbol);
-    const multiplier = getMultiplierForFuture(rootSymbol);
+    const multiplier = getMultiplierForFuture(rootSymbol, futures_multipliers);
     return {
       assetType: 'FUTURES',
       multiplier,
@@ -59,7 +56,7 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   }
 
   // Options detection
-  const optionsRegex = /^[A-Z]+(\d{6}[CP]\d+)$/;
+  const optionsRegex = /^[A-Z]+\d{6}[CP]\d+$/;
   if (optionsRegex.test(cleanSymbol) || cleanSymbol.length > 10) {
     return {
       assetType: 'OPTIONS',
@@ -69,24 +66,13 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   }
 
   // Forex detection
-  const forexWithSlashRegex = /^[A-Z]{3}\/[A-Z]{3}$/;
-  const forexNoSlashRegex = /^[A-Z]{6}$/;
-  
-  if (forexWithSlashRegex.test(cleanSymbol)) {
-    const [base, quote] = cleanSymbol.split('/');
-    if (currency_codes.has(base) && currency_codes.has(quote)) {
-      return {
-        assetType: 'FOREX',
-        multiplier: 100000,
-        market
-      };
-    }
-  }
-  
-  if (forexNoSlashRegex.test(cleanSymbol)) {
-    const base = cleanSymbol.slice(0, 3);
-    const quote = cleanSymbol.slice(3, 6);
-    if (currency_codes.has(base) && currency_codes.has(quote)) {
+  const forexRegex = /^[A-Z]{3}\/?[A-Z]{3}$/;
+
+  if (forexRegex.test(cleanSymbol)) {
+    const [base, quote] = cleanSymbol.includes('/') ? cleanSymbol.split('/'): [cleanSymbol.slice(0, 3), cleanSymbol.slice(3, 6)];
+    const hasBase = currency_codes.find(i => i.code === base);
+    const hasQuote = currency_codes.find(i => i.code === quote) 
+    if (hasBase && hasQuote) {
       return {
         assetType: 'FOREX',
         multiplier: 100000,
@@ -98,8 +84,8 @@ export async function detectAssetType(symbol: string): Promise<AssetConfig> {
   // Crypto detection
   const cryptoRegex = /^[A-Z]{3,5}\/[A-Z]{3,5}$/;
   const commonCryptos = ['BTC', 'ETH', 'USDT', 'BNB'];
-  if (cryptoRegex.test(cleanSymbol) || 
-      commonCryptos.some(crypto => cleanSymbol.includes(crypto))) {
+  if (cryptoRegex.test(cleanSymbol) ||
+    commonCryptos.some(crypto => cleanSymbol.includes(crypto))) {
     return {
       assetType: 'CRYPTO',
       multiplier: 1,

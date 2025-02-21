@@ -13,53 +13,57 @@ import useAssetStore from "@/store/assets";
 
 const ImportTrades = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<string>("file");  
-  const {currency_codes, futures_multipliers, get_currency_codes, get_futures_multipliers } = useAssetStore()
+  const [activeTab, setActiveTab] = useState<string>("file");
+  const { currency_codes, futures_multipliers, get_currency_codes, get_futures_multipliers } = useAssetStore()
   const hasHydrated = useAssetStore.persist.hasHydrated()
 
-  const { data: availableBrokers} = useQuery<Broker[]>({
+  const { data: availableBrokers } = useQuery<Broker[]>({
     queryKey: ["availableBrokers"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("brokers")
         .select("*");
-      
+
       if (error) {
         console.error("Error fetching brokers:", error);
         throw error;
       }
-      
+
       return data as Broker[];
     },
   });
 
   // for later use
   useEffect(() => {
-    if (hasHydrated) {
-      console.log('✅ State has been hydrated from storage!')
+    const runTask = async () => {
+      if (hasHydrated) {
+        console.log('✅ State has been hydrated from storage!')
 
-      // Only load initial data if state is still the default (or empty)
-      if (currency_codes.size === 0) {
-        get_currency_codes()
-      } 
-      else {
-        console.log('Currency: Using persisted state:', currency_codes)
-      }
+        // Only load initial data if state is still the default (or empty)
+        if (!currency_codes || currency_codes.length === 0) {
+          await get_currency_codes()
+        }
+        else {
+          console.log('Currency: Using persisted state:', currency_codes)
+        }
 
-      // Only load initial data if state is still the default (or empty)
-      if (futures_multipliers.size === 0) {
-        get_futures_multipliers()
-      } 
-      else {
-        console.log('Futures: Using persisted state:', futures_multipliers)
+        // Only load initial data if state is still the default (or empty)
+        if (!futures_multipliers || futures_multipliers.length === 0) {
+          await get_futures_multipliers()
+        }
+        else {
+          console.log('Futures: Using persisted state:', futures_multipliers)
+        }
       }
     }
+
+    runTask()
   }, [hasHydrated])
 
   return (
     <div className="p-6">
       <div className="flex items-center mb-6 bg-background/60 backdrop-blur-sm sticky top-0 z-10 -mt-6 py-4 px-6 border-b">
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="text-sm text-muted-foreground hover:text-foreground mr-4"
         >
@@ -74,7 +78,7 @@ const ImportTrades = () => {
             <TabsTrigger value="file" className="flex-1">File Upload</TabsTrigger>
             <TabsTrigger value="broker" className="flex-1">Broker Sync</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="file">
             <div className="grid grid-cols-2 gap-6">
               <Card className="p-6">
@@ -85,7 +89,7 @@ const ImportTrades = () => {
               </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="broker">
             <div className="grid grid-cols-2 gap-6">
               <Card className="p-6">

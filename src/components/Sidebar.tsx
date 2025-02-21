@@ -15,10 +15,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navigationItems = [
   { title: "Dashboard", icon: Grid, url: "/app/dashboard" },
-  { title: "Trading Journal", icon: BookOpen, url: "/app/debrief" },
+  { title: "Debrief", icon: BookOpen, url: "/app/debrief" },
   { title: "Trades", icon: BarChart2, url: "/app/trades" },
-  { title: "Insights", icon: ChartLine, url: "/insights" },
-  { title: "Replay", icon: Play, url: "/app/strategy-optimization" },
+  { title: "Behavioral Patterns", icon: ChartLine, url: "/app/behavioral-patterns" },
+  { title: "Strategy Optimization", icon: Play, url: "/app/strategy-optimization" },
 ];
 
 const Sidebar = () => {

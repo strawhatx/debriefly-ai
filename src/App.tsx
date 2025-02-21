@@ -13,13 +13,12 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import StrategyOptimization from "./pages/StrategyOptimization";
 import Dashboard from "./pages/Dashboard";
-import Debrief from "./pages/Debrief";
+import { Debrief } from "./pages/Debrief";
 import Trades from "./pages/Trades";
-import BehaviorialPatterns from "./pages/BehaviorialPatterns";
+import { BehaviorialPatterns } from "./pages/BehaviorialPatterns";
 import Settings from "./pages/Settings";
 import TradeEntry from "./pages/TradeEntry";
 import Sidebar from "./components/Sidebar";
-import Navigation from "./components/Navigation";
 import { Header } from "./components/Header";
 
 const queryClient = new QueryClient();
