@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -54,7 +55,7 @@ const Settings = () => {
           .single();
 
         if (subscriptionData) {
-          setSubscriptionTier(subscriptionData.tier.toLowerCase() as 'FREE' | 'PREMIUM');
+          setSubscriptionTier(subscriptionData.tier as 'FREE' | 'PREMIUM');
         }
 
         // Fetch trading accounts
@@ -126,7 +127,10 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="subscription">
-          <SubscriptionSection subscriptionTier={subscriptionTier} />
+          <SubscriptionSection 
+            subscriptionTier={subscriptionTier} 
+            renewalDate="April 15, 2024"
+          />
         </TabsContent>
 
         <TabsContent value="trading-accounts">
