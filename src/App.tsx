@@ -11,10 +11,10 @@ import { Blog } from "./pages/Blog";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import StrategyOptimization from "./pages/StrategyOptimization";
+import { StrategyOptimization } from "./pages/StrategyOptimization";
 import Dashboard from "./pages/Dashboard";
 import { Debrief } from "./pages/Debrief";
-import Trades from "./pages/Trades";
+import { TradeHistory } from "./pages/TradeHistory";
 import { BehaviorialPatterns } from "./pages/BehaviorialPatterns";
 import Settings from "./pages/Settings";
 import TradeEntry from "./pages/TradeEntry";
@@ -86,9 +86,9 @@ const App = () => {
                     <Debrief />
                   </SidebarLayout>
                 } />
-                <Route path="/app/trades" element={
+                <Route path="/app/trade-history" element={
                   <SidebarLayout>
-                    <Trades />
+                    <TradeHistory />
                   </SidebarLayout>
                 } />
                 <Route path="/app/strategy-optimization" element={

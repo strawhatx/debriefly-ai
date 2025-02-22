@@ -43,16 +43,10 @@ const ImportTrades = () => {
         if (!currency_codes || currency_codes.length === 0) {
           await get_currency_codes()
         }
-        else {
-          console.log('Currency: Using persisted state:', currency_codes)
-        }
 
         // Only load initial data if state is still the default (or empty)
         if (!futures_multipliers || futures_multipliers.length === 0) {
           await get_futures_multipliers()
-        }
-        else {
-          console.log('Futures: Using persisted state:', futures_multipliers)
         }
       }
     }

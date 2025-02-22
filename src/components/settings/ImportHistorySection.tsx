@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import { ImportDialog } from "./ImportDialog";
 import { ImportsTable } from "./ImportsTable";
+import { Input } from "../ui/input";
 
 type Import = {
   id: string;
@@ -83,11 +84,19 @@ export const ImportHistorySection = () => {
   }, []);
 
   return (
-    <Card className="p-6">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold">Import History</h3>
-          <div className="space-x-2">
+    <section className="bg-gray-800 rounded-xl border border-gray-700" >
+      <div className="overflow-x-auto">
+        <div className="p-6 flex justify-between items-center">
+          <h3 className="text-xl font-bold">Trading Accounts</h3>
+          <div className="flex gap-4">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search accounts..."
+                className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              />
+            </div>
             <ImportDialog
               tradingAccounts={tradingAccounts}
               onImportComplete={fetchImports}
@@ -110,6 +119,6 @@ export const ImportHistorySection = () => {
           )}
         </div>
       </div>
-    </Card>
+    </section>
   );
 };

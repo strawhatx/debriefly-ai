@@ -12,7 +12,7 @@ export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [errorId, setErrorId] = useState("");
-  const { currency_codes, futures_multipliers} = useAssetStore()
+  const { currency_codes, futures_multipliers } = useAssetStore()
 
   const handleImport = async (selectedFile: File | null) => {
     if (!selectedAccount || !selectedFile) {
@@ -67,7 +67,7 @@ export const useFileImport = (selectedAccount: string) => {
       // Read and parse the CSV file
       Papa.parse(selectedFile, {
         complete: async (result) => {
-          const trades = result.data;
+          var trades = result.data;
           const rawHeaders = result.meta.fields; // Get CSV headers
           toast({
             title: "Import started",
@@ -75,7 +75,8 @@ export const useFileImport = (selectedAccount: string) => {
           });
 
           //set status to procesing
-          const { data, error } = await supabase.from('imports').update({ status: 'PROCESSING' }).match({ id: importRecord.id})
+          const { data, error } = await supabase.from('imports').update({ status: 'PROCESSING' }).match({ id: importRecord.id })
+
 
           // Insert trades into Supabase
           await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
@@ -93,7 +94,7 @@ export const useFileImport = (selectedAccount: string) => {
       });
 
       //set status to failed w/message
-      await supabase.from('imports').update({ status: 'FAILED', error_message: error.message || "Failed to start import" }).match({ id: errorId})
+      await supabase.from('imports').update({ status: 'FAILED', error_message: error.message || "Failed to start import" }).match({ id: errorId })
       return false;
     }
     finally {
@@ -103,7 +104,13 @@ export const useFileImport = (selectedAccount: string) => {
 
   const insertTradesToSupabase = async (trades: any[], rawHeaders: {}, user_id: string, account_id: string, import_id: string) => {
     // Transform data if necessary (for example, ensure fields match the table schema)
-    const transformedTrades = trades.map(trade => mapTradeData(trade, rawHeaders, user_id, account_id, import_id));
+    var transformedTrades = trades.map(trade => mapTradeData(trade, rawHeaders, user_id, account_id, import_id));
+
+    // 🔥 Filter out any trades that are NOT filled
+    transformedTrades = transformedTrades.filter((trade) => trade.status.toUpperCase() === "FILLED");
+
+    // Sort trades by time
+    //transformedTrades.sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());
 
     // Insert trades into Supabase
     const { data, error } = await supabase.from('trade_history').insert(transformedTrades).select();
@@ -119,25 +126,30 @@ export const useFileImport = (selectedAccount: string) => {
   };
 
   const processTradesIntoPositions = (trades: any[]) => {
-    const openLongPositions: Position[] = [];
-    const openShortPositions: Position[] = [];
+    const openLongPositions: Record<string, Position[]> = {}; // Separate long positions by symbol
+    const openShortPositions: Record<string, Position[]> = {};
     const closedPositions: any[] = [];
-    
+
     trades
-      .filter((trade) => trade.status.toUpperCase() === 'FILLED')
-      .sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime())
+      .filter((trade) => trade.status.toUpperCase() === 'FILLED' && trade.quantity > 0) // Remove cancelled/partial fills
+      //.sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime()) // FIFO Sorting
+      .sort((a, b) => parseInt(a.external_id) - parseInt(b.external_id)) // Use order_id for strict execution order
       .forEach((trade) => {
+        const symbol = trade.symbol; // Ensure trades are matched per symbol
         const price = trade.fill_price;
         let remainingQuantity = trade.quantity;
-        const {multiplier, assetType } = detectAssetType(trade.symbol, currency_codes, futures_multipliers);// Default to 1 if not provided
-    
+        const { multiplier, assetType } = detectAssetType(symbol, currency_codes, futures_multipliers);
+
+        if (!openLongPositions[symbol]) openLongPositions[symbol] = [];
+        if (!openShortPositions[symbol]) openShortPositions[symbol] = [];
+
         if (trade.side === 'BUY') {
-          while (remainingQuantity > 0 && openShortPositions.length > 0) {
-            const entry = openShortPositions.shift()!;
+          while (remainingQuantity > 0 && openShortPositions[symbol].length > 0) {
+            const entry = openShortPositions[symbol][0]; // FIFO: Take first available position
             const closeQty = Math.min(entry.quantity, remainingQuantity);
             const pnl = (entry.fill_price - price) * closeQty * multiplier;
             const common = commonPositionFields(entry, trade);
-    
+
             closedPositions.push({
               ...common,
               position_type: 'SHORT',
@@ -148,25 +160,22 @@ export const useFileImport = (selectedAccount: string) => {
               pnl,
               quantity: closeQty,
             });
-    
+
+            entry.quantity -= closeQty;
             remainingQuantity -= closeQty;
-    
-            if (entry.quantity > closeQty) {
-              openShortPositions.unshift({ ...entry, quantity: entry.quantity - closeQty });
-            }
+            if (entry.quantity === 0) openShortPositions[symbol].shift(); // Remove if fully closed
           }
-    
+
           if (remainingQuantity > 0) {
-            openLongPositions.push({ ...trade, position_type: 'LONG', quantity: remainingQuantity });
+            openLongPositions[symbol].push({ ...trade, quantity: remainingQuantity });
           }
-        } 
-        else if (trade.side === 'SELL') {
-          while (remainingQuantity > 0 && openLongPositions.length > 0) {
-            const entry = openLongPositions.shift()!;
+        } else if (trade.side === 'SELL') {
+          while (remainingQuantity > 0 && openLongPositions[symbol].length > 0) {
+            const entry = openLongPositions[symbol][0]; // FIFO: Take first available position
             const closeQty = Math.min(entry.quantity, remainingQuantity);
             const pnl = (price - entry.fill_price) * closeQty * multiplier;
             const common = commonPositionFields(entry, trade);
-    
+
             closedPositions.push({
               ...common,
               position_type: 'LONG',
@@ -177,22 +186,20 @@ export const useFileImport = (selectedAccount: string) => {
               pnl,
               quantity: closeQty,
             });
-    
+
+            entry.quantity -= closeQty;
             remainingQuantity -= closeQty;
-    
-            if (entry.quantity > closeQty) {
-              openLongPositions.unshift({ ...entry, quantity: entry.quantity - closeQty });
-            }
+            if (entry.quantity === 0) openLongPositions[symbol].shift(); // Remove if fully closed
           }
-    
+
           if (remainingQuantity > 0) {
-            openShortPositions.push({ ...trade, position_type: 'SHORT', quantity: remainingQuantity });
+            openShortPositions[symbol].push({ ...trade, quantity: remainingQuantity });
           }
         }
       });
-    
+
     return closedPositions;
-    
+
   };
 
   const commonPositionFields = (entry: any, exit: any) => ({

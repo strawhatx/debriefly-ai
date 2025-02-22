@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import filesize from "filesize";
+import { SortAsc } from "lucide-react";
 
 interface Import {
   id: string;
@@ -42,41 +43,41 @@ export const ImportsTable = ({ imports }: ImportsTableProps) => {
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Account</TableHead>
-          <TableHead>File</TableHead>
-          <TableHead>Size</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Error</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <table className="w-full">
+      <thead>
+        <tr className="border-b border-gray-700">
+          <th className="px-6 py-3 text-left">
+            <div className="flex items-center gap-2">
+              Date
+              <SortAsc className="w-4 h-4" />
+            </div>
+          </th>
+          <th className="px-6 py-3 text-left">Account</th>
+          <th className="px-6 py-3 text-left">File</th>
+          <th className="px-6 py-3 text-left">Status</th>
+          <th className="px-6 py-3 text-left">Error Msg</th>
+        </tr>
+      </thead>
+      <tbody>
         {imports.map((import_) => (
-          <TableRow key={import_.id}>
-            <TableCell>
+          <tr key={import_.id} className="border-b border-gray-700 hover:bg-gray-700/50">
+            <td className="px-6 py-4">
               {format(new Date(import_.created_at), 'MMM d, yyyy HH:mm')}
-            </TableCell>
-            <TableCell>{import_.account_name}</TableCell>
-            <TableCell>{import_.original_filename || '-'}</TableCell>
-            <TableCell>
-              {import_.file_size ? filesize(import_.file_size) : '-'}
-            </TableCell>
-            <TableCell>{import_.file_type || import_.import_type}</TableCell>
-            <TableCell>
+            </td>
+            <td className="px-6 py-4">{import_.account_name}</td>
+            <td className="px-6 py-4 max-w-44">{import_.original_filename || '-'}</td>
+            <td className="px-6 py-4">
               <span className={getStatusColor(import_.status)}>
                 {import_.status}
               </span>
-            </TableCell>
-            <TableCell className="text-red-500">
+            </td>
+            <td className="px-6 py-4 text-red-500 min-w-48">
               {import_.error_message}
-            </TableCell>
-          </TableRow>
+            </td>
+          </tr>
         ))}
-      </TableBody>
-    </Table>
+
+      </tbody>
+    </table>
   );
 };
