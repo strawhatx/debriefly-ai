@@ -22,7 +22,7 @@ const Settings = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
-  const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'premium'>('free');
+  const [subscriptionTier, setSubscriptionTier] = useState<'FREE' | 'PREMIUM'>('FREE');
   const [tradingAccounts, setTradingAccounts] = useState<any[]>([]);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const Settings = () => {
           .single();
 
         if (subscriptionData) {
-          setSubscriptionTier(subscriptionData.tier.toLowerCase() as 'free' | 'premium');
+          setSubscriptionTier(subscriptionData.tier.toLowerCase() as 'FREE' | 'PREMIUM');
         }
 
         // Fetch trading accounts
