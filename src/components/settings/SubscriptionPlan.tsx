@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Star } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSubscriptionMethods } from "./hooks/useSubscriptionMethods";
 import { useToast } from "../ui/use-toast";
@@ -12,13 +12,14 @@ interface SubscriptionPlanProps {
 export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const { subscriptionTier, renewalDate, createSubscription, updateSubscription, cancelSubscription, createCustomerPortalSession } = useSubscriptionMethods(customerId);
+  const { 
+    subscriptionTier, 
+    renewalDate, 
+    createCustomerPortalSession,
+    createPaymentLink
+  } = useSubscriptionMethods(customerId);
 
-  // ✅ Determine Upgrade/Downgrade Plan Name
-  const isBeta = subscriptionTier?.toUpperCase() === "BETA";
-  const newPlan = subscriptionTier ? (isBeta ? "Pro" : "Beta") : "Beta"; // Swap between plans
-  
-  const handleManageSubscription = async () => {
+  const handleManageBilling = async () => {
     setLoading(true);
     try {
       const url = await createCustomerPortalSession(customerId);
@@ -42,6 +43,31 @@ export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
       setLoading(false);
     }
   };
+  
+  const handleSubscribe = async () => {
+    setLoading(true);
+    try {
+      const url = await createPaymentLink();
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not create payment link",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Failed to create payment link:", error);
+      toast({
+        title: "Error",
+        description: "Could not create payment link",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -55,7 +81,7 @@ export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
 
       <div>
         <div className="p-4 bg-gray-900/50 rounded-lg">
-          {/* ✅ Show Subscription Plan & Status */}
+          {/* Show Subscription Plan & Status */}
           {subscriptionTier && (
             <div className="flex items-center justify-between mb-6">
               <span className="text-emerald-400 font-medium">{subscriptionTier}</span>
@@ -64,29 +90,31 @@ export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
               </span>
             </div>
           )}
-          {/* ✅ Show Renewal Date for Paid Plans */}
+          {/* Show Renewal Date for Paid Plans */}
           {(subscriptionTier && renewalDate) && (
             <p className="text-gray-400">Your subscription renews on {renewalDate}</p>
           )}
         </div>
 
-        {/* ✅ Subscription Action Buttons */}
+        {/* Subscription Action Buttons */}
         <div className="flex gap-3 pt-3">
           {subscriptionTier ? (
             <Button
-              onClick={handleManageSubscription}
+              onClick={handleManageBilling}
               className="mt-2 px-4 py-2 bg-primary hover:bg-emerald-300 rounded-lg text-sm font-medium"
               disabled={loading}
             >
-              {loading ? "Loading..." : "Manage Subscription"}
+              <ExternalLink className="w-4 h-4 mr-2" />
+              {loading ? "Loading..." : "Manage Billing"}
             </Button>
           ) : (
             <Button
-              onClick={() => createSubscription(newPlan)}
+              onClick={handleSubscribe}
               className="mt-2 px-4 py-2 bg-primary hover:bg-emerald-300 rounded-lg text-sm font-medium"
               disabled={loading}
             >
-              <Star /> Enable Beta Access
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Subscribe
             </Button>
           )}
         </div>
