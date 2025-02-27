@@ -113,13 +113,20 @@ export const useFileImport = (selectedAccount: string) => {
     //transformedTrades.sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime());
 
     // Insert trades into Supabase
-    const { data, error } = await supabase.from('trade_history').insert(transformedTrades).select();
+    const { data: history, error: historyError } = await supabase.from('trade_history').insert(transformedTrades).select();
 
-    if (error) {
-      throw new Error(`Error inserting trades:${error}`);
+    if (historyError) {
+      throw new Error(`Error inserting trades:${historyError}`);
     }
 
-    const positions = processTradesIntoPositions(data);
+    //set status to uploaded
+    const { data: import_, error: importError } = await supabase.from('imports').update({ status: 'UPLOADED' }).match({ id: import_id })
+
+    if (importError) {
+      throw new Error(`Error updating status: ${importError}`);
+    }
+
+    const positions = processTradesIntoPositions(history);
 
     const { error: insertError } = await supabase.from('positions').insert(positions);
     if (insertError) console.error(insertError);

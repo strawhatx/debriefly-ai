@@ -67,3 +67,15 @@ Simply open [Lovable](https://lovable.dev/projects/831713e0-03d7-4725-80fa-bb2f1
 ## I want to use a custom domain - is that possible?
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+
+Start: supabase start
+
+Stop: supabase stop
+
+Login: supabase login
+
+Debug Edge Functions: 
+- supabase functions serve payment-methods --env-file supabase/.env --inspect-mode brk
+- supabase functions serve subscriptions --env-file supabase/.env --inspect-mode brk
+
+- supabase functions serve --all --env-file supabase/.env

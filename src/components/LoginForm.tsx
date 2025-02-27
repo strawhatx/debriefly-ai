@@ -9,12 +9,14 @@ import { Separator } from "@/components/ui/separator";
 import GoogleSignInButton from "./auth/GoogleSignInButton";
 import AuthHeader from "./auth/AuthHeader";
 import EmailPasswordForm from "./auth/EmailPasswordForm";
+import { useStripeMethods } from "./settings/hooks/useStripeMethods";
 
 const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { createCustomer } = useStripeMethods();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -36,6 +38,7 @@ const LoginForm = () => {
           return;
         }
 
+        //CREATE ACCOUNT
         const { error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -43,6 +46,7 @@ const LoginForm = () => {
 
         if (signUpError) throw signUpError;
 
+        //SIGN IN
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
@@ -50,12 +54,23 @@ const LoginForm = () => {
 
         if (signInError) throw signInError;
 
+        //CREATE STRIPE CUSTOMER
+        const { data, error: userError } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        await createCustomer(data.user.email, data.user.id);
+
+        //SUCCESS
         toast({
           title: "Success",
           description: "Account created and logged in successfully",
         });
+
         navigate("/app/dashboard");
-      } else {
+      }
+
+      else {
         const { error } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
@@ -67,15 +82,20 @@ const LoginForm = () => {
           title: "Welcome back",
           description: "You have been logged in successfully",
         });
+
         navigate("/app/dashboard");
       }
-    } catch (error: any) {
+    } 
+    
+    catch (error: any) {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
+    } 
+    
+    finally {
       setIsLoading(false);
     }
   };
@@ -83,7 +103,7 @@ const LoginForm = () => {
   return (
     <Card className="p-6 space-y-6 animate-fade-up bg-gray-800 border-gray-800">
       <AuthHeader isSignUp={isSignUp} />
-      
+
       <GoogleSignInButton isLoading={isLoading} />
 
       <div className="relative">

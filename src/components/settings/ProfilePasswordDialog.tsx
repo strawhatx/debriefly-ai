@@ -58,7 +58,6 @@ export const ProfilePasswordDialog = () => {
     }
   };
 
-
   return (
     <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
       <DialogTrigger asChild>

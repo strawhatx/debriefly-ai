@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { 
-  User, 
-  CreditCard, 
+import {
+  User,
+  CreditCard,
   ChartBar,
   Upload,
   Bell,
@@ -22,14 +22,15 @@ const Settings = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
-  const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'premium'>('free');
+  const [subscriptionTier, setSubscriptionTier] = useState<'FREE' | 'PREMIUM'>('FREE');
+  const [renewalDate, setRenewlDate] = useState('April 15, 2024');
   const [tradingAccounts, setTradingAccounts] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           navigate("/login");
           return;
@@ -44,17 +45,6 @@ const Settings = () => {
 
         if (profileData) {
           setProfile(profileData);
-        }
-
-        // Fetch subscription data
-        const { data: subscriptionData } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (subscriptionData) {
-          setSubscriptionTier(subscriptionData.tier.toLowerCase() as 'free' | 'premium');
         }
 
         // Fetch trading accounts
@@ -92,7 +82,7 @@ const Settings = () => {
         <h2 className="text-2xl font-bold mb-8">Settings</h2>
         <SignOutButton />
       </div>
-      
+
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="mb-8">
           <TabsTrigger value="profile" className="flex items-center gap-2">
@@ -126,11 +116,14 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="subscription">
-          <SubscriptionSection subscriptionTier={subscriptionTier} />
+          <SubscriptionSection
+            customerId={profile.stripe_customer_id}
+            userId={profile.id}
+          />
         </TabsContent>
 
         <TabsContent value="trading-accounts">
-          <TradingAccountsSection 
+          <TradingAccountsSection
             tradingAccounts={tradingAccounts}
             setTradingAccounts={setTradingAccounts}
           />
