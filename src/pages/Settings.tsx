@@ -46,17 +46,6 @@ const Settings = () => {
           setProfile(profileData);
         }
 
-        // Fetch subscription data
-        const { data: subscriptionData } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        if (subscriptionData) {
-          setSubscriptionTier(subscriptionData.tier as 'FREE' | 'PREMIUM');
-        }
-
         // Fetch trading accounts
         const { data: tradingAccountsData } = await supabase
           .from('trading_accounts')
