@@ -1,15 +1,15 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@12.3.0?target=deno";
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "@supabase/supabase-js";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 
 // ✅ Initialize Stripe & Supabase
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"), { apiVersion: "2023-10-16" });
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 
-
 // ✅ Helper: Fetch Stripe Customer
-const getOrCreateCustomer = async (req: Request, email: string, userId: string): Promise<string> => {
+const getOrCreateCustomer = async (req: Request, email: string, userId: string): Promise<Response> => {
   try {
     // Fetch Free Plan Price ID
     const { data:plans, error: planError } = await supabase.from("subscription_plans")
@@ -20,7 +20,7 @@ const getOrCreateCustomer = async (req: Request, email: string, userId: string):
       return new Response(JSON.stringify({ error: "Free plan not found" }), { status: 500 });
     }
 
-    const freePlanPriceId = plan.stripe_price_id;
+    const freePlanPriceId = plans.stripe_price_id;
 
     // Check if customer already exists in Supabase
     const { data, error: profileError } = await supabase
@@ -65,13 +65,15 @@ const getOrCreateCustomer = async (req: Request, email: string, userId: string):
       status: 500,
     });
   }
-}
+};
 
 // ✅ Helper: Create a SetupIntent
 const createSetupIntent = async (req: Request, customerId: string): Promise<Response> => {
   try {
     const customer = await stripe.customers.retrieve(customerId);
-    if (customer.deleted) return new Response(JSON.stringify({ error: "Customer is deleted" }), { headers: handleReturnCORS(req), status: 400 });
+    if (!customer || (customer as any).deleted) {
+      return new Response(JSON.stringify({ error: "Customer is deleted" }), { headers: handleReturnCORS(req), status: 400 });
+    }
 
     const setupIntent = await stripe.setupIntents.create({ customer: customerId });
 
@@ -86,7 +88,7 @@ const createSetupIntent = async (req: Request, customerId: string): Promise<Resp
       status: 500,
     });
   }
-}
+};
 
 // ✅ Helper: Save Payment Method
 const savePaymentMethod = async (req: Request, userId: string, customerId: string, paymentMethodId: string): Promise<Response> => {
@@ -124,7 +126,7 @@ const savePaymentMethod = async (req: Request, userId: string, customerId: strin
       status: 500,
     });
   }
-}
+};
 
 // ✅ Helper: Set Default Payment Method
 const setDefaultPaymentMethod = async (req: Request, customerId: string, paymentMethodId: string): Promise<Response> => {
@@ -142,7 +144,7 @@ const setDefaultPaymentMethod = async (req: Request, customerId: string, payment
       status: 500,
     });
   }
-}
+};
 
 // ✅ Helper: Delete Payment Method
 const deletePaymentMethod = async (req: Request, customerId: string, paymentMethodId: string): Promise<Response> => {
@@ -161,7 +163,7 @@ const deletePaymentMethod = async (req: Request, customerId: string, paymentMeth
       status: 500,
     });
   }
-}
+};
 
 // 🚀 **Main Function**
 serve(async (req) => {

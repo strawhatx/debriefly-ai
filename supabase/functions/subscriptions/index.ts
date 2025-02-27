@@ -1,7 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@12.3.0?target=deno";
-import { createClient } from "jsr:@supabase/supabase-js@2";
+import { createClient } from "@supabase/supabase-js";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 
 // ✅ Initialize Stripe & Supabase
