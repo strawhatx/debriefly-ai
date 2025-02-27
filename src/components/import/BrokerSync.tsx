@@ -93,7 +93,6 @@ export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
   return (
     <div className="space-y-6">
       <BrokerInfo 
-        broker={selectedBrokerData}
         availableBrokers={availableBrokers}
         onBrokerSelect={setSelectedBroker}
         selectedBrokerId={selectedBroker}

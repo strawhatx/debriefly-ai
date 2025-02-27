@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
@@ -22,8 +23,6 @@ const Settings = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
-  const [subscriptionTier, setSubscriptionTier] = useState<'FREE' | 'PREMIUM'>('FREE');
-  const [renewalDate, setRenewlDate] = useState('April 15, 2024');
   const [tradingAccounts, setTradingAccounts] = useState<any[]>([]);
 
   useEffect(() => {
@@ -45,6 +44,17 @@ const Settings = () => {
 
         if (profileData) {
           setProfile(profileData);
+        }
+
+        // Fetch subscription data
+        const { data: subscriptionData } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (subscriptionData) {
+          setSubscriptionTier(subscriptionData.tier as 'FREE' | 'PREMIUM');
         }
 
         // Fetch trading accounts

@@ -5,7 +5,6 @@ import { Table, TableBody, TableRow } from "@/components/ui/table";
 import { Filter, Plus, Search, SortAsc } from "lucide-react";
 import { TradingAccountForm } from "./TradingAccountForm";
 import { TradingAccountRow } from "./TradingAccountRow";
-import { TradingAccountsHeader } from "./TradingAccountsHeader";
 import { EmptyTradingAccounts } from "./EmptyTradingAccounts";
 import { TradingAccount } from "@/types/trading";
 import { useTradingAccounts } from "@/hooks/useTradingAccounts";
@@ -103,6 +102,5 @@ export const TradingAccountsSection = ({
         </table>
       </div>
     </section>
-
   );
 };
