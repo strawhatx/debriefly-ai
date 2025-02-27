@@ -1,17 +1,47 @@
+
+import { useState } from "react";
 import { Star } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSubscriptionMethods } from "./hooks/useSubscriptionMethods";
+import { useToast } from "../ui/use-toast";
 
 interface SubscriptionPlanProps {
   customerId: string;
 }
 
 export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
-  const { subscriptionTier, renewalDate, createSubscription, updateSubscription, cancelSubscription } = useSubscriptionMethods(customerId);
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { subscriptionTier, renewalDate, createSubscription, updateSubscription, cancelSubscription, createCustomerPortalSession } = useSubscriptionMethods(customerId);
 
   // ✅ Determine Upgrade/Downgrade Plan Name
   const isBeta = subscriptionTier?.toUpperCase() === "BETA";
   const newPlan = subscriptionTier ? (isBeta ? "Pro" : "Beta") : "Beta"; // Swap between plans
+  
+  const handleManageSubscription = async () => {
+    setLoading(true);
+    try {
+      const url = await createCustomerPortalSession(customerId);
+      if (url) {
+        window.location.href = url;
+      } else {
+        toast({
+          title: "Error",
+          description: "Could not create customer portal session",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error("Failed to create portal session:", error);
+      toast({
+        title: "Error",
+        description: "Could not open Stripe customer portal",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -22,7 +52,6 @@ export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
           </div>
         </div>
       )}
-
 
       <div>
         <div className="p-4 bg-gray-900/50 rounded-lg">
@@ -43,27 +72,25 @@ export const SubscriptionPlan = ({ customerId }: SubscriptionPlanProps) => {
 
         {/* ✅ Subscription Action Buttons */}
         <div className="flex gap-3 pt-3">
-          <Button
-            onClick={() => subscriptionTier ? updateSubscription(newPlan) : createSubscription(newPlan)}
-            className="mt-2 px-4 py-2 bg-primary hover:bg-emerald-300 rounded-lg text-sm font-medium"
-
-          >
-            <Star /> {subscriptionTier ? (isBeta ? "Upgrade to Pro" : "Switch to Beta") : "Enable Beta Access"}
-          </Button>
-
-          {(subscriptionTier && !isBeta) && (
+          {subscriptionTier ? (
             <Button
-              variant="link"
-              onClick={cancelSubscription}
-              className="mt-2 px-4 py-2 text-red-400 hover:text-red-300 rounded-lg text-sm font-medium"
-
+              onClick={handleManageSubscription}
+              className="mt-2 px-4 py-2 bg-primary hover:bg-emerald-300 rounded-lg text-sm font-medium"
+              disabled={loading}
             >
-              Cancel
+              {loading ? "Loading..." : "Manage Subscription"}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => createSubscription(newPlan)}
+              className="mt-2 px-4 py-2 bg-primary hover:bg-emerald-300 rounded-lg text-sm font-medium"
+              disabled={loading}
+            >
+              <Star /> Enable Beta Access
             </Button>
           )}
         </div>
       </div>
-
     </div>
   );
 };

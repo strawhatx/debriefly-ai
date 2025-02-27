@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@12.3.0?target=deno";
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -7,6 +8,34 @@ import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"), { apiVersion: "2023-10-16" });
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 
+// ✅ Helper: Create a Stripe Customer Portal Session
+const createCustomerPortalSession = async (req: Request, stripeCustomerId: string): Promise<Response> => {
+  try {
+    console.log("✅ Creating customer portal session for:", stripeCustomerId);
+    
+    // Set the return URL to the settings page
+    const returnUrl = Deno.env.get("PRODUCTION_URL") || "http://localhost:5173/settings";
+    
+    const session = await stripe.billingPortal.sessions.create({
+      customer: stripeCustomerId,
+      return_url: returnUrl,
+    });
+
+    console.log("✅ Portal session created:", session.id);
+
+    return new Response(JSON.stringify({ success: true, url: session.url }), { 
+      headers: handleReturnCORS(req), 
+      status: 200 
+    });
+  }
+  catch (error) {
+    console.error("❌ Stripe Error:", error.message);
+    return new Response(JSON.stringify({ error: error.message }), { 
+      headers: handleReturnCORS(req), 
+      status: 500 
+    });
+  }
+};
 
 // ✅ Helper: Create a New Subscription
 const createSubscription = async (req: Request, stripeCustomerId: string, priceId: string): Promise<Response> => {
@@ -136,6 +165,10 @@ serve(async (req) => {
       case "getSubscriptionDetails":
         if (!stripeCustomerId) return new Response(JSON.stringify({ error: "Missing required fields" }), { headers: handleReturnCORS(req), status: 400 });
         return getSubscriptionDetails(req, stripeCustomerId);
+        
+      case "createCustomerPortalSession":
+        if (!stripeCustomerId) return new Response(JSON.stringify({ error: "Missing required fields" }), { headers: handleReturnCORS(req), status: 400 });
+        return createCustomerPortalSession(req, stripeCustomerId);
 
       default:
         return new Response(JSON.stringify({ error: "Invalid action" }), { headers: handleReturnCORS(req), status: 400 });

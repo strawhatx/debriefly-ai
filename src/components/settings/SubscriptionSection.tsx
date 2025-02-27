@@ -1,5 +1,6 @@
+
 import { Card } from "@/components/ui/card";
-import { Check} from "lucide-react";
+import { Check } from "lucide-react";
 import { SubscriptionPaymentMethods } from "./SubscriptionPaymentMethods";
 import { SubscriptionPlan } from "./SubscriptionPlan";
 
@@ -9,7 +10,6 @@ interface SubscriptionSectionProps {
 }
 
 export const SubscriptionSection = ({ customerId, userId }: SubscriptionSectionProps) => {
-
   return (
     <div className="grid grid-cols-2 grid-rows-2 gap-4">
       <Card className="h-full p-6 col-span-1 row-span-1">

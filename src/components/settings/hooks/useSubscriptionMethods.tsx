@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -70,6 +71,31 @@ export const useSubscriptionMethods = (customerId: string) => {
       console.error("❌ Error fetching subscription:", error);
     }
     setLoading(false);
+  };
+
+  // ✅ Create a Stripe Customer Portal session
+  const createCustomerPortalSession = async (stripeCustomerId: string) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "createCustomerPortalSession",
+          stripeCustomerId,
+        }),
+      });
+
+      const result = await response.json();
+      if (result.error) {
+        console.error("❌ Error creating portal session:", result.error);
+        return null;
+      }
+
+      return result.url;
+    } catch (error) {
+      console.error("❌ Error creating customer portal session:", error);
+      return null;
+    }
   };
 
   // ✅ Upgrade or downgrade subscription
@@ -178,5 +204,13 @@ export const useSubscriptionMethods = (customerId: string) => {
     }
   }, [customerId]);
 
-  return { subscriptionTier, renewalDate, loading, createSubscription, updateSubscription, cancelSubscription };
+  return { 
+    subscriptionTier, 
+    renewalDate, 
+    loading, 
+    createSubscription, 
+    updateSubscription, 
+    cancelSubscription,
+    createCustomerPortalSession
+  };
 };

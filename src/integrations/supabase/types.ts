@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      billing_history: {
+        Row: {
+          amount: number | null
+          created_at: string | null
+          id: string
+          status: string | null
+          stripe_invoice_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          stripe_invoice_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          stripe_invoice_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       broker_connection_fields: {
         Row: {
           broker_id: string
@@ -242,6 +269,42 @@ export type Database = {
           },
         ]
       }
+      payment_methods: {
+        Row: {
+          brand: string | null
+          created_at: string | null
+          exp_month: number | null
+          exp_year: number | null
+          id: string
+          is_default: boolean | null
+          last_4: number | null
+          stripe_payment_method_id: string
+          user_id: string | null
+        }
+        Insert: {
+          brand?: string | null
+          created_at?: string | null
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean | null
+          last_4?: number | null
+          stripe_payment_method_id: string
+          user_id?: string | null
+        }
+        Update: {
+          brand?: string | null
+          created_at?: string | null
+          exp_month?: number | null
+          exp_year?: number | null
+          id?: string
+          is_default?: boolean | null
+          last_4?: number | null
+          stripe_payment_method_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       positions: {
         Row: {
           asset_type: Database["public"]["Enums"]["asset_type"] | null
@@ -346,6 +409,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          stripe_customer_id: string | null
           updated_at: string
           username: string | null
         }
@@ -354,6 +418,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          stripe_customer_id?: string | null
           updated_at?: string
           username?: string | null
         }
@@ -362,45 +427,32 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          stripe_customer_id?: string | null
           updated_at?: string
           username?: string | null
         }
         Relationships: []
       }
-      subscriptions: {
+      subscription_plans: {
         Row: {
-          active: boolean
-          created_at: string
-          id: string
-          tier: Database["public"]["Enums"]["subscription_tier"]
-          updated_at: string
-          user_id: string
+          id: number
+          monthly_price: number
+          name: string
+          stripe_price_id: string
         }
         Insert: {
-          active?: boolean
-          created_at?: string
-          id?: string
-          tier?: Database["public"]["Enums"]["subscription_tier"]
-          updated_at?: string
-          user_id: string
+          id?: number
+          monthly_price: number
+          name: string
+          stripe_price_id: string
         }
         Update: {
-          active?: boolean
-          created_at?: string
-          id?: string
-          tier?: Database["public"]["Enums"]["subscription_tier"]
-          updated_at?: string
-          user_id?: string
+          id?: number
+          monthly_price?: number
+          name?: string
+          stripe_price_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "subscriptions_user_id_fkey1"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       trade_history: {
         Row: {
