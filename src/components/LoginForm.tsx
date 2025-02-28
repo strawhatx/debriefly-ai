@@ -9,14 +9,14 @@ import { Separator } from "@/components/ui/separator";
 import GoogleSignInButton from "./auth/GoogleSignInButton";
 import AuthHeader from "./auth/AuthHeader";
 import EmailPasswordForm from "./auth/EmailPasswordForm";
-import { useStripeMethods } from "./settings/hooks/useStripeMethods";
+import { usePayment } from "./settings/hooks/usePayment";
 
 const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { createCustomer } = useStripeMethods();
+  const { createStripeCustomer } = usePayment();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -59,7 +59,8 @@ const LoginForm = () => {
 
         if (userError) throw userError;
 
-        await createCustomer(data.user.email, data.user.id);
+        // ✅ Call Hook to Create Stripe Customer
+        await createStripeCustomer(data.user.id, data.user.email);
 
         //SUCCESS
         toast({
@@ -85,16 +86,16 @@ const LoginForm = () => {
 
         navigate("/app/dashboard");
       }
-    } 
-    
+    }
+
     catch (error: any) {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
       });
-    } 
-    
+    }
+
     finally {
       setIsLoading(false);
     }
