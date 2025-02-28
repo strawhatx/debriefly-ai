@@ -74,7 +74,7 @@ export const ImportDialog = ({ tradingAccounts, onImportComplete }: ImportDialog
           user_id: user.id
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (importError) {
         console.error('Error creating import record:', importError);

@@ -65,12 +65,12 @@ export const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => 
               />
             </div>
             <div>
-              <Label className="text-sm mb-2 block">Email</Label>
+              <Label className="text-sm mb-2 block">Username</Label>
               <Input
-                type="email"
+                type="text"
                 className="border-gray-600"
-                value={profile?.email || ""}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                value={profile?.username || ""}
+                onChange={(e) => setProfile({ ...profile, username: e.target.value })}
                 placeholder="Enter your email"
               />
             </div>

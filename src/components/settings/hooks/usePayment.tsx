@@ -35,7 +35,7 @@ export const usePayment = () => {
 
   const fetchSubscription = async (userId: string) => {
     const { data, error } = await supabase.from("subscriptions")
-        .select("*").eq("user_id", userId).single();
+        .select("*").eq("user_id", userId).maybeSingle();
   
     if (error || !data) {
       console.warn("❌ No active subscription found.");

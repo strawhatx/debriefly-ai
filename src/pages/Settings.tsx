@@ -22,6 +22,7 @@ const Settings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [tradingAccounts, setTradingAccounts] = useState<any[]>([]);
 
@@ -35,23 +36,20 @@ const Settings = () => {
           return;
         }
 
+        //set email
+        setEmail(user.email);
+
         // Fetch profile data
         const { data: profileData } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+          .from('profiles').select('*').eq('id', user.id).maybeSingle();
 
         if (profileData) {
           setProfile(profileData);
         }
 
         // Fetch trading accounts
-        const { data: tradingAccountsData } = await supabase
-          .from('trading_accounts')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
+        const { data: tradingAccountsData } = await supabase.from('trading_accounts')
+          .select('*').eq('user_id', user.id).order('created_at', { ascending: false });
 
         if (tradingAccountsData) {
           setTradingAccounts(tradingAccountsData);
@@ -115,10 +113,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="subscription">
-          <SubscriptionSection
-            customerId={profile.stripe_customer_id}
-            userId={profile.id}
-          />
+          <SubscriptionSection email={email} userId={profile.id} />
         </TabsContent>
 
         <TabsContent value="trading-accounts">

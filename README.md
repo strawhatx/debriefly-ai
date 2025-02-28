@@ -75,7 +75,7 @@ Stop: supabase stop
 Login: supabase login
 
 Debug Edge Functions: 
-- supabase functions serve payment-methods --env-file supabase/.env --inspect-mode brk
-- supabase functions serve subscriptions --env-file supabase/.env --inspect-mode brk
+- supabase functions serve stripe-subscriptions-webhook --env-file supabase/.env --inspect-mode brk
+- supabase functions serve payments --env-file supabase/.env --inspect-mode brk
 
 - supabase functions serve --all --env-file supabase/.env

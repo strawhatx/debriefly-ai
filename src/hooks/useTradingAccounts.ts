@@ -90,7 +90,7 @@ export const useTradingAccounts = (
             *,
             broker:brokers(*)
           `)
-          .single();
+          .maybeSingle();
 
         if (error) {
           if (error.message.includes('Trading account limit reached')) {
@@ -120,7 +120,7 @@ export const useTradingAccounts = (
             *,
             broker:brokers(*)
           `)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
         setTradingAccounts(

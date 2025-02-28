@@ -1,5 +1,5 @@
 import { CheckIcon } from "lucide-react";
-import { Card } from "../ui/card";
+import { Card, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
 import { usePayment } from "./hooks/usePayment";
 import { useEffect, useState } from "react";
@@ -24,7 +24,7 @@ const tiers = [
       "Csv Trade History Import",
     ],
     isActive: true,
-    stripePriceId: "price_free_beta",
+    stripePriceId: "price_1QwsM12c1fXi1EZHRerWIEBh",
   },
   {
     name: "Pro (Coming soon)",
@@ -39,13 +39,14 @@ const tiers = [
       "Broker Integration (Future Idea)",
     ],
     isActive: false,
-    stripePriceId: "price_pro_20",
+    stripePriceId: "price_1QwsXn2c1fXi1EZHVhiacfWi",
   },
 ];
 
 export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps) => {
   const { fetchSubscription, createPaymentLink, openBillingPortal, loading } = usePayment();
   const [activePlan, setActivePlan] = useState<string | null>(null);
+
 
   // ✅ Fetch the user's current active subscription
   useEffect(() => {
@@ -55,18 +56,20 @@ export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps)
         setActivePlan(subscription.stripe_price_id);
       }
     };
-  
+
     fetchData();
+    openBillingPortal(userId, email);
+    createPaymentLink(userId, email)
   }, [userId]);
-  
+
 
   return (
-    <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
+    <div className="mx-auto mt-16 gap-6 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
       {tiers.map((tier) => {
         const isCurrentPlan = activePlan === tier.stripePriceId;
 
         return (
-          <Card key={tier.id} className="p-6">
+          <Card key={tier.id} className="p-6 h-full">
             <h3 id={tier.id} className="text-primary text-lg font-semibold">{tier.name}</h3>
             <p className="mt-4 flex items-baseline gap-x-2">
               <span className="text-white text-5xl font-semibold tracking-tight">{tier.priceMonthly}</span>
@@ -83,24 +86,26 @@ export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps)
               ))}
             </ul>
 
-            {/* ✅ If this is the user's active plan, show "Manage Billing" instead */}
-            {isCurrentPlan ? (
-              <Button
-                onClick={() => openBillingPortal(userId, email)}
-                className="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold"
-                disabled={loading}
-              >
-                Manage Billing
-              </Button>
-            ) : (
-              <Button
-                onClick={() => tier.isActive && createPaymentLink(userId, email, tier.stripePriceId)}
-                className="mt-6 w-full bg-primary hover:bg-emerald-400 text-white font-semibold"
-                disabled={!tier.isActive || loading}
-              >
-                {tier.isActive ? "Get Started Today" : "Coming Soon"}
-              </Button>
-            )}
+            <CardFooter>
+              {/* ✅ If this is the user's active plan, show "Manage Billing" instead */}
+              {isCurrentPlan ? (
+                <Button
+                  onClick={() => openBillingPortal(userId, email)}
+                  className="mt-6 w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold"
+                  disabled={loading}
+                >
+                  Manage Billing
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => tier.isActive && createPaymentLink(userId, email, tier.stripePriceId)}
+                  className="mt-6 w-full bg-primary hover:bg-emerald-400 text-white font-semibold"
+                  disabled={!tier.isActive || loading}
+                >
+                  {tier.isActive ? "Get Started Today" : "Coming Soon"}
+                </Button>
+              )}
+            </CardFooter>
           </Card>
         );
       })}

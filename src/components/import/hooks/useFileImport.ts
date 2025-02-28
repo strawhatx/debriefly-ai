@@ -55,7 +55,7 @@ export const useFileImport = (selectedAccount: string) => {
           file_type: selectedFile.type
         })
         .select()
-        .single();
+        .maybeSingle();
 
       //just in case
       setErrorId(importRecord.id);
