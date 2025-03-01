@@ -433,26 +433,43 @@ export type Database = {
         }
         Relationships: []
       }
-      subscription_plans: {
+      subscriptions: {
         Row: {
-          id: number
-          monthly_price: number
-          name: string
+          created_at: string | null
+          current_period_end: string | null
+          id: string
+          status: string
           stripe_price_id: string
+          stripe_subscription_id: string
+          user_id: string
         }
         Insert: {
-          id?: number
-          monthly_price: number
-          name: string
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          status: string
           stripe_price_id: string
+          stripe_subscription_id: string
+          user_id: string
         }
         Update: {
-          id?: number
-          monthly_price?: number
-          name?: string
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          status?: string
           stripe_price_id?: string
+          stripe_subscription_id?: string
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trade_history: {
         Row: {
