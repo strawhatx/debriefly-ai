@@ -32,7 +32,7 @@ const LoginForm = () => {
     setLoginError(null);
 
     try {
-      console.log("Attempting auth with Supabase URL:", supabase.supabaseUrl);
+      console.log("Attempting auth with Supabase");
       
       if (isSignUp) {
         if (formData.password !== formData.confirmPassword) {
@@ -111,10 +111,10 @@ const LoginForm = () => {
     }
   };
 
-  // Check if we're using the default placeholder values
-  const isUsingDefaultSupabaseConfig = 
-    supabase.supabaseUrl === 'https://example.supabase.co' || 
-    supabase.supabaseUrl === '';
+  // Check if we're using the default placeholder values by checking the URL from our client file
+  const isUsingDefaultSupabaseConfig = !import.meta.env.VITE_SUPABASE_URL || 
+    import.meta.env.VITE_SUPABASE_URL === 'https://example.supabase.co' || 
+    import.meta.env.VITE_SUPABASE_URL === '';
 
   return (
     <Card className="p-6 space-y-6 animate-fade-up bg-gray-800 border-gray-800">
