@@ -10,6 +10,8 @@ import GoogleSignInButton from "./auth/GoogleSignInButton";
 import AuthHeader from "./auth/AuthHeader";
 import EmailPasswordForm from "./auth/EmailPasswordForm";
 import { usePayment } from "./settings/hooks/usePayment";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -22,37 +24,41 @@ const LoginForm = () => {
     password: "",
     confirmPassword: "",
   });
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError(null);
 
     try {
+      console.log("Attempting auth with Supabase URL:", supabase.supabaseUrl);
+      
       if (isSignUp) {
         if (formData.password !== formData.confirmPassword) {
-          toast({
-            title: "Error",
-            description: "Passwords do not match",
-            variant: "destructive",
-          });
+          setLoginError("Passwords do not match");
           return;
         }
 
         //CREATE ACCOUNT
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
         });
 
         if (signUpError) throw signUpError;
+        
+        console.log("Sign up successful:", signUpData);
 
         //SIGN IN
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        const { error: signInError, data: signInData } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
 
         if (signInError) throw signInError;
+        
+        console.log("Sign in successful:", signInData);
 
         //CREATE STRIPE CUSTOMER
         const { data, error: userError } = await supabase.auth.getUser();
@@ -72,12 +78,14 @@ const LoginForm = () => {
       }
 
       else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
 
         if (error) throw error;
+        
+        console.log("Login successful:", data);
 
         toast({
           title: "Welcome back",
@@ -89,6 +97,8 @@ const LoginForm = () => {
     }
 
     catch (error: any) {
+      console.error("Authentication error:", error);
+      setLoginError(error.message || "An error occurred during authentication");
       toast({
         title: "Error",
         description: error.message,
@@ -101,9 +111,32 @@ const LoginForm = () => {
     }
   };
 
+  // Check if we're using the default placeholder values
+  const isUsingDefaultSupabaseConfig = 
+    supabase.supabaseUrl === 'https://example.supabase.co' || 
+    supabase.supabaseUrl === '';
+
   return (
     <Card className="p-6 space-y-6 animate-fade-up bg-gray-800 border-gray-800">
       <AuthHeader isSignUp={isSignUp} />
+
+      {isUsingDefaultSupabaseConfig && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Configuration Error</AlertTitle>
+          <AlertDescription>
+            Supabase is not properly configured. Please set the VITE_SUPABASE_URL and VITE_SUPABASE_KEY environment variables.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {loginError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Authentication Error</AlertTitle>
+          <AlertDescription>{loginError}</AlertDescription>
+        </Alert>
+      )}
 
       <GoogleSignInButton isLoading={isLoading} />
 
