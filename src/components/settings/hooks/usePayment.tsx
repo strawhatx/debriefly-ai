@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const API_URL = `${import.meta.env.VITE_SUPABASE_API}/subscriptions`; // API path
+const API_URL = `${import.meta.env.VITE_SUPABASE_API}/payments`; // API path
 
 export const usePayment = () => {
   const [loading, setLoading] = useState(false);

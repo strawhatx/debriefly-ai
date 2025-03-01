@@ -7,26 +7,33 @@ import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"), { apiVersion: "2023-10-16" });
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 
-// ✅ Helper: Create a Stripe Customer & Store in Supabase
-const createStripeCustomer = async (userId: string, email: string) => {
-  if (!email) {
-    console.error("❌ Missing email for user:", userId);
+// ✅ Helper: Get or Create a Stripe Customer
+const getOrCreateCustomer = async (userId: string, email: string) => {
+  // 🔍 Step 1: Check if the user already has a Stripe customer ID in Supabase
+  const { data, error } = await supabase
+    .from("profiles").select("stripe_customer_id").eq("id", userId).single();
+
+  if (error && error.code !== "PGRST116") {
+    console.error("❌ Supabase Error Fetching Customer ID:", error.message);
     return null;
   }
 
+  if (data?.stripe_customer_id) {
+    console.log("✅ Existing Stripe customer found:", data.stripe_customer_id);
+    return data.stripe_customer_id;
+  }
+
+  // 🔥 If no customer exists, create one in Stripe
   console.log("🆕 Creating new Stripe customer for:", email);
   try {
-    // 🔥 Create Customer in Stripe
     const customer = await stripe.customers.create({ email, metadata: { userId } });
 
-    // 🔄 Save Customer ID in Supabase
-    const { error } = await supabase
-      .from("profiles")
-      .update({ stripe_customer_id: customer.id })
-      .eq("id", userId);
+    // 🔄 Save the new customer ID in Supabase
+    const { error: updateError } = await supabase.from("profiles")
+      .update({ stripe_customer_id: customer.id }).eq("id", userId);
 
-    if (error) {
-      console.error("❌ Supabase Error Saving Customer ID:", error.message);
+    if (updateError) {
+      console.error("❌ Supabase Error Saving Customer ID:", updateError.message);
       return null;
     }
 
@@ -37,6 +44,41 @@ const createStripeCustomer = async (userId: string, email: string) => {
     console.error("❌ Stripe Error:", stripeError.message);
     return null;
   }
+};
+
+// ✅ Helper: Get or Create a Default Subscription for a User
+const getOrCreateSubscription = async (customerId: string, userId: string) => {
+  // 🔍 Check if user already has an active subscription
+  const existingSubscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+    status: "active",
+  });
+
+  if (existingSubscriptions.data.length > 0) {
+    console.log("✅ Existing subscription found:", existingSubscriptions.data[0].id);
+    return existingSubscriptions.data[0];
+  }
+
+  // 🔥 If no subscription exists, create a default subscription
+  console.log("🆕 Creating default subscription for customer:", customerId);
+  const subscription = await stripe.subscriptions.create({
+    customer: customerId,
+    items: [{ price: Deno.env.get("STRIPE_DEFAULT_PRICE_ID") }], // Default plan
+    expand: ["latest_invoice.payment_intent"],
+  });
+
+  // 🔄 Store new subscription in Supabase
+  await supabase
+    .from("subscriptions")
+    .upsert({
+      user_id: userId,
+      stripe_subscription_id: subscription.id,
+      stripe_price_id: Deno.env.get("STRIPE_DEFAULT_PRICE_ID"),
+      status: subscription.status,
+      current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+    });
+
+  return subscription;
 };
 
 // 🚀 **Main Function**
@@ -52,30 +94,34 @@ serve(async (req) => {
     }
 
     console.log(`📢 Processing action: ${action} for user: ${userId}`);
+    
+    // ✅ Fetch or create a Stripe customer ID
+    const customerId = await getOrCreateCustomer(userId, email);
+    if (!customerId) return new Response(JSON.stringify({ error: "Failed to create Stripe customer" }), { headers: handleReturnCORS(req), status: 500 });
 
     switch (action) {
-      // ✅ 1️⃣ Create Stripe Customer on Signup
+      // ✅ 1 Create Stripe Customer on Signup
       case "createStripeCustomer":
-        const customerId = await createStripeCustomer(userId, email);
-        if (!customerId) return new Response(JSON.stringify({ error: "Failed to create Stripe customer" }), { headers: handleReturnCORS(req), status: 500 });
-
         return new Response(JSON.stringify({ stripeCustomerId: customerId }), { headers: handleReturnCORS(req), status: 200 });
 
-      // ✅ 2️⃣ Redirect User to Stripe Billing Portal
+      // ✅ 2 Redirect User to Stripe Billing Portal
       case "createBillingPortal":
+        await getOrCreateSubscription(customerId, userId); // Ensure user has a subscription
+
         const portalSession = await stripe.billingPortal.sessions.create({
-          customer: await createStripeCustomer(userId, email), // Ensure user has a customer ID
+          customer: customerId,
           return_url: Deno.env.get("PRODUCTION_URL") + "/settings/subscription",
         });
+
         return new Response(JSON.stringify({ url: portalSession.url }), { headers: handleReturnCORS(req), status: 200 });
 
-      // ✅ 3️⃣ Generate Payment Link for Subscription
+      // ✅ 3 Generate Payment Link for Subscription
       case "createPaymentLink":
         if (!priceId) return new Response(JSON.stringify({ error: "Missing priceId" }), { headers: handleReturnCORS(req), status: 400 });
 
         const paymentLink = await stripe.paymentLinks.create({
           line_items: [{ price: priceId, quantity: 1 }],
-          customer: await createStripeCustomer(userId, email), // Ensure user has a customer ID
+          customer: customerId,
           success_url: Deno.env.get("PRODUCTION_URL") + "/success",
           cancel_url: Deno.env.get("PRODUCTION_URL") + "/cancel",
         });
@@ -91,3 +137,4 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: error.message }), { headers: handleReturnCORS(req), status: 500 });
   }
 });
+

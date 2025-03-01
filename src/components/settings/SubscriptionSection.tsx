@@ -47,10 +47,9 @@ export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps)
   const { fetchSubscription, createPaymentLink, openBillingPortal, loading } = usePayment();
   const [activePlan, setActivePlan] = useState<string | null>(null);
 
-
   // ✅ Fetch the user's current active subscription
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async () => { 
       const subscription = await fetchSubscription(userId);
       if (subscription) {
         setActivePlan(subscription.stripe_price_id);
@@ -58,8 +57,6 @@ export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps)
     };
 
     fetchData();
-    openBillingPortal(userId, email);
-    createPaymentLink(userId, email)
   }, [userId]);
 
 
