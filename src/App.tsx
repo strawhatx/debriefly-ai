@@ -75,7 +75,7 @@ const App = () => {
               <Route path="/login" element={<Login />} />
 
               {/* Protected routes */}
-              <Route element={<AuthGuard />}>
+           
                 <Route path="/app/dashboard" element={
                   <SidebarLayout>
                     <Dashboard />
@@ -111,7 +111,7 @@ const App = () => {
                     <TradeEntry />
                   </SidebarLayout>
                 } />
-              </Route>
+              
 
               <Route path="*" element={<NotFound />} />
             </Routes>
