@@ -76,3 +76,103 @@ html {
     @apply bg-background text-foreground;
   }
 }
+
+/* Rich text editor styles */
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.75em;
+}
+
+.ProseMirror h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.ProseMirror h2 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.ProseMirror li {
+  margin-bottom: 0.25em;
+}
+
+.ProseMirror code {
+  background-color: rgba(55, 65, 81, 0.5);
+  border-radius: 0.25em;
+  padding: 0.1em 0.3em;
+  font-family: monospace;
+}
+
+.ProseMirror pre {
+  background-color: rgba(55, 65, 81, 0.5);
+  border-radius: 0.25em;
+  padding: 0.5em;
+  margin-bottom: 0.75em;
+  font-family: monospace;
+  overflow-x: auto;
+}
+
+.ProseMirror mark {
+  background-color: rgba(245, 158, 11, 0.2);
+  color: rgb(253, 230, 138);
+  padding: 0.1em 0.2em;
+  border-radius: 0.25em;
+}
+
+/* Text alignment styles */
+.ProseMirror .is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror p[style*="text-align: center"] {
+  text-align: center;
+}
+
+.ProseMirror p[style*="text-align: right"] {
+  text-align: right;
+}
+
+.ProseMirror p[style*="text-align: justify"] {
+  text-align: justify;
+}
+
+.ProseMirror h1[style*="text-align: center"],
+.ProseMirror h2[style*="text-align: center"] {
+  text-align: center;
+}
+
+.ProseMirror h1[style*="text-align: right"],
+.ProseMirror h2[style*="text-align: right"] {
+  text-align: right;
+}
+
+.ProseMirror h1[style*="text-align: justify"],
+.ProseMirror h2[style*="text-align: justify"] {
+  text-align: justify;
+}
+
+ @tiptap/react @tiptap/extension-underline @tiptap/extension-bold @tiptap/extension-bullet-list @tiptap/extension-code  @tiptap/extension-code-block @tiptap/extension-document @tiptap/extension-heading @tiptap/extension-highlight @tiptap/extension-history @tiptap/extension-italic @tiptap/extension-list-item @tiptap/extension-ordered-list @tiptap/extension-paragraph @tiptap/extension-text @tiptap/extension-text-align
+
+   
