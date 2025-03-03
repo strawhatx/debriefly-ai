@@ -9,8 +9,8 @@ import { supabase } from '@/integrations/supabase/client'
 import { Tag } from 'lucide-react'
 
 interface EmotionalTagProps {
-    emotionTags: any[];
-    onChange: (values: any[]) => void;
+    emotionTags: string[];
+    onChange: (values: string[]) => void;
 }
 
 // Available emotion tags
@@ -27,28 +27,46 @@ export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
     useEffect(() => {
         const fetchEmotionTags = async () => {
             if (!selectedTrade?.id) return;
-            const { data, error } = await supabase.from("emotional_tags").select("id,tag").eq("position_id", selectedTrade.id);
-            if (!error) onChange(data);
+            const { data, error } = await supabase
+                .from("emotional_tags").select("tags").eq("position_id", selectedTrade.id).maybeSingle();
+
+            if (error) {
+                console.error("Error fetching emotional tags:", error);
+                return;
+            }
+
+            onChange(data?.tags ? JSON.parse(data.tags) : []);
         };
 
         fetchEmotionTags();
     }, [selectedTrade]);
 
-    const handleTagChange = (selected: any[]) => {
-        const updatedTags = selected.map(tag => ({ id: null, tag }));
-        onChange(updatedTags);
+    const handleTagChange = async (selected: string[]) => {
+        onChange(selected);
+        if (!selectedTrade?.id) return;
+
+        const { error } = await supabase
+            .from("emotional_tags")
+            .upsert(
+                { position_id: selectedTrade.id, tags: JSON.stringify(selected) },
+                { onConflict: "position_id" } // Now it will work because `position_id` is unique
+            );
+
+        if (error) {
+            console.error("Error saving emotional tags:", error);
+        }
     };
 
     return (
         <div className="py-3 px-2">
             <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-col items-start flex-wrap gap-2">
-                    <Listbox as="div" value={emotionTags.map(e => e.tag)} onChange={handleTagChange} multiple>
+                    <Listbox as="div" value={emotionTags} onChange={handleTagChange} multiple>
                         <div className="relative mt-2 w-64">
                             <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-full border border-gray-600 py-1.5 pr-2 pl-3 text-left text-white outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                 <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6 text-gray-400">
                                     <Tag className="w-3" />
-                                    <span className="block truncate text-xs">{emotionTags.length > 0 ? emotionTags.map(e => e.tag).join(', ') : "Add Tags"}</span>
+                                    <span className="block truncate text-xs">{emotionTags.length > 0 ? emotionTags.join(', ') : "Add Tags"}</span>
                                 </span>
                                 <ChevronUpDownIcon aria-hidden="true" className="col-start-1 row-start-1 size-5 self-center justify-self-end text-white sm:size-4" />
                             </ListboxButton>
@@ -60,9 +78,11 @@ export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
                                             <Tag className="w-4" />
                                             <span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{emotion}</span>
                                         </div>
-                                        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600 group-not-data-selected:hidden group-data-focus:text-white">
-                                            <CheckIcon aria-hidden="true" className="size-5" />
-                                        </span>
+                                        {emotionTags.includes(emotion) && (
+                                            <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600 group-not-data-selected:hidden group-data-focus:text-white">
+                                                <CheckIcon aria-hidden="true" className="size-5" />
+                                            </span>
+                                        )}
                                     </ListboxOption>
                                 ))}
                             </ListboxOptions>
@@ -70,11 +90,11 @@ export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
                     </Listbox>
 
                     {emotionTags.length > 0 ? (
-                        emotionTags.map(e => (
-                            <div key={e.tag} className="flex items-center gap-1 px-2 py-1 bg-gray-700 rounded-full">
-                                <span>{e.tag}</span>
+                        emotionTags.map(tag => (
+                            <div key={tag} className="flex items-center gap-1 px-2 py-1 bg-gray-700 rounded-full">
+                                <span>{tag}</span>
                                 <button
-                                    onClick={() => onChange(emotionTags.filter(tag => tag.tag !== e.tag))}
+                                    onClick={() => handleTagChange(emotionTags.filter(t => t !== tag))}
                                     className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-600"
                                 >
                                     ×
