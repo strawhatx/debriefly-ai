@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
 import { BrokerInfo } from "./BrokerInfo";
-import { useBrokerData } from "./hooks/useBrokerData";
+import { useBrokerData } from "@/hooks/use-broker-data";
 import { BrokerSyncProps } from "./types";
 
 export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {

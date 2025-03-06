@@ -7,7 +7,7 @@ import { TradingAccountForm } from "./TradingAccountForm";
 import { TradingAccountRow } from "./TradingAccountRow";
 import { EmptyTradingAccounts } from "./EmptyTradingAccounts";
 import { TradingAccount } from "@/types/trading";
-import { useTradingAccounts } from "@/hooks/useTradingAccounts";
+import { useTradingAccounts } from "@/hooks/use-trading-accounts";
 import { Input } from "../ui/input";
 
 interface TradingAccountsSectionProps {

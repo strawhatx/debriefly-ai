@@ -3,9 +3,8 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import * as Papa from 'papaparse'; // For CSV parsing
-import { mapTradeData } from "../utils/utils";
-import { Position } from "../utils/types";
-import { detectAssetType } from "../utils/asset-detection";
+import { mapTradeData } from "../lib/utils";
+import { Position } from "../lib/types";
 
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();

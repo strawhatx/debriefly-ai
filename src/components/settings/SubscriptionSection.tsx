@@ -1,7 +1,7 @@
 import { CheckIcon } from "lucide-react";
 import { Card, CardFooter } from "../ui/card";
 import { Button } from "../ui/button";
-import { usePayment } from "./hooks/usePayment";
+import { usePayment } from "@/hooks/use-payment";
 import { useEffect, useState } from "react";
 
 interface SubscriptionSectionProps {

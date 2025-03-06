@@ -1,13 +1,12 @@
 
-import React, { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Broker } from "./types";
 import { BrokerInfo } from "./BrokerInfo";
 import { AccountSelect } from "./AccountSelect";
 import { FileUploader } from "./FileUploader";
 import { ImportButton } from "./ImportButton";
-import { useFileImport } from "./hooks/useFileImport";
+import { useFileImport } from "@/hooks/use-file-import"
 import useBrokerStore from "@/store/broker";
 
 interface FileImportProps {

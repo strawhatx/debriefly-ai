@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { TradingAccount, BrokerField } from "../types";
+import { TradingAccount, BrokerField } from "../types/types";
 import { useToast } from "@/components/ui/use-toast";
 
 export const useBrokerData = (initialBrokerId: string = "") => {
@@ -15,7 +15,7 @@ export const useBrokerData = (initialBrokerId: string = "") => {
     queryKey: ["tradingAccounts", selectedBroker],
     queryFn: async () => {
       if (!selectedBroker) return [];
-      
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast({
@@ -50,7 +50,15 @@ export const useBrokerData = (initialBrokerId: string = "") => {
         return [];
       }
 
-      return data as TradingAccount[];
+      const transformedAccounts: TradingAccount[] = (data || []).map(account => ({
+        id: account.id,
+        account_name: account.account_name,
+        broker: account.broker.length > 0
+          ? account.broker[0] // Extract the first broker from the array
+          : { id: "", name: "Unknown", description: "" } // Default fallback
+      }));
+
+      return transformedAccounts;
     },
     enabled: !!selectedBroker,
   });

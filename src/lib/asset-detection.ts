@@ -1,17 +1,11 @@
 // ✅ Updated Asset Detection with Asset Store Integration
 import useAssetStore from "@/store/assets";
+import { normalizeSymbol } from "./utils";
 
 interface FuturesAssetConfig {
   tick_size: number; 
   tick_value: number;
 }
-
-
-
-const extractCleanSymbol = (symbol: string): string => {
-  const parts = symbol.split(':');
-  return parts.length === 2 ? parts[1] : symbol;
-};
 
 const extractFuturesRoot = (symbol: string): string => {
   return symbol.replace(/([1-2]!|[FGHJKMNQUVXZ](\d{1,4}|[1-9]))$/, '');
@@ -101,8 +95,8 @@ export const extractMarket = (symbol: string): string | undefined => {
 };
 
 export const getAssetType = (symbol: string): string => {
-  const normalizedSymbol = symbol.toUpperCase().trim();
-  const cleanSymbol = extractCleanSymbol(normalizedSymbol);
+  const capsSymbol = symbol.toUpperCase().trim();
+  const cleanSymbol = normalizeSymbol(capsSymbol);
 
   console.log(`Detecting asset type for: ${cleanSymbol}`);
 
@@ -127,8 +121,8 @@ export const getFuturesInfo = async (symbol: string): Promise<FuturesAssetConfig
 
   if (futures_multipliers.length === 0) await get_futures_multipliers();
 
-  const normalizedSymbol = symbol.toUpperCase().trim();
-  const cleanSymbol = extractCleanSymbol(normalizedSymbol);
+  const capsSymbol = symbol.toUpperCase().trim();
+  const cleanSymbol = normalizeSymbol(capsSymbol);
 
   console.log(`Detecting asset type for: ${cleanSymbol}`);
 
@@ -139,10 +133,3 @@ export const getFuturesInfo = async (symbol: string): Promise<FuturesAssetConfig
   return { tick_size: result.tick_size, tick_value: result.tick_value, };
 
 };
-
-// Example Usage
-(async () => {
-  console.log(await detectAssetType("ESM24")); // Futures Example
-  console.log(await detectAssetType("EUR/USD")); // Forex Example
-  console.log(await detectAssetType("BTC/USD")); // Crypto Example
-})();

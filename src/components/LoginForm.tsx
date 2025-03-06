@@ -9,9 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import GoogleSignInButton from "./auth/GoogleSignInButton";
 import AuthHeader from "./auth/AuthHeader";
 import EmailPasswordForm from "./auth/EmailPasswordForm";
-import { usePayment } from "./settings/hooks/usePayment";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { usePayment } from "@/hooks/use-payment";
 
 const LoginForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
