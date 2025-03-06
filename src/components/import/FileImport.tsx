@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Broker } from "./types";
@@ -17,31 +17,25 @@ interface FileImportProps {
 export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
   const [selectedBrokerId, setSelectedBrokerId] = useState<string>("");
   const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [accounts, setAccounts] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const setBroker = useBrokerStore((state) => state.update);
 
   const { isUploading, handleImport } = useFileImport(selectedAccount);
 
-  const { data: tradingAccounts } = useQuery({
-    queryKey: ["tradingAccounts", selectedBrokerId],
-    queryFn: async () => {
-      if (!selectedBrokerId) return [];
+  const fetchAccounts = async () => {
+    if (!selectedBrokerId) return [];
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
-        .from("trading_accounts")
-        .select("*")
-        .eq("broker_id", selectedBrokerId)
-        .eq("user_id", user.id);
+    const { data, error } = await supabase
+      .from("trading_accounts").select("*").eq("broker_id", selectedBrokerId).eq("user_id", user.id);
 
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedBrokerId,
-  });
+    if (error) throw error;
+    setAccounts(data);
+  }
 
   const handleStartImport = async () => {
     const success = await handleImport(selectedFile);
@@ -53,11 +47,16 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
 
   const handleBrokerSelect = (brokerId: string) => {
     setSelectedBrokerId(brokerId);
-    
+
     var result = availableBrokers?.find(b => b.id === brokerId)
 
     setBroker(result)
   };
+
+  useEffect(() => {
+
+    fetchAccounts();
+  }, [selectedBrokerId])
 
   return (
     <div className="space-y-6">
@@ -70,7 +69,8 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
       {selectedBrokerId && (
         <div className="space-y-6">
           <AccountSelect
-            accounts={tradingAccounts}
+            accounts={accounts}
+            refreshAccounts={fetchAccounts}
             selectedAccount={selectedAccount}
             onAccountChange={setSelectedAccount}
           />

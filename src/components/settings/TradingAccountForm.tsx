@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
-import { PROFIT_CALC_METHODS, EditingAccount } from "@/types/trading";
+import { MARKETS, EditingAccount } from "@/types/trading";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -65,16 +65,16 @@ export const TradingAccountForm = ({
       </td>
       <td>
         <Select
-          value={editingAccount.profit_calculation_method}
-          onValueChange={(value) => onUpdate({ ...editingAccount, profit_calculation_method: value as typeof PROFIT_CALC_METHODS[number] })}
+          value={editingAccount.market}
+          onValueChange={(value) => onUpdate({ ...editingAccount, market: value as typeof MARKETS[number] })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select method" />
           </SelectTrigger>
           <SelectContent>
-            {PROFIT_CALC_METHODS.map((method) => (
-              <SelectItem key={method} value={method}>
-                {method}
+            {MARKETS.map((market) => (
+              <SelectItem key={market} value={market}>
+                {market}
               </SelectItem>
             ))}
           </SelectContent>

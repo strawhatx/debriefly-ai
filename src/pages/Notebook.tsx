@@ -7,7 +7,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { EmotionalTags } from '@/components/notebook/EmotionalTags';
-import { JournalEditor } from '@/components/notebook/JournalEditor';
 import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 
@@ -20,38 +19,38 @@ interface Journal {
     updated_at: string;
 }
 
-interface EmotionTag {
-    id: string | null;
-    tag: string;
-}
-
 export const Notebook = () => {
     const [journal, setJournal] = useState<Journal>(null);
-    const [emotionTags, setEmotionTags] = useState<EmotionTag[]>([]);
+    const [emotionTags, setEmotionTags] = useState<string[]>([]);
     const { toast } = useToast();
 
     const selectedTrade = useTradeStore((state) => state.selected);
 
     const handleSave = async () => {
-        await supabase.from("journal_entries").upsert(journal);
+        await supabase.from("journal_entries").upsert(
+            journal, { onConflict: "position_id" } // Now it will work because `position_id` is unique);
+        )
+
+        await fetchJournal();
+
     }
 
+    const fetchJournal = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data, error } = await supabase.from("journal_entries").select("id,user_id,position_id,entry_text,created_at,updated_at")
+            .eq("position_id", selectedTrade.id).maybeSingle();
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        if (data) setJournal(data);
+
+        else setJournal((prev: Journal) => ({ ...prev, user_id: user.id, position_id: selectedTrade.id }));
+    };
+
     useEffect(() => {
-        const fetchJournal = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            const { data, error } = await supabase.from("journal_entries").select("id,user_id,position_id,entry_text,created_at,updated_at")
-                .eq("position_id", selectedTrade.id).maybeSingle();
-
-            if (error) {
-                console.error(error);
-                return;
-            }
-
-            if (data) setJournal(data);
-
-            else setJournal((prev: Journal) => ({ ...prev, user_id: user.id, position_id: selectedTrade.id }));
-        };
-
         if (!selectedTrade) return;
 
         fetchJournal();
@@ -109,7 +108,7 @@ export const Notebook = () => {
                             <EmotionalTags
                                 emotionTags={emotionTags}
                                 onChange={setEmotionTags}
-                            />
+                            />``
 
                             {/* Notes Section */}
                             <RichTextEditor

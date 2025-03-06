@@ -33,7 +33,7 @@ export const useTradingAccounts = (
     setEditingAccount({
       isNew: true,
       broker_id: defaultBrokerId,
-      profit_calculation_method: "FIFO",
+      market: "STOCKS",
       account_balance: 0,
     });
   };
@@ -83,7 +83,7 @@ export const useTradingAccounts = (
             account_name: editingAccount.account_name,
             user_id: user.id,
             broker_id: editingAccount.broker_id,
-            profit_calculation_method: editingAccount.profit_calculation_method,
+            market: editingAccount.market,
             account_balance: Number(editingAccount.account_balance)
           }])
           .select(`
@@ -112,7 +112,7 @@ export const useTradingAccounts = (
           .update({
             account_name: editingAccount.account_name,
             broker_id: editingAccount.broker_id,
-            profit_calculation_method: editingAccount.profit_calculation_method,
+            market: editingAccount.market,
             account_balance: Number(editingAccount.account_balance)
           })
           .eq('id', editingAccount.id)

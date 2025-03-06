@@ -4,7 +4,7 @@ export const FIELD_MAPPING = {
   side: ['SIDE','ACTION'],
   order_type: ['TYPE', 'ORDER TYPE', 'ORDER'],
   entry_price: ['PRICE',  'EXECUTION PRICE', 'FILL PRICE', 'ENTRY PRICE'],
-  exit_price: ['STOP PRICESTOP PRICE',  'EXIT PRICE', 'STOP'],
+  exit_price: ['STOP PRICE',  'EXIT PRICE', 'STOP'],
   quantity: ['QTY', 'QUANTITY', 'LOT SIZE', 'CONTRACTS', 'SIZE', 'TRADE SIZE' ],
   fees: ['COMMISSION', 'FEE'],
   entry_date:['PLACING TIME', 'ENTRY TIME', 'TIME', 'DATE'],

@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { AccountDialog } from "./AccountDialog";
 
 interface TradingAccount {
   id: string;
@@ -20,17 +21,13 @@ interface TradingAccount {
 
 interface AccountSelectProps {
   accounts: TradingAccount[] | undefined;
+  refreshAccounts:() => void
   selectedAccount: string;
   onAccountChange: (value: string) => void;
   isLoading?: boolean;
 }
 
-export const AccountSelect = ({
-  accounts,
-  selectedAccount,
-  onAccountChange,
-  isLoading = false,
-}: AccountSelectProps) => {
+export const AccountSelect = ({ accounts, refreshAccounts, selectedAccount, onAccountChange, isLoading = false }: AccountSelectProps) => {
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -45,7 +42,7 @@ export const AccountSelect = ({
       <div className="space-y-2">
         <Label>Trading Account</Label>
         <div className="text-sm text-muted-foreground">
-          No trading accounts found for this broker. Please create one in Settings first.
+          No trading accounts found for this broker. Please create one -- <AccountDialog refreshAccounts={refreshAccounts} />.
         </div>
       </div>
     );

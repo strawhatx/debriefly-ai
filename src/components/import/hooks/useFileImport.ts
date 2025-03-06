@@ -6,13 +6,11 @@ import * as Papa from 'papaparse'; // For CSV parsing
 import { mapTradeData } from "../utils/utils";
 import { Position } from "../utils/types";
 import { detectAssetType } from "../utils/asset-detection";
-import useAssetStore from "@/store/assets";
 
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [errorId, setErrorId] = useState("");
-  const { currency_codes, futures_multipliers } = useAssetStore()
 
   const handleImport = async (selectedFile: File | null) => {
     if (!selectedAccount || !selectedFile) {
@@ -132,20 +130,21 @@ export const useFileImport = (selectedAccount: string) => {
     if (insertError) console.error(insertError);
   };
 
-  const processTradesIntoPositions = (trades: any[]) => {
+  const processTradesIntoPositions = async (trades: any[]) => {
     const openLongPositions: Record<string, Position[]> = {}; // Separate long positions by symbol
     const openShortPositions: Record<string, Position[]> = {};
     const closedPositions: any[] = [];
 
-    trades
+    const filteredTrades = trades
       .filter((trade) => trade.status.toUpperCase() === 'FILLED' && trade.quantity > 0) // Remove cancelled/partial fills
       //.sort((a, b) => new Date(a.entry_date).getTime() - new Date(b.entry_date).getTime()) // FIFO Sorting
-      .sort((a, b) => parseInt(a.external_id) - parseInt(b.external_id)) // Use order_id for strict execution order
-      .forEach((trade) => {
+      .sort((a, b) => parseInt(a.external_id) - parseInt(b.external_id)); // Use order_id for strict execution order
+      
+      for (const trade of filteredTrades) {
         const symbol = trade.symbol; // Ensure trades are matched per symbol
         const price = trade.fill_price;
         let remainingQuantity = trade.quantity;
-        const { multiplier, assetType } = detectAssetType(symbol, currency_codes, futures_multipliers);
+        const { assetType } = await detectAssetType(symbol);
 
         if (!openLongPositions[symbol]) openLongPositions[symbol] = [];
         if (!openShortPositions[symbol]) openShortPositions[symbol] = [];
@@ -203,7 +202,7 @@ export const useFileImport = (selectedAccount: string) => {
             openShortPositions[symbol].push({ ...trade, quantity: remainingQuantity });
           }
         }
-      });
+      }
 
     return closedPositions;
 

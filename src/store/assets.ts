@@ -5,7 +5,9 @@ import { persist } from 'zustand/middleware'
 
 interface Multiplier {
     symbol: string;
-    multiplier: number;
+    tick_size: number;
+    tick_value: number; 
+    point_value: number;
 }
 
 interface Currency {
@@ -43,9 +45,11 @@ const useAssetStore = create<AssetState>()(
                 });
             }
         },
+
         get_futures_multipliers: async () => {
             try {
-                const { data, error } = await supabase.from('futures_multipliers').select('symbol, multiplier');
+                const { data, error } = await supabase.from('futures_multipliers')
+                    .select('symbol, tick_size, tick_value, point_value');
 
                 if (error) throw error;
 

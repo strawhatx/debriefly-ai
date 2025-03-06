@@ -1,11 +1,11 @@
 
-export const PROFIT_CALC_METHODS = ['FIFO', 'LIFO'] as const;
+export const MARKETS = ['STOCKS', 'OPTIONS', 'CRYPTO', 'FOREX', 'FUTURES'] as const;
 
 export interface TradingAccount {
   id: string;
   account_name: string;
   broker_id: string;
-  profit_calculation_method: typeof PROFIT_CALC_METHODS[number];
+  market: typeof MARKETS[number];
   account_balance: number;
   created_at: string;
   broker?: {
