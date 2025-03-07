@@ -71,12 +71,10 @@ export const TradeHistory = () => {
       if (!user) throw new Error("Not authenticated");
 
       let query = supabase
-        .from("trade_history")
+        .from("positions")
         .select(`
-          *,
-          trading_accounts (
-            account_name
-          )
+          id, trading_account_id, symbol, asset_type, position_type, fill_price, stop_price entry_date, pnl,
+          emotional_tags ( tags )
         `)
         .eq("user_id", user.id)
         .order("entry_date", { ascending: false });

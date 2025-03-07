@@ -1,7 +1,5 @@
 import { XMarkIcon } from '@heroicons/react/20/solid'
 
-
-
 const features = [
   {
     name: 'Manual Logs Waste Time.',

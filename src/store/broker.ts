@@ -1,5 +1,5 @@
 // src/store/broker.ts
-import { Broker } from '@/components/import/types';
+import { Broker } from '../types/types';
 import { create } from 'zustand';
 
 interface BrokerState {

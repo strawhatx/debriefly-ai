@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { RefreshCw, Search } from "lucide-react";
+import { Import, RefreshCw, Search } from "lucide-react";
 import { ImportDialog } from "./ImportDialog";
 import { ImportsTable } from "./ImportsTable";
 import { Input } from "../ui/input";
+import { Link } from "react-router-dom";
 
 type Import = {
   id: string;
@@ -97,10 +98,10 @@ export const ImportHistorySection = () => {
                 className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
-            <ImportDialog
-              tradingAccounts={tradingAccounts}
-              onImportComplete={fetchImports}
-            />
+            <Link to="/app/trade-import" className="inline-flex items-center gap-2 px-6 text-background py-2 bg-primary rounded-lg font-medium group">
+            <Import className="" />
+            Import Trades
+            </Link>
             <Button variant="outline" onClick={fetchImports}>
               <RefreshCw className="h-4 w-4" />
             </Button>

@@ -12,8 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload } from "lucide-react";
-import { AccountSelect } from "@/components/import/AccountSelect";
 
 export const ProfilePasswordDialog = () => {
   const { toast } = useToast();

@@ -2,7 +2,6 @@
 import { Card } from "@/components/ui/card";
 import TradingAccountsOverview from "@/components/dashboard/TradingAccountsOverview";
 import { TradingCalendar } from "@/components/dashboard/TradingCalendar";
-import WinLossInsights from "@/components/dashboard/WinLossInsights";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Import, LineChart, ThumbsUp, TrendingUp } from "lucide-react";
@@ -46,7 +45,7 @@ const Dashboard = () => {
           <Button
             size="sm"
             className="gap-2 text-sm h-9"
-            onClick={() => navigate("/app/trade-entry")}
+            onClick={() => navigate("/app/trade-import")}
           >
             <Import className="w-3.5 h-3.5" />
             Import Trades

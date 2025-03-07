@@ -17,7 +17,7 @@ import { Debrief } from "./pages/Debrief";
 import { TradeHistory } from "./pages/TradeHistory";
 import { BehaviorialPatterns } from "./pages/BehaviorialPatterns";
 import Settings from "./pages/Settings";
-import TradeEntry from "./pages/TradeEntry";
+import TradeImport from "./pages/TradeImport";
 import Sidebar from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { Notebook } from "./pages/Notebook";
@@ -119,9 +119,9 @@ const App = () => {
                     <Settings />
                   </SidebarLayout>
                 } />
-                <Route path="/app/trade-entry" element={
+                <Route path="/app/trade-import" element={
                   <SidebarLayout>
-                    <TradeEntry />
+                    <TradeImport />
                   </SidebarLayout>
                 } />
                 <Route path="/app/notebook" element={

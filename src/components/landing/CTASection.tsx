@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import { Card } from "../ui/card"
 import { ArrowRight } from "lucide-react"
 
 export const CtaSection = () => {

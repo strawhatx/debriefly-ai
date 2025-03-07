@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Broker } from "./types";
+import { Broker } from "@/types/types";
 import { BrokerInfo } from "./BrokerInfo";
 import { AccountSelect } from "./AccountSelect";
 import { FileUploader } from "./FileUploader";
@@ -69,7 +69,7 @@ export const FileImport = ({ availableBrokers = [] }: FileImportProps) => {
         <div className="space-y-6">
           <AccountSelect
             accounts={accounts}
-            refreshAccounts={fetchAccounts}
+             refreshAccounts={fetchAccounts}
             selectedAccount={selectedAccount}
             onAccountChange={setSelectedAccount}
           />
