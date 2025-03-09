@@ -1,19 +1,16 @@
 // src/store/trading-account.ts
 import { create } from 'zustand';
-
-export interface TradingAccount {
-    id: string;
-    account_name: string;
-  }
+import { persist } from 'zustand/middleware';
 
 interface TradingAccountState {
-    selected: TradingAccount | null;
-    update: (selected: TradingAccount) => void;
+    selected: string | null;
+    update: (value: string) => void;
 }
 
-const useTradingAccountStore = create<TradingAccountState>((set) => ({
+const useTradingAccountStore = create<TradingAccountState>()(persist((set) => ({
     selected: null,
-    update: (selected) => set({ selected }),
-}));
+    update: (value) => set({ selected: value }),
+}), { name: 'trading-account-store' }));
+
 
 export default useTradingAccountStore;

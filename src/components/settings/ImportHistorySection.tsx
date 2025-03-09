@@ -102,9 +102,6 @@ export const ImportHistorySection = () => {
             <Import className="" />
             Import Trades
             </Link>
-            <Button variant="outline" onClick={fetchImports}>
-              <RefreshCw className="h-4 w-4" />
-            </Button>
           </div>
         </div>
 

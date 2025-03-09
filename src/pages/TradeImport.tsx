@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileImport } from "@/components/import/FileImport";
 import { BrokerSync } from "@/components/import/BrokerSync";
-import { Broker } from "@/components/import/types";
+import { Broker } from "../types/broker";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { FileImportDescription } from "@/components/import/FileImportDescription";

@@ -1,7 +1,5 @@
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableRow } from "@/components/ui/table";
 import { Filter, Plus, Search, SortAsc } from "lucide-react";
 import { TradingAccountForm } from "./TradingAccountForm";
 import { TradingAccountRow } from "./TradingAccountRow";

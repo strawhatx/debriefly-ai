@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Broker } from "@/types/types";
+import { Broker } from "@/types/broker";
 import { BrokerInfo } from "./BrokerInfo";
 import { AccountSelect } from "./AccountSelect";
 import { FileUploader } from "./FileUploader";

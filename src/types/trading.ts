@@ -16,6 +16,20 @@ export interface TradingAccount {
   };
 }
 
+export interface Trade {
+  id: string;
+  symbol: string;
+  entry_date: string;
+  closing_date: string | null;
+  fill_price: number;
+  stop_price: number;
+  quantity: number;
+  side: string;
+  pnl: number | null;
+  fees: number;
+  emotional_tags: string[]
+}
+
 export interface EditingAccount extends Partial<TradingAccount> {
   isNew?: boolean;
 }
