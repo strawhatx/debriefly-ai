@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import * as Papa from 'papaparse'; // For CSV parsing
 import { mapTradeData } from "../lib/utils";
 import { Position } from "../lib/types";
+import { getAssetType } from "@/lib/asset-detection";
+import { calculatePnL } from "@/lib/calculate";
 
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
@@ -77,6 +79,9 @@ export const useFileImport = (selectedAccount: string) => {
 
           // Insert trades into Supabase
           await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
+
+          //Run the Analysis
+          await runTradeAnalysis(user.id);
         },
         header: true, // Assuming the CSV file has headers
       });
@@ -96,6 +101,31 @@ export const useFileImport = (selectedAccount: string) => {
     }
     finally {
       setIsUploading(false);
+    }
+  };
+
+  const runTradeAnalysis = async (user_id: string) => {
+    const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-behavior-analysis`; // API path
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id })
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        console.error("❌ Error creating Stripe customer:", result.error);
+        return null;
+      }
+
+      console.log("✅ Stripe Customer Created:", result.stripeCustomerId);
+      return result.stripeCustomerId;
+    } 
+    catch (error) {
+      console.error("❌ Error:", error);
+      return null;
     }
   };
 
@@ -143,7 +173,7 @@ export const useFileImport = (selectedAccount: string) => {
         const symbol = trade.symbol; // Ensure trades are matched per symbol
         const price = trade.fill_price;
         let remainingQuantity = trade.quantity;
-        const { assetType } = await detectAssetType(symbol);
+        const asset_type = await getAssetType(symbol);
 
         if (!openLongPositions[symbol]) openLongPositions[symbol] = [];
         if (!openShortPositions[symbol]) openShortPositions[symbol] = [];
@@ -152,14 +182,13 @@ export const useFileImport = (selectedAccount: string) => {
           while (remainingQuantity > 0 && openShortPositions[symbol].length > 0) {
             const entry = openShortPositions[symbol][0]; // FIFO: Take first available position
             const closeQty = Math.min(entry.quantity, remainingQuantity);
-            const pnl = (entry.fill_price - price) * closeQty * multiplier;
+            const pnl = calculatePnL(symbol, entry.fill_price, price, closeQty, (entry.fees || 0) + (trade.fees || 0));
             const common = commonPositionFields(entry, trade);
 
             closedPositions.push({
               ...common,
               position_type: 'SHORT',
-              multiplier,
-              asset_type: assetType,
+              asset_type,
               fill_price: entry.fill_price,
               stop_price: price,
               pnl,
@@ -178,14 +207,13 @@ export const useFileImport = (selectedAccount: string) => {
           while (remainingQuantity > 0 && openLongPositions[symbol].length > 0) {
             const entry = openLongPositions[symbol][0]; // FIFO: Take first available position
             const closeQty = Math.min(entry.quantity, remainingQuantity);
-            const pnl = (price - entry.fill_price) * closeQty * multiplier;
+            const pnl = calculatePnL(symbol, entry.fill_price, price, closeQty, (entry.fees || 0) + (trade.fees || 0));
             const common = commonPositionFields(entry, trade);
 
             closedPositions.push({
               ...common,
               position_type: 'LONG',
-              multiplier,
-              asset_type: assetType,
+              asset_type,
               fill_price: entry.fill_price,
               stop_price: price,
               pnl,

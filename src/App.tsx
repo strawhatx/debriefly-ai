@@ -22,6 +22,7 @@ import Sidebar from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { Notebook } from "./pages/Notebook";
 import TradeSidebar from "./components/notebook/TradeSidebar";
+import { EdgeFunctions } from "./pages/EdgeFunctions";
 
 const queryClient = new QueryClient();
 
@@ -129,8 +130,8 @@ const App = () => {
                     <Notebook />
                   </NotebookLayout>
                 } />
+                <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
               </Route>
-
               <Route path="*" element={<NotFound />} />
             </Routes>
           </SidebarProvider>
