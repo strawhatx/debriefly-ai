@@ -1,45 +1,63 @@
-// ✅ Enhanced Trade Behavior Analysis Prompt
 export const tradeBehaviorPrompt = (trades): string => {
     return `
-        Analyze the following trading history for user performance, psychology patterns, and behavioral improvements:
+        Analyze the following trading history from multiple expert perspectives:
 
         ${JSON.stringify(trades, null, 2)}
 
         ---
         
-        **📌 Behavior Tag Validation**  
-        - If user-labeled behavior tags (e.g., “FOMO,” “Hesitation”) exist, validate them against trade patterns.  
-        - Confirm if the behavior is consistent or an exception.  
-        - Provide AI feedback on whether the user’s tagging is accurate.  
+        **🎯 Role-Based Analysis**  
 
-        **🧠 Pattern Detection (If No Tags Exist)**  
-        - If no behavior tags are present, infer psychological patterns such as:  
-        - **Overtrading** (excessive trades within a short time)  
-        - **Hesitation** (delayed entries after valid signals)  
-        - **Revenge Trading** (aggressive trades after consecutive losses)  
-        - **Emotional Risk-Taking** (position size increase after a loss)  
-        - **Exit Anxiety** (premature exits in profitable trades)  
-        - **FOMO Trading** (chasing high-volatility moves without confirmation)  
-        
+        **📌 Pro Trader (Execution & Strategy)**  
+        - Evaluate trade execution quality (entry/exit precision).  
+        - Identify **inefficiencies in strategy** (e.g., poor stop placement, chasing trades).  
+        - Recommend **tactical improvements** (e.g., adjusting risk/reward ratio, avoiding overtrades).  
+
+        **🧠 Trading Psychologist (Emotional Control & Discipline)**  
+        - Detect **emotional trading behaviors** (revenge trading, hesitation, FOMO).  
+        - Identify **consistency vs. impulsiveness** in decision-making.  
+        - Suggest **mindset exercises** for discipline (journaling, post-trade analysis).  
+
+        **📊 Risk Manager (Capital Protection)**  
+        - Assess risk exposure per trade (**position sizing, stop-loss discipline**).  
+        - Identify trades that **exceed acceptable risk limits**.  
+        - Suggest improvements in **risk-reward ratio and capital allocation**.  
+
+        **📈 Market Analyst (Market Trends & Timing)**  
+        - Analyze how **market conditions affected trades** (trend-following vs. counter-trend).  
+        - Identify if entries were **aligned with volatility and trend strength**.  
+        - Recommend **timing adjustments** based on historical market patterns.  
+
+        **📊 Quant Analyst (Data-Driven Edge)**  
+        - Compute **win rate, max drawdown, risk/reward ratios**.  
+        - Compare **trade performance across different setups**.  
+        - Identify statistically profitable trade patterns.  
+
+        **🎯 AI Strategist (Automated Strategy Optimization)**  
+        - Suggest **rule-based trade execution refinements**.  
+        - Optimize **trade filters based on past performance**.  
+        - Recommend **improvements to systematic strategies**.  
+
         **📈 Statistical Insights & Performance Metrics**  
-        - Calculate **win rate**, **profit/loss**, and **risk exposure** for each behavior.  
-        - Example: “Trades labeled as ‘FOMO’ had a **30% lower win rate** than disciplined trades.”  
-        - Compare these stats against the user’s past performance to identify improvements or regressions.  
+        - Calculate **win rate, profit/loss, and risk exposure** per role.  
+        - Compare stats **against past performance** to identify trends.  
+        - Example: "Your short trades had a **60% win rate**, while long trades had only **30%**."  
 
         **📊 Behavior & Performance Correlation**  
         - Did emotional patterns **directly impact** profitability, consistency, or risk exposure?  
-        - How do the most recent trades compare to past sessions? Has the user improved?  
-        - Example: “Compared to last month, **hesitation in entries decreased by 20%, improving win rate by 8%**.”  
+        - How do the most recent trades compare to past sessions?  
+        - Example: "Compared to last month, **hesitation in entries decreased by 20%, improving win rate by 8%**."  
 
-        **🎯 Personalized AI Insights & Recommendations**  
-        For each detected behavior, provide:  
-        1️⃣ **Issue Summary** (Explain the behavioral pattern)  
-        2️⃣ **Trade Evidence** (Show examples from user’s data)  
-        3️⃣ **Impact on Performance** (How it affected P/L, risk, or consistency)  
-        4️⃣ **Actionable Fix** (What the user should do differently in their next session)  
+        **🎯 Role-Specific AI Insights & Recommendations**  
+        - **Pro Trader:** Tactical strategy refinements.  
+        - **Psychologist:** Behavioral discipline insights.  
+        - **Risk Manager:** Position sizing & risk adjustments.  
+        - **Market Analyst:** Trend & volatility-based timing insights.  
+        - **Quant Analyst:** Data-driven optimization.  
+        - **AI Strategist:** Systematic improvements.  
 
-        **🔥 Final Recommendation**  
-        - What are the **top 2 improvements** the trader should focus on for the next session?  
-        - Suggest **practical steps** (e.g., “Limit trades to max 3 per session” or “Use stop-loss discipline to avoid revenge trades”).  
+        **🔥 Final Actionable Recommendations**  
+        - What are the **top 2 improvements** the trader should focus on next?  
+        - Suggest **practical steps** (e.g., "Limit trades to max 3 per session" or "Use stop-loss discipline to avoid revenge trades").  
     `;
 };

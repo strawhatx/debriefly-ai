@@ -37,7 +37,7 @@ export const SelectAccount = () => {
                             <span className="ml-3 block truncate font-normal group-data-selected:font-semibold">All</span>
                         </div>
                     </ListboxOption>
-                    {tradingAccounts.map((acct) => (
+                    {tradingAccounts && tradingAccounts.map((acct) => (
                         <ListboxOption key={acct.id} value={acct.id} className="group relative cursor-default py-2 pr-9 pl-3 select-none text-white data-focus:bg-primary">
                             <div className="flex items-center text-gray-400">
                                 <User className="w-4" />

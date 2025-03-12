@@ -9,18 +9,26 @@ import { Separator } from '@/components/ui/separator';
 import { EmotionalTags } from '@/components/notebook/EmotionalTags';
 import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { TradingStrategy } from '@/components/notebook/TradingStrategy';
 
 interface Journal {
-    id: string | null;
     user_id: string;
     position_id: string;
     entry_text: string;
+    strategy: string;
     created_at: string;
     updated_at: string;
 }
 
 export const Notebook = () => {
-    const [journal, setJournal] = useState<Journal>(null);
+    const [journal, setJournal] = useState<Journal>({
+        user_id: "",
+        position_id: "",
+        entry_text: "",
+        strategy: "",
+        created_at: null,
+        updated_at: null,
+    });
     const [emotionTags, setEmotionTags] = useState<string[]>([]);
     const { toast } = useToast();
 
@@ -32,12 +40,11 @@ export const Notebook = () => {
         )
 
         await fetchJournal();
-
     }
 
     const fetchJournal = async () => {
         const { data: { user } } = await supabase.auth.getUser();
-        const { data, error } = await supabase.from("journal_entries").select("id,user_id,position_id,entry_text,created_at,updated_at")
+        const { data, error } = await supabase.from("journal_entries").select("user_id,position_id,entry_text,strategy,created_at,updated_at")
             .eq("position_id", selectedTrade.id).maybeSingle();
 
         if (error) {
@@ -47,7 +54,14 @@ export const Notebook = () => {
 
         if (data) setJournal(data);
 
-        else setJournal((prev: Journal) => ({ ...prev, user_id: user.id, position_id: selectedTrade.id }));
+        else setJournal({ 
+            user_id: user.id, 
+            position_id: selectedTrade.id, 
+            entry_text: "", 
+            strategy: "", 
+            created_at: null, 
+            updated_at: null
+        });
     };
 
     useEffect(() => {
@@ -108,11 +122,16 @@ export const Notebook = () => {
                             <EmotionalTags
                                 emotionTags={emotionTags}
                                 onChange={setEmotionTags}
-                            />``
+                            />
+
+                            <TradingStrategy
+                                strategy={journal?.strategy}
+                                onChange={(value) => setJournal((prev: Journal) => ({ ...prev, strategy: value }))}
+                            />
 
                             {/* Notes Section */}
                             <RichTextEditor
-                                content={journal?.entry_text}
+                                content={journal.entry_text}
                                 onChange={(value) => setJournal((prev: Journal) => ({ ...prev, entry_text: value }))}
                             />
 
