@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload } from "lucide-react";
-import { AccountSelect } from "@/components/import/AccountSelect";
+import { AccountSelect } from "@/features/import/components/AccountSelect";
 
 interface ImportDialogProps {
   tradingAccounts: any[];

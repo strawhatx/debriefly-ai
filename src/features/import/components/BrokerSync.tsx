@@ -5,8 +5,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
 import { BrokerInfo } from "./BrokerInfo";
-import { useBrokerData } from "@/hooks/use-broker-data";
-import { BrokerSyncProps } from "./types";
+import { useBrokerData } from "../hooks/use-broker-data";
+
+export interface Broker {
+  id: string;
+  name: string;
+  description?: string;
+  asset_types: string[];
+  created_at?: string;
+  updated_at?: string;
+  file_upload_enabled: boolean;
+  broker_sync_enabled: boolean;
+}
+
+export interface BrokerSyncProps {
+  availableBrokers?: Broker[];
+}
 
 export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
   const { toast } = useToast();

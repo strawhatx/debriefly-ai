@@ -26,7 +26,7 @@ const statsData = [
   },
 ];
 
-export const DebriefOverview = () => {
+export const PerformanceOverview = () => {
   return (
     <>
       {statsData.map((stat) => (

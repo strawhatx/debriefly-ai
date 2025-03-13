@@ -1,7 +1,16 @@
-
-import { Broker } from "./types";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+export interface Broker {
+  id: string;
+  name: string;
+  description?: string;
+  asset_types: string[];
+  created_at?: string;
+  updated_at?: string;
+  file_upload_enabled: boolean;
+  broker_sync_enabled: boolean;
+}
 
 interface BrokerInfoProps {
   availableBrokers?: Broker[];

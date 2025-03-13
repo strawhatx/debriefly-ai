@@ -1,7 +1,16 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BrokerField } from "./types";
+
+export interface BrokerField {
+  id: string;
+  broker_id: string;
+  field_name: string;
+  field_type: 'TEXT' | 'PASSWORD' | 'APIKEY';
+  required: boolean;
+  display_name: string;
+  description: string | null;
+}
 
 interface BrokerConnectionFieldsProps {
   brokerFields: BrokerField[];
