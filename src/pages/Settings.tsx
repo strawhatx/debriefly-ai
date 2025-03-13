@@ -16,7 +16,7 @@ import { NotificationSection } from "@/components/settings/NotificationSection";
 import { SubscriptionSection } from "@/components/settings/SubscriptionSection";
 import { TradingAccountsSection } from "@/components/settings/TradingAccountsSection";
 import { ImportHistorySection } from "@/components/settings/ImportHistorySection";
-import { SignOutButton } from "@/components/auth/SignOutButton";
+import { SignOutButton } from "@/features/authentication/components/SignOutButton";
 
 const Settings = () => {
   const { toast } = useToast();

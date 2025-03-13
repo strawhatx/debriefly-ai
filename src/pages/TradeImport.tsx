@@ -14,8 +14,6 @@ import useAssetStore from "@/store/assets";
 const ImportTrades = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("file");
-  const { currency_codes, futures_multipliers, get_currency_codes, get_futures_multipliers } = useAssetStore()
-  const hasHydrated = useAssetStore.persist.hasHydrated()
 
   const { data: availableBrokers } = useQuery<Broker[]>({
     queryKey: ["availableBrokers"],
@@ -32,27 +30,6 @@ const ImportTrades = () => {
       return data as Broker[];
     },
   });
-
-  // for later use
-  useEffect(() => {
-    const runTask = async () => {
-      if (hasHydrated) {
-        console.log('✅ State has been hydrated from storage!')
-
-        // Only load initial data if state is still the default (or empty)
-        if (!currency_codes || currency_codes.length === 0) {
-          await get_currency_codes()
-        }
-
-        // Only load initial data if state is still the default (or empty)
-        if (!futures_multipliers || futures_multipliers.length === 0) {
-          await get_futures_multipliers()
-        }
-      }
-    }
-
-    runTask()
-  }, [hasHydrated])
 
   return (
     <div className="p-6">

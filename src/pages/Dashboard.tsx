@@ -1,7 +1,7 @@
 
 import { Card } from "@/components/ui/card";
-import TradingAccountsOverview from "@/components/dashboard/TradingAccountsOverview";
-import { TradingCalendar } from "@/components/dashboard/TradingCalendar";
+import TradingAccountsOverview from "@/features/dashboard/components/TradingAccountsOverview";
+import { TradingCalendar } from "@/features/dashboard/components/TradingCalendar";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Import, LineChart, ThumbsUp, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";

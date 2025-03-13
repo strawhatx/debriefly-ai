@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
 import { StepBack, StepForward } from "lucide-react";
-import { Badge } from "../ui/badge";
+import { Badge } from "../../../components/ui/badge";
 
 export const TradingCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());

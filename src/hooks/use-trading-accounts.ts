@@ -1,179 +1,135 @@
-
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { TradingAccount, EditingAccount } from "@/types/trading";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const useTradingAccounts = (
-  tradingAccounts: TradingAccount[],
-  setTradingAccounts: (accounts: TradingAccount[]) => void
-) => {
+export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [tradingAccounts, setTradingAccounts] = useState<TradingAccount[]>(initialAccounts);
   const [editingAccount, setEditingAccount] = useState<EditingAccount | null>(null);
 
-  const { data: brokers } = useQuery({
+  const { data: brokers = [] } = useQuery({
     queryKey: ["availableBrokers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brokers")
-        .select("*");
+      const { data, error } = await supabase.from("brokers").select("*");
       if (error) throw error;
       return data;
     },
   });
 
-  const handleStartEdit = (account: TradingAccount) => {
-    setEditingAccount(account);
-  };
+  const handleStartEdit = useCallback((account: TradingAccount) => setEditingAccount(account), []);
 
-  const handleStartCreate = () => {
-    const defaultBrokerId = brokers && brokers.length > 0 ? brokers[0].id : null;
-    
+  const handleStartCreate = useCallback(() => {
     setEditingAccount({
       isNew: true,
-      broker_id: defaultBrokerId,
+      broker_id: brokers.length > 0 ? brokers[0].id : null,
       market: "STOCKS",
       account_balance: 0,
     });
+  }, [brokers]);
+
+  const handleCancelEdit = useCallback(() => setEditingAccount(null), []);
+
+  const validateAccount = (account: EditingAccount) => {
+    if (!account.account_name?.trim()) return "Please enter an account name.";
+    if (!account.broker_id) return "Please select a broker.";
+    if (isNaN(Number(account.account_balance)) || Number(account.account_balance) < 0) {
+      return "Please enter a valid account balance.";
+    }
+    return null;
   };
 
-  const handleCancelEdit = () => {
-    setEditingAccount(null);
-  };
+  const saveAccount = useMutation({
+    mutationFn: async () => {
+      if (!editingAccount) throw new Error("No account is being edited.");
+      const validationError = validateAccount(editingAccount);
+      if (validationError) throw new Error(validationError);
 
-  const handleSave = async () => {
-    if (!editingAccount) return;
-
-    if (!editingAccount.account_name?.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter an account name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!editingAccount.broker_id) {
-      toast({
-        title: "Error",
-        description: "Please select a broker",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!editingAccount.account_balance || isNaN(Number(editingAccount.account_balance)) || Number(editingAccount.account_balance) < 0) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid account balance",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) throw new Error("Not authenticated.");
+
+      const payload = {
+        account_name: editingAccount.account_name,
+        user_id: user.id,
+        broker_id: editingAccount.broker_id,
+        market: editingAccount.market,
+        account_balance: Number(editingAccount.account_balance),
+      };
 
       if (editingAccount.isNew) {
         const { data, error } = await supabase
-          .from('trading_accounts')
-          .insert([{
-            account_name: editingAccount.account_name,
-            user_id: user.id,
-            broker_id: editingAccount.broker_id,
-            market: editingAccount.market,
-            account_balance: Number(editingAccount.account_balance)
-          }])
-          .select(`
-            *,
-            broker:brokers(*)
-          `)
-          .maybeSingle();
-
-        if (error) {
-          if (error.message.includes('Trading account limit reached')) {
-            toast({
-              title: "Account Limit Reached",
-              description: "You've reached the maximum number of trading accounts for your subscription tier. Please upgrade to add more accounts.",
-              variant: "destructive",
-            });
-            setEditingAccount(null);
-            return;
-          }
-          throw error;
-        }
-        
-        setTradingAccounts([data, ...tradingAccounts]);
-      } else {
-        const { data, error } = await supabase
-          .from('trading_accounts')
-          .update({
-            account_name: editingAccount.account_name,
-            broker_id: editingAccount.broker_id,
-            market: editingAccount.market,
-            account_balance: Number(editingAccount.account_balance)
-          })
-          .eq('id', editingAccount.id)
-          .select(`
-            *,
-            broker:brokers(*)
-          `)
+          .from("trading_accounts")
+          .insert([payload])
+          .select("*, broker:brokers(*)")
           .maybeSingle();
 
         if (error) throw error;
-        setTradingAccounts(
-          tradingAccounts.map(acc => acc.id === data.id ? data : acc)
-        );
+        return { type: "add", account: data };
+      } else {
+        const { data, error } = await supabase
+          .from("trading_accounts")
+          .update(payload)
+          .eq("id", editingAccount.id)
+          .select("*, broker:brokers(*)")
+          .maybeSingle();
+
+        if (error) throw error;
+        return { type: "update", account: data };
       }
-
+    },
+    onSuccess: ({ type, account }) => {
+      setTradingAccounts((prev) => 
+        type === "add" ? [account, ...prev] : prev.map((a) => (a.id === account.id ? account : a))
+      );
+      toast({
+        title: "Success",
+        description: `Trading account ${type === "add" ? "added" : "updated"} successfully.`,
+      });
       setEditingAccount(null);
-      toast({
-        title: "Success",
-        description: `Trading account ${editingAccount.isNew ? 'added' : 'updated'} successfully`,
-      });
-    } catch (error: any) {
-      console.error('Error saving trading account:', error);
+      queryClient.invalidateQueries(["tradingAccounts"]);
+    },
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || `Failed to ${editingAccount.isNew ? 'add' : 'update'} trading account`,
+        description: error.message || "Failed to save trading account.",
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
-  const handleDelete = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('trading_accounts')
-        .delete()
-        .eq('id', id);
-
+  const deleteAccount = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("trading_accounts").delete().eq("id", id);
       if (error) throw error;
-
-      setTradingAccounts(tradingAccounts.filter(account => account.id !== id));
+    },
+    onSuccess: (_, id) => {
+      setTradingAccounts((prev) => prev.filter((account) => account.id !== id));
       toast({
         title: "Success",
-        description: "Trading account deleted successfully",
+        description: "Trading account deleted successfully.",
       });
-    } catch (error) {
-      console.error('Error deleting trading account:', error);
+      queryClient.invalidateQueries(["tradingAccounts"]);
+    },
+    onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to delete trading account",
+        description: "Failed to delete trading account.",
         variant: "destructive",
       });
-    }
-  };
+    },
+  });
 
   return {
+    tradingAccounts,
     editingAccount,
     setEditingAccount,
     handleStartEdit,
     handleStartCreate,
     handleCancelEdit,
-    handleSave,
-    handleDelete,
+    handleSave: saveAccount.mutate,
+    handleDelete: deleteAccount.mutate,
   };
 };

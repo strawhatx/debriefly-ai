@@ -7,10 +7,15 @@ type PermissionCheck<Key extends keyof Permissions> =
 export type RolesWithPermissions = {
   [R in Role]: Partial<{
     [Key in keyof Permissions]: Partial<{
-      [Action in Permissions[Key]["action"]]: PermissionCheck<Key>
-    }>
-  }>
-}
+      [Action in Permissions[Key]["action"]]: PermissionCheck<Key>;
+    }>;
+  }> & {
+    limits?: {
+      [Key in keyof Permissions]?: number;
+    };
+  };
+};
+
 
 export type Permissions = {
   broker: {
