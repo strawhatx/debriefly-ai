@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { PowerCircle } from "lucide-react";
-import { useSignout } from "../hooks/use-signout"; // Import the custom hook
+import { useSignout } from "../../authentication/hooks/use-signout"; // Import the custom hook
 
 export const SignOutButton = () => {
   const { signOut, loading } = useSignout();

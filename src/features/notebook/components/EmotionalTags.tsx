@@ -1,61 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { ChevronUpDownIcon } from '@heroicons/react/16/solid'
 import { CheckIcon } from '@heroicons/react/20/solid'
-import useTradeStore from '@/store/trade'
-import { supabase } from '@/integrations/supabase/client'
 import { Tag } from 'lucide-react'
+import { useEmotionalTags } from '../hooks/use-emotional-tags'
 
 interface EmotionalTagProps {
     emotionTags: string[];
     onChange: (values: string[]) => void;
 }
 
-// Available emotion tags
-const allEmotionTags = [
-    'CALM', 'CONFIDENT', 'DISCIPLINED', 'PATIENT',
-    'HESITANT', 'ANXIOUS', 'FEARFUL', 'DOUBTFUL',
-    'FOMO', 'GREEDY', 'EXCITED', 'OVERCONFIDENT',
-    'REVENGE', 'ANGRY', 'FRUSTRATED', 'IMPULSIVE'
-];
-
 export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
-    const selectedTrade = useTradeStore((state) => state.selected);
-
-    useEffect(() => {
-        const fetchEmotionTags = async () => {
-            if (!selectedTrade?.id) return;
-            const { data, error } = await supabase
-                .from("emotional_tags").select("tags").eq("position_id", selectedTrade.id).maybeSingle();
-
-            if (error) {
-                console.error("Error fetching emotional tags:", error);
-                return;
-            }
-
-            onChange(data?.tags ? JSON.parse(data.tags) : []);
-        };
-
-        fetchEmotionTags();
-    }, [selectedTrade]);
-
-    const handleTagChange = async (selected: string[]) => {
-        onChange(selected);
-        if (!selectedTrade?.id) return;
-
-        const { error } = await supabase
-            .from("emotional_tags")
-            .upsert(
-                { position_id: selectedTrade.id, tags: JSON.stringify(selected) },
-                { onConflict: "position_id" } // Now it will work because `position_id` is unique
-            );
-
-        if (error) {
-            console.error("Error saving emotional tags:", error);
-        }
-    };
+   const { allEmotionTags, handleTagChange } = useEmotionalTags(onChange)
 
     return (
         <div className="py-3 px-2">

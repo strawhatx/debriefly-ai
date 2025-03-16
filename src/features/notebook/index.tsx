@@ -21,12 +21,7 @@ interface Journal {
 
 export const Notebook = () => {
     const [journal, setJournal] = useState<Journal>({
-        user_id: "",
-        position_id: "",
-        entry_text: "",
-        strategy: "",
-        created_at: "",
-        updated_at: "",
+        user_id: "", position_id: "", entry_text: "", strategy: "", created_at: "", updated_at: "" 
     });
 
     const [emotionTags, setEmotionTags] = useState<string[]>([]);
