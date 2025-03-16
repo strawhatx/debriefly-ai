@@ -9,12 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { AvatarUpload } from "./AvatarUpload";
 import { ProfilePasswordDialog } from "./ProfilePasswordDialog";
 
-interface ProfileSectionProps {
-  profile: any;
-  setProfile: (profile: any) => void;
+interface Profile {
+  id:string;
+  full_name: string;
+  username: string;
+  avatar_url: string;
 }
 
-export const ProfileSection = ({ profile, setProfile }: ProfileSectionProps) => {
+export const ProfileSection = () => {
+  const [profile, setProfile] = useState<Profile | null>(null);
   const { toast } = useToast();
 
   const handleProfileUpdate = async () => {

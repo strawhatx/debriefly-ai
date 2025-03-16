@@ -23,7 +23,6 @@ const Settings = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
   const [tradingAccounts, setTradingAccounts] = useState<any[]>([]);
 
   useEffect(() => {

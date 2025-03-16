@@ -1,64 +1,22 @@
-
-import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Edit } from "lucide-react";
+import { useAvatarUpload } from "../hooks/use-avatar-upload";
+
+interface Profile {
+  id:string;
+  full_name: string;
+  username: string;
+  avatar_url: string;
+}
 
 interface AvatarUploadProps {
-  profile: any;
-  setProfile: (profile: any) => void;
+  profile: Profile;
+  setProfile: (profile: Profile) => void;
 }
 
 export const AvatarUpload = ({ profile, setProfile }: AvatarUploadProps) => {
-  const { toast } = useToast();
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      setUploadingAvatar(true);
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${profile.id}-${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(fileName);
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', profile.id);
-
-      if (updateError) throw updateError;
-
-      setProfile({ ...profile, avatar_url: publicUrl });
-
-      toast({
-        title: "Success",
-        description: "Avatar updated successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload avatar",
-        variant: "destructive",
-      });
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
+  const { handleAvatarUpload, uploadingAvatar, fileInputRef } = useAvatarUpload(profile, setProfile);
 
   return (
     <div className="flex flex-col items-center gap-8">
