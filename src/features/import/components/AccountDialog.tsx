@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,133 +13,51 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { MARKETS, EditingAccount } from "@/types/trading";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 import { Check } from "lucide-react";
+import { MARKET } from "../hooks/use-account-dialog";
+import { useAccountDialog } from "../hooks/use-account-dialog"; // Import the custom hook
+import useBrokerStore from "@/store/broker";
 
 interface AccountDialogProps {
-  refreshAccounts: () => void;
+  onSave: () => void;
 }
 
-export const AccountDialog = ({ refreshAccounts }: AccountDialogProps) => {
-  const { toast } = useToast();
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [account, setAccount] = useState<EditingAccount>(null);
-  const [isUploading, setIsUploading] = useState(false);
-
-  const { data: brokers } = useQuery({
-    queryKey: ["availableBrokers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brokers")
-        .select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
+export const AccountDialog = ({ onSave }: AccountDialogProps) => {
+  const { uploadOpen, setUploadOpen, account, setAccount, isUploading, handleSave: save } = useAccountDialog();
+  const { brokers } = useBrokerStore();
 
   const handleSave = async () => {
-    if (!account) return;
-
-    if (!account.account_name?.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter an account name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!account.broker_id) {
-      toast({
-        title: "Error",
-        description: "Please select a broker",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!account.account_balance || isNaN(Number(account.account_balance)) || Number(account.account_balance) < 0) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid account balance",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      const { error } = await supabase
-        .from('trading_accounts')
-        .insert([{
-          account_name: account.account_name,
-          user_id: user.id,
-          broker_id: account.broker_id,
-          market: account.market,
-          account_balance: Number(account.account_balance)
-        }]);
-
-      if (error) {
-        if (error.message.includes('Trading account limit reached')) {
-          toast({
-            title: "Account Limit Reached",
-            description: "You've reached the maximum number of trading accounts for your subscription tier. Please upgrade to add more accounts.",
-            variant: "destructive",
-          });
-          setAccount(null);
-          return;
-        }
-        throw error;
-      }
-
-      refreshAccounts();
-
-      setAccount(null);
-      toast({
-        title: "Success",
-        description: `Trading account added successfully`,
-      });
-    } catch (error: any) {
-      console.error('Error saving trading account:', error);
-      toast({
-        title: "Error",
-        description: error.message || `Failed to add trading account`,
-        variant: "destructive",
-      });
-    }
-  };
+    await save();
+    onSave();
+  }
 
   return (
     <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
       <DialogTrigger asChild>
-        <Button variant="link">
-          here
-        </Button>
+        <Button variant="link">here</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Account</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
+          {/* Account Name */}
           <div className="space-y-2">
-            <Label htmlFor="file">Account Name</Label>
+            <Label>Account Name</Label>
             <Input
-              value={account.account_name || ''}
+              value={account?.account_name || ""}
               onChange={(e) => setAccount({ ...account, account_name: e.target.value })}
               placeholder="Enter account name"
             />
           </div>
+
+          {/* Broker Selection */}
           <div className="space-y-2">
-            <Label htmlFor="file">Broker</Label>
+            <Label>Broker</Label>
             <Select
-              value={account.broker_id}
+              value={account?.broker_id}
               onValueChange={(value) => setAccount({ ...account, broker_id: value })}
             >
               <SelectTrigger>
@@ -156,17 +72,19 @@ export const AccountDialog = ({ refreshAccounts }: AccountDialogProps) => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Market Selection */}
           <div className="space-y-2">
-            <Label htmlFor="file">Market</Label>
+            <Label>Market</Label>
             <Select
-              value={account.market}
-              onValueChange={(value) => setAccount({ ...account, market: value as typeof MARKETS[number] })}
+              value={account?.market}
+              onValueChange={(value) => setAccount({ ...account, market: value as MARKET })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select method" />
+                <SelectValue placeholder="Select market" />
               </SelectTrigger>
               <SelectContent>
-                {MARKETS.map((market) => (
+                {['STOCKS', 'OPTIONS', 'CRYPTO', 'FOREX', 'FUTURES'].map((market) => (
                   <SelectItem key={market} value={market}>
                     {market}
                   </SelectItem>
@@ -174,23 +92,25 @@ export const AccountDialog = ({ refreshAccounts }: AccountDialogProps) => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Account Balance */}
           <div className="space-y-2">
-            <Label htmlFor="file">File</Label>
+            <Label>Balance</Label>
             <Input
               type="number"
               step="0.01"
               min="0"
-              value={account.account_balance || ''}
+              value={account?.account_balance || ""}
               onChange={(e) => setAccount({ ...account, account_balance: parseFloat(e.target.value) })}
               placeholder="Enter balance"
             />
           </div>
 
+          {/* Save Button */}
           <Button size="icon" disabled={isUploading} onClick={handleSave}>
             <Check className="h-4 w-4" />
             {isUploading ? "Uploading..." : "Start Import"}
           </Button>
-
         </div>
       </DialogContent>
     </Dialog>

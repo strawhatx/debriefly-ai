@@ -1,32 +1,56 @@
+interface Trade {
+    id: string;
+    symbol: string;
+    entry_date: string;
+    fill_price: number;
+    stop_price: number;
+    quantity: number;
+    side: string;
+    pnl: number | null;
+    emotional_tags: string[]
+  }
 
 interface TradeStatisticsProps {
-    trades: any[] | null;
+    trades: Trade[] | null;
 }
 
+// Reusable Stat Card Component
+const StatCard = ({ title, value, textColor = "text-white" }: { title: string, value: string | number, textColor?: string }) => (
+    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <span className="text-gray-400">{title}</span>
+        <div className={`text-2xl font-semibold mt-1 ${textColor}`}>{value}</div>
+    </div>
+);
+
 export const TradeStatistics = ({ trades }: TradeStatisticsProps) => {
+    if (!trades || trades.length === 0) {
+        return (
+            <section className="text-gray-400 text-center p-6 bg-gray-800 rounded-xl border border-gray-700">
+                No trade data available.
+            </section>
+        );
+    }
+
     const totalTrades = trades.length;
-    const totalPnL = trades.reduce((acc, trade) => acc + trade.pnl, 0);
-    const winRate = totalTrades > 0 ? (trades.filter(t => t.pnl > 0).length / totalTrades) * 100 : 0;
+    const totalPnL = trades.reduce((acc, trade) => acc + (trade.pnl ?? 0), 0);
+    const winningTrades = trades.filter(t => (t.pnl ?? 0) > 0).length;
+    const winRate = (winningTrades / totalTrades) * 100;
     const avgTrade = totalTrades > 0 ? totalPnL / totalTrades : 0;
 
     return (
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <span className="text-gray-400">Total Trades</span>
-                <div className="text-2xl font-semibold mt-1">{totalTrades}</div>
-            </div>
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <span className="text-gray-400">Win Rate</span>
-                <div className="text-2xl font-semibold text-emerald-400 mt-1">{winRate.toFixed(2)}%</div>
-            </div>
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <span className="text-gray-400">Total P&L</span>
-                <div className={`text-2xl font-semibold ${totalPnL >= 0 ? 'text-emerald-400' : 'text-red-400'} mt-1`}>{totalPnL.toFixed(2)}</div>
-            </div>
-            <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <span className="text-gray-400">Avg Trade</span>
-                <div className={`text-2xl font-semibold ${avgTrade >= 0 ? 'text-emerald-400' : 'text-red-400'} mt-1`}>{avgTrade.toFixed(2)}</div>
-            </div>
+            <StatCard title="Total Trades" value={totalTrades} />
+            <StatCard title="Win Rate" value={`${winRate.toFixed(2)}%`} textColor="text-emerald-400" />
+            <StatCard 
+                title="Total P&L" 
+                value={`$${totalPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+                textColor={totalPnL >= 0 ? 'text-emerald-400' : 'text-red-400'} 
+            />
+            <StatCard 
+                title="Avg Trade" 
+                value={`$${avgTrade.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+                textColor={avgTrade >= 0 ? 'text-emerald-400' : 'text-red-400'} 
+            />
         </section>
     );
 };

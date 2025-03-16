@@ -21,7 +21,7 @@ import TradeImport from "./pages/TradeImport";
 import Sidebar from "./components/Sidebar";
 import { Header } from "./components/Header";
 import { Notebook } from "./pages/Notebook";
-import TradeSidebar from "./components/notebook/TradeSidebar";
+import TradeSidebar from "./features/notebook/components/TradeSidebar";
 import { EdgeFunctions } from "./pages/EdgeFunctions";
 
 const queryClient = new QueryClient();

@@ -12,7 +12,7 @@ import { ArrowDownRight, ArrowUpRight, CircleChevronLeft, SortAsc } from "lucide
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import useTradeStore from "@/store/trade";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
 
 const TradeSidebar = () => {
   const [trades, setTrades] = useState([]);

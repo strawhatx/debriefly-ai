@@ -1,11 +1,12 @@
-
+import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { AccountSelect } from "./AccountSelect";
 import { BrokerConnectionFields } from "./BrokerConnectionFields";
 import { BrokerInfo } from "./BrokerInfo";
-import { useBrokerData } from "../hooks/use-broker-data";
+import { useBrokerFields } from "../hooks/use-broker-fields";
+import { useBrokerForm } from "../hooks/use-broker-form";
+import { useBrokerConnection } from "../hooks/use-broker-connection";
 
 export interface Broker {
   id: string;
@@ -18,124 +19,58 @@ export interface Broker {
   broker_sync_enabled: boolean;
 }
 
-export interface BrokerSyncProps {
-  availableBrokers?: Broker[];
-}
-
-export const BrokerSync = ({ availableBrokers }: BrokerSyncProps) => {
+export const BrokerSync = () => {
   const { toast } = useToast();
-  
-  const {
-    selectedBroker,
-    setSelectedBroker,
+
+  // State management
+  const [selectedBroker, setSelectedBroker] = useState<string>("");
+  const [selectedAccount, setSelectedAccount] = useState<string>("");
+
+  // Fetch broker-specific fields
+  const { brokerFields, isLoadingFields: isLoading } = useBrokerFields(selectedBroker);
+
+  // Handle form state for broker fields
+  const { formValues, handleFieldChange, resetForm } = useBrokerForm();
+
+  // Handle broker connection logic
+  const { connectBroker, isProcessing } = useBrokerConnection({
     selectedAccount,
-    setSelectedAccount,
-    formValues,
-    setFormValues,
-    tradingAccounts,
-    isLoadingAccounts,
     brokerFields,
-    isLoadingFields,
-    handleFieldChange
-  } = useBrokerData();
-
-  const selectedBrokerData = availableBrokers?.find(b => b.id === selectedBroker);
-
-  const handleConnect = async () => {
-    if (!selectedAccount || !brokerFields) {
-      toast({
-        title: "Missing information",
-        description: "Please select a broker and account, and fill all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const missingFields = brokerFields
-      .filter(field => field.required && !formValues[field.field_name]);
-    
-    if (missingFields.length > 0) {
-      toast({
-        title: "Missing required fields",
-        description: `Please fill in: ${missingFields.map(f => f.display_name).join(', ')}`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from("trading_accounts")
-        .update({
-          broker_credentials: formValues,
-          broker_connected: true
-        })
-        .eq("id", selectedAccount);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Broker connection successful",
-      });
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-
-      await supabase
-        .from("imports")
-        .insert({
-          user_id: user.id,
-          trading_account_id: selectedAccount,
-          import_type: 'broker_sync',
-          status: 'PENDING'
-        });
-
-      setFormValues({});
-      setSelectedAccount("");
+    formValues,
+    resetForm,
+    toast,
+    onSuccess: () => {
       setSelectedBroker("");
-    } catch (error: any) {
-      console.error('Error connecting broker:', error);
-      toast({
-        title: "Error",
-        description: "Failed to connect broker",
-        variant: "destructive",
-      });
-    }
-  };
+      setSelectedAccount("");
+    },
+  });
 
   return (
     <div className="space-y-6">
-      <BrokerInfo 
-        availableBrokers={availableBrokers}
-        onBrokerSelect={setSelectedBroker}
-        selectedBrokerId={selectedBroker}
-        syncMode={true}
-      />
+      {/* Broker Selection */}
+      <BrokerInfo onBrokerSelect={setSelectedBroker} selectedBrokerId={selectedBroker} syncMode={true} />
 
+      {/* Account Selection (only show when broker is selected) */}
       {selectedBroker && (
         <AccountSelect
-          accounts={tradingAccounts}
+          brokerId={selectedBroker}
           selectedAccount={selectedAccount}
-          onAccountChange={setSelectedAccount}
-          isLoading={isLoadingAccounts}
+          onAccountSelected={setSelectedAccount}
         />
       )}
 
-      {brokerFields && selectedAccount && (
-        <BrokerConnectionFields
-          brokerFields={brokerFields}
-          formValues={formValues}
-          onFieldChange={handleFieldChange}
-        />
+      {/* Broker Fields Form (only show when broker and account are selected) */}
+      {brokerFields.length > 0 && selectedAccount && (
+        <BrokerConnectionFields brokerFields={brokerFields} formValues={formValues} onFieldChange={handleFieldChange} />
       )}
 
-      <Button 
-        onClick={handleConnect} 
+      {/* Connect & Import Button */}
+      <Button
+        onClick={connectBroker}
         className="w-full"
-        disabled={!selectedBroker || !selectedAccount || !brokerFields?.length}
+        disabled={!selectedBroker || !selectedAccount || !brokerFields.length || isProcessing}
       >
-        Connect & Import
+        {isProcessing ? "Connecting..." : "Connect & Import"}
       </Button>
     </div>
   );

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { AccountDialog } from "./AccountDialog";
+import { useTradingAccounts } from "../hooks/use-trading-accounts";
 
 interface TradingAccount {
   id: string;
@@ -20,14 +21,14 @@ interface TradingAccount {
 }
 
 interface AccountSelectProps {
-  accounts: TradingAccount[] | undefined;
-  refreshAccounts:() => void
+  brokerId: string;
   selectedAccount: string;
-  onAccountChange: (value: string) => void;
-  isLoading?: boolean;
+  onAccountSelected: (accountId: string) => void;
 }
 
-export const AccountSelect = ({ accounts, refreshAccounts, selectedAccount, onAccountChange, isLoading = false }: AccountSelectProps) => {
+export const AccountSelect = ({ brokerId, selectedAccount, onAccountSelected }: AccountSelectProps) => {
+  const { tradingAccounts: accounts, refresh, isLoading } = useTradingAccounts(brokerId);
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -42,7 +43,7 @@ export const AccountSelect = ({ accounts, refreshAccounts, selectedAccount, onAc
       <div className="space-y-2">
         <Label>Trading Account</Label>
         <div className="text-sm text-muted-foreground">
-          No trading accounts found for this broker. Please create one -- <AccountDialog refreshAccounts={refreshAccounts} />.
+          No trading accounts found for this broker. Please create one -- <AccountDialog onSave={refresh} />.
         </div>
       </div>
     );
@@ -51,7 +52,7 @@ export const AccountSelect = ({ accounts, refreshAccounts, selectedAccount, onAc
   return (
     <div className="space-y-2">
       <Label htmlFor="account">Trading Account</Label>
-      <Select value={selectedAccount} onValueChange={onAccountChange}>
+      <Select value={selectedAccount} onValueChange={onAccountSelected}>
         <SelectTrigger id="account">
           <SelectValue placeholder="Select an account" />
         </SelectTrigger>

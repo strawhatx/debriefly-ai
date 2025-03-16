@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Edit, Save, Tag } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
-import { TradeToolbar } from '@/components/notebook/TradeToolbar';
+import { TradeToolbar } from '@/features/notebook/components/TradeToolbar';
 import useTradeStore from '@/store/trade';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { EmotionalTags } from '@/components/notebook/EmotionalTags';
+import { EmotionalTags } from '@/features/notebook/components/EmotionalTags';
 import { useToast } from '@/hooks/use-toast';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { TradingStrategy } from '@/components/notebook/TradingStrategy';
+import { TradingStrategy } from '@/features/notebook/components/TradingStrategy';
 
 interface Journal {
     user_id: string;

@@ -5,9 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileImport } from "@/features/import/components/FileImport";
 import { BrokerSync } from "@/features/import/components/BrokerSync";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { FileImportDescription } from "@/features/import/components/FileImportDescription";
+import useBrokerStore from "@/store/broker";
 
 export interface Broker {
     id: string;
@@ -23,22 +22,7 @@ export interface Broker {
 const Import = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>("file");
-
-  const { data: availableBrokers } = useQuery<Broker[]>({
-    queryKey: ["availableBrokers"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("brokers")
-        .select("*");
-
-      if (error) {
-        console.error("Error fetching brokers:", error);
-        throw error;
-      }
-
-      return data as Broker[];
-    },
-  });
+  const { brokers } = useBrokerStore();
 
   return (
     <div className="p-6">
@@ -62,7 +46,7 @@ const Import = () => {
           <TabsContent value="file">
             <div className="grid grid-cols-2 gap-6">
               <Card className="p-6">
-                <FileImport availableBrokers={availableBrokers} />
+                <FileImport />
               </Card>
               <Card className="p-6">
                 <FileImportDescription />
@@ -73,14 +57,14 @@ const Import = () => {
           <TabsContent value="broker">
             <div className="grid grid-cols-2 gap-6">
               <Card className="p-6">
-                <BrokerSync availableBrokers={availableBrokers} />
+                <BrokerSync />
               </Card>
               <Card className="p-6">
                 <h3 className="text-lg font-semibold mb-4">How to Sync with Your Broker</h3>
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <p>Currently, direct broker sync is supported for:</p>
                   <ul className="list-disc list-inside space-y-1">
-                    {availableBrokers
+                    {brokers
                       ?.filter(broker => broker.broker_sync_enabled)
                       .map(broker => (
                         <li key={broker.id}>{broker.name}</li>

@@ -1,5 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import useBrokerStore from "@/store/broker";
 
 export interface Broker {
   id: string;
@@ -13,18 +14,15 @@ export interface Broker {
 }
 
 interface BrokerInfoProps {
-  availableBrokers?: Broker[];
   onBrokerSelect: (brokerId: string) => void;
   selectedBrokerId: string;
   syncMode?: boolean;
 }
 
-export const BrokerInfo = ({availableBrokers = [], onBrokerSelect, selectedBrokerId, syncMode = false
-}: BrokerInfoProps) => {
+export const BrokerInfo = ({onBrokerSelect, selectedBrokerId, syncMode = false}: BrokerInfoProps) => {
+  const { brokers} = useBrokerStore();
 
-  const filteredBrokers = availableBrokers.filter(broker =>
-    syncMode ? broker.broker_sync_enabled : broker.file_upload_enabled
-  );
+  const filteredBrokers = brokers.filter(broker => syncMode ? broker.broker_sync_enabled : broker.file_upload_enabled);
 
   return (
     <div className="space-y-2">
