@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 
-const Contact = () => {
+export const ContactPage = () => {
   const {toast} = useToast();
   const [data, setData] = useState({ name: '', email: '', message: '' });
 
@@ -173,5 +173,3 @@ const Contact = () => {
     </div>
   );
 }
-
-export default Contact;

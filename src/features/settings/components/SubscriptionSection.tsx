@@ -1,6 +1,6 @@
 import { CheckIcon } from "lucide-react";
-import { Card, CardFooter } from "../ui/card";
-import { Button } from "../ui/button";
+import { Card, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { usePayment } from "@/hooks/use-payment";
 import { useEffect, useState } from "react";
 
@@ -58,7 +58,6 @@ export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps)
 
     fetchData();
   }, [userId]);
-
 
   return (
     <div className="mx-auto mt-16 gap-6 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">

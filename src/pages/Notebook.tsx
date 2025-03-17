@@ -1,9 +1,7 @@
-import Notebook from "@/features/notebook";
+import { Notebook } from "@/features/notebook";
 
-const NotebookPage = () => {
+export const NotebookPage = () => {
   return (
     <Notebook />
   );
 };
-
-export default NotebookPage;

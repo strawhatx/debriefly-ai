@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, User, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export const Blog = () => {
+export const BlogPage = () => {
   const featuredPost = {
     title: "How AI is Revolutionizing Trading Psychology",
     excerpt: "Discover how artificial intelligence is helping traders overcome emotional biases and improve their decision-making process.",

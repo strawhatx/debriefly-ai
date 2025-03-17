@@ -36,7 +36,6 @@ export const useTradingAccounts = (brokerId: string) => {
     };
 
     useEffect(() => {
-
         fetchTradingAccounts();
     }, []);
 

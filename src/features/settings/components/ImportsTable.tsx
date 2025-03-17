@@ -1,14 +1,5 @@
 
 import { format } from "date-fns";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import filesize from "filesize";
 import { SortAsc } from "lucide-react";
 
 interface Import {

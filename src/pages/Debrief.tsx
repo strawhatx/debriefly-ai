@@ -1,4 +1,5 @@
-import { Debrief } from '@/features/debrief';
+import { Debrief } from "@/features/debrief";
+
 
 export const DebriefPage = () => {
 

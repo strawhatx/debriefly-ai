@@ -9,16 +9,12 @@ interface TradingAccountRowProps {
   onDelete: (id: string) => void;
 }
 
-export const TradingAccountRow = ({
-  account,
-  onEdit,
-  onDelete,
-}: TradingAccountRowProps) => {
+export const TradingAccountRow = ({ account, onEdit, onDelete }: TradingAccountRowProps) => {
   return (
     <>
       <td className="px-6 py-4">{account.account_name}</td>
       <td className="px-6 py-4"> {account.broker?.name || 'N/A'}</td>
-      <td className="px-6 py-4">{account.market   }</td>
+      <td className="px-6 py-4">{account.market}</td>
       <td className="px-6 py-4">
         ${account.account_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </td>

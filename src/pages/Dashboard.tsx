@@ -7,7 +7,7 @@ import { AlertTriangle, Import, LineChart, ThumbsUp, TrendingUp } from "lucide-r
 import { useNavigate } from "react-router-dom";
 import { SelectAccount } from "@/components/SelectAccount";
 
-const Dashboard = () => {
+export const DashboardPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -81,5 +81,3 @@ const Dashboard = () => {
     </div>
   );
 };
-
-export default Dashboard;

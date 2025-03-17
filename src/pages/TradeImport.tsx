@@ -1,9 +1,7 @@
 import Import from "@/features/import";
 
-const ImportTrades = () => {
+export const TradeImportPage = () => {
   return (
     <Import />
   );
 };
-
-export default ImportTrades;

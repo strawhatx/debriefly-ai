@@ -5,18 +5,15 @@ import { TradingAccountForm } from "./TradingAccountForm";
 import { TradingAccountRow } from "./TradingAccountRow";
 import { EmptyTradingAccounts } from "./EmptyTradingAccounts";
 import { TradingAccount } from "@/types/trading";
-import { useTradingAccounts } from "@/hooks/use-trading-accounts";
-import { Input } from "../ui/input";
+import { useTradingAccounts } from "../hooks/use-trading-accounts";
+import { Input } from "@/components/ui/input";
 
 interface TradingAccountsSectionProps {
   tradingAccounts: TradingAccount[];
-  setTradingAccounts: (accounts: TradingAccount[]) => void;
 }
 
-export const TradingAccountsSection = ({
-  tradingAccounts,
-  setTradingAccounts
-}: TradingAccountsSectionProps) => {
+export const TradingAccountsSection = ({ tradingAccounts }
+  : TradingAccountsSectionProps) => {
   const {
     editingAccount,
     setEditingAccount,
@@ -25,7 +22,7 @@ export const TradingAccountsSection = ({
     handleCancelEdit,
     handleSave,
     handleDelete,
-  } = useTradingAccounts(tradingAccounts, setTradingAccounts);
+  } = useTradingAccounts(tradingAccounts);
 
   return (
     <section className="bg-gray-800 rounded-xl border border-gray-700" >

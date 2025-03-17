@@ -58,7 +58,7 @@ const riskDistributionData = [
   { name: 'High Risk (1.5-2%)', value: 25, color: '#EF4444' }
 ];
 
-export const StrategyOptimization = () => {
+export const StrategyOptimizationPage = () => {
   const [selectedTimeframe, setSelectedTimeframe] = useState('30d');
   const [showBacktestModal, setShowBacktestModal] = useState(false);
 

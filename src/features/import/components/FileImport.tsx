@@ -3,7 +3,7 @@ import { BrokerInfo } from "./BrokerInfo";
 import { AccountSelect } from "./AccountSelect";
 import { FileUploader } from "./FileUploader";
 import { Button } from "@/components/ui/button";
-import { useFileImport } from "@/hooks/use-file-import";
+import { useFileImport } from "../hooks/use-file-import";
 import useBrokerStore from "@/store/broker";
 import { Upload } from "lucide-react";
 

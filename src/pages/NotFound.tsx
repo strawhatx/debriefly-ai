@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 
-const NotFound = () => {
+export const NotFoundPage = () => {
   const location = useLocation();
 
   useEffect(() => {
@@ -36,5 +36,3 @@ const NotFound = () => {
     </div>
   );
 };
-
-export default NotFound;

@@ -20,12 +20,7 @@ interface TradingAccountFormProps {
   onCancel: () => void;
 }
 
-export const TradingAccountForm = ({
-  editingAccount,
-  onUpdate,
-  onSave,
-  onCancel,
-}: TradingAccountFormProps) => {
+export const TradingAccountForm = ({editingAccount, onUpdate, onSave, onCancel }: TradingAccountFormProps) => {
   const { data: brokers } = useQuery({
     queryKey: ["availableBrokers"],
     queryFn: async () => {

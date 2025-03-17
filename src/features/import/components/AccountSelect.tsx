@@ -10,16 +10,6 @@ import { Label } from "@/components/ui/label";
 import { AccountDialog } from "./AccountDialog";
 import { useTradingAccounts } from "../hooks/use-trading-accounts";
 
-interface TradingAccount {
-  id: string;
-  account_name: string;
-  broker?: {
-    id: string;
-    name: string;
-    description?: string;
-  };
-}
-
 interface AccountSelectProps {
   brokerId: string;
   selectedAccount: string;

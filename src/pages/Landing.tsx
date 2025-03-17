@@ -1,10 +1,8 @@
 import Landing from "@/features/landing";
 
-const Index = () => {
+export const LandingPage = () => {
 
   return (
     <Landing />
   );
 };
-
-export default Index;

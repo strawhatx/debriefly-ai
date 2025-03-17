@@ -1,9 +1,8 @@
 import Authentication from "@/features/authentication";
 
-const Login = () => {
+export const LoginPage = () => {
   return (
     <Authentication />
   );
 };
 
-export default Login;

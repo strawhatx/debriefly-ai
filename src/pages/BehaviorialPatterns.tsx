@@ -94,7 +94,7 @@ const tradeData = [
   },
 ];
 
-export const BehaviorialPatterns = () => {
+export const BehaviorialPatternsPage = () => {
   const [timeRange, setTimeRange] = useState('7d');
   const [selectedBehavior, setSelectedBehavior] = useState<string | null>(null);
   

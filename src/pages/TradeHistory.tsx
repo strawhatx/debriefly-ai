@@ -1,6 +1,6 @@
 import { History } from "@/features/history";
 
-export const TradeHistory = () => {
+export const TradeHistoryPage = () => {
 
   return (
    <History />

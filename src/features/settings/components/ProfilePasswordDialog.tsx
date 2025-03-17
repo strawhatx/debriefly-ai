@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,95 +8,56 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { usePasswordDialog } from "../hooks/use-password-dialog";
 
 export const ProfilePasswordDialog = () => {
-  const { toast } = useToast();
-  const [passwordOpen, setPasswordOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const handlePasswordUpdate = async () => {
-    if (newPassword !== confirmPassword) {
-      toast({
-        title: "Error",
-        description: "New passwords don't match",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Password updated successfully",
-      });
-
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setPasswordOpen(false);
-    } catch (error) {
-      console.error('Error updating password:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update password",
-        variant: "destructive",
-      });
-    }
-  };
+  const { isOpen, setIsOpen, passwords, updatePassword, handlePasswordUpdate } = usePasswordDialog();
 
   return (
-    <Dialog open={passwordOpen} onOpenChange={setPasswordOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="link" className="text-primary hover:text-emerald-300 text-sm font-medium">
-          Change Password
-        </Button>
+        <Button variant="outline">Change Password</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Change Password</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Current Password</Label>
-            <Input 
-              type="password" 
-              className="border-gray-600"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter current password" 
+        <div className="grid gap-4 py-4">
+          <div className="grid gap-2">
+            <Label htmlFor="current">Current Password</Label>
+            <Input
+              id="current"
+              type="password"
+              value={passwords.current}
+              onChange={(e) => updatePassword('current', e.target.value)}
             />
           </div>
-          <div>
-            <Label className="text-sm font-medium mb-2 block">New Password</Label>
-            <Input 
-              type="password" 
-              className="border-gray-600"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password" 
+          <div className="grid gap-2">
+            <Label htmlFor="new">New Password</Label>
+            <Input
+              id="new"
+              type="password"
+              value={passwords.new}
+              onChange={(e) => updatePassword('new', e.target.value)}
             />
           </div>
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Confirm New Password</Label>
-            <Input 
-              type="password" 
-              className="border-gray-600"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password" 
+          <div className="grid gap-2">
+            <Label htmlFor="confirm">Confirm New Password</Label>
+            <Input
+              id="confirm"
+              type="password"
+              value={passwords.confirm}
+              onChange={(e) => updatePassword('confirm', e.target.value)}
             />
           </div>
-          <Button onClick={handlePasswordUpdate}>Update Password</Button>
+        </div>
+        <div className="flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handlePasswordUpdate}>
+            Update Password
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
