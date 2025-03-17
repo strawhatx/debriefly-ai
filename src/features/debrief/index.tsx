@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  Brain, 
-  ThumbsUp, 
-  AlertTriangle, 
-  Download, 
+import {
+  Brain,
+  ThumbsUp,
+  AlertTriangle,
+  Download,
   Share2,
   TrendingUp,
   LineChart,
@@ -17,27 +17,19 @@ import {
   History,
   ArrowRight
 } from 'lucide-react';
-import { 
-  LineChart as RechartsLineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
+import {
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
 } from 'recharts';
-
-// Mock data for performance chart
-const performanceData = [
-  { time: '09:30', pnl: 0 },
-  { time: '10:00', pnl: 250 },
-  { time: '10:30', pnl: -150 },
-  { time: '11:00', pnl: 400 },
-  { time: '11:30', pnl: 300 },
-  { time: '12:00', pnl: 800 },
-  { time: '12:30', pnl: 600 },
-  { time: '13:00', pnl: 1200 },
-];
+import { PerformanceOverview } from './components/PerformanceOverview';
+import { useDebrief } from './hooks/use-debrief';
+import { HeaderSection } from './components/HeaderSection';
+import { SessionPerformance } from './components/SessionPerformance';
 
 // Mock data for trades
 const trades = [
@@ -86,116 +78,26 @@ const behaviorData = [
 ];
 
 export const Debrief = () => {
-  const [sortField, setSortField] = useState<'time' | 'pnl'>('time');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
-  const sortedTrades = [...trades].sort((a, b) => {
-    if (sortOrder === 'asc') {
-      return sortField === 'time' 
-        ? a.time.localeCompare(b.time) 
-        : a.pnl - b.pnl;
-    } else {
-      return sortField === 'time' 
-        ? b.time.localeCompare(a.time) 
-        : b.pnl - a.pnl;
-    }
-  });
-
-  const toggleSort = (field: 'time' | 'pnl') => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
-  };
-
+  const { positions, isLoading, error } = useDebrief();
+  const mappedOverviewPositions = positions?.map(({ risk, reward, outcome }) => ({ risk, reward, outcome }));
+  const mappedSessionPositions = positions?.map(({ time, pnl }) => ({ time, pnl }));
+  
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       {/* Header Section */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Trading Session Debrief</h1>
-          <div className="flex items-center gap-2 text-gray-400">
-            <Clock className="w-4 h-4" />
-            <span>March 15, 2024 • 09:30 - 13:00 EST</span>
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg">
-            <Download className="w-4 h-4" />
-            Export PDF
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg">
-            <Share2 className="w-4 h-4" />
-            Share Report
-          </button>
-        </div>
-      </div>
+      <HeaderSection />
 
       {/* Performance Overview */}
-      <div className="grid grid-cols-4 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <span className="text-gray-400">Net P&L</span>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">+$1,200</div>
-          <div className="text-sm text-gray-400">+2.4% Account Growth</div>
-        </div>
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <span className="text-gray-400">Win Rate</span>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">67%</div>
-          <div className="text-sm text-gray-400">2/3 Profitable Trades</div>
-        </div>
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <span className="text-gray-400">Avg R:R Ratio</span>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">1:1.9</div>
-          <div className="text-sm text-gray-400">Above Target (1:1.5)</div>
-        </div>
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <span className="text-gray-400">Behavior Score</span>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">8.5/10</div>
-          <div className="text-sm text-emerald-400">Disciplined Trading</div>
-        </div>
-      </div>
+      <PerformanceOverview positions={mappedOverviewPositions} />
 
       {/* Performance Chart and AI Analysis */}
+
       <div className="grid grid-cols-2 gap-6">
-        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <LineChart className="text-blue-400" />
-            Session Performance
-          </h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsLineChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="time" 
-                  stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF' }}
-                />
-                <YAxis 
-                  stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF' }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1F2937',
-                    border: '1px solid #374151',
-                    borderRadius: '0.5rem',
-                  }}
-                  labelStyle={{ color: '#9CA3AF' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="pnl" 
-                  stroke="#10B981" 
-                  strokeWidth={2}
-                  dot={{ fill: '#10B981', strokeWidth: 2 }}
-                />
-              </RechartsLineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <SessionPerformance
+          positions={mappedSessionPositions}
+          isLoading={isLoading}
+          className="mt-4"
+        />
 
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -254,7 +156,7 @@ export const Debrief = () => {
             <thead>
               <tr className="border-b border-gray-700">
                 <th className="px-6 py-3 text-left">
-                  <button 
+                  <button
                     onClick={() => toggleSort('time')}
                     className="flex items-center gap-2"
                   >
@@ -268,7 +170,7 @@ export const Debrief = () => {
                 <th className="px-6 py-3 text-left">Exit</th>
                 <th className="px-6 py-3 text-left">R:R</th>
                 <th className="px-6 py-3 text-left">
-                  <button 
+                  <button
                     onClick={() => toggleSort('pnl')}
                     className="flex items-center gap-2"
                   >
@@ -285,9 +187,8 @@ export const Debrief = () => {
                   <td className="px-6 py-4">{trade.time}</td>
                   <td className="px-6 py-4">{trade.symbol}</td>
                   <td className="px-6 py-4">
-                    <span className={`flex items-center gap-1 ${
-                      trade.type === 'Long' ? 'text-emerald-400' : 'text-red-400'
-                    }`}>
+                    <span className={`flex items-center gap-1 ${trade.type === 'Long' ? 'text-emerald-400' : 'text-red-400'
+                      }`}>
                       {trade.type === 'Long' ? (
                         <ArrowUpRight className="w-4 h-4" />
                       ) : (
@@ -305,13 +206,12 @@ export const Debrief = () => {
                   <td className="px-6 py-4">
                     <div className="flex gap-2">
                       {trade.tags.map((tag, index) => (
-                        <span 
+                        <span
                           key={index}
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            tag === 'Disciplined' || tag === 'Planned' || tag === 'Confident'
+                          className={`px-2 py-1 rounded-full text-xs ${tag === 'Disciplined' || tag === 'Planned' || tag === 'Confident'
                               ? 'bg-emerald-500/20 text-emerald-300'
                               : 'bg-amber-500/20 text-amber-300'
-                          }`}
+                            }`}
                         >
                           {tag}
                         </span>
@@ -336,12 +236,12 @@ export const Debrief = () => {
             <ResponsiveContainer width="100%" height="100%">
               <RechartsLineChart data={behaviorData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis 
-                  dataKey="date" 
+                <XAxis
+                  dataKey="date"
                   stroke="#9CA3AF"
                   tick={{ fill: '#9CA3AF' }}
                 />
-                <YAxis 
+                <YAxis
                   stroke="#9CA3AF"
                   tick={{ fill: '#9CA3AF' }}
                   domain={[0, 10]}
@@ -354,10 +254,10 @@ export const Debrief = () => {
                   }}
                   labelStyle={{ color: '#9CA3AF' }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="#8B5CF6" 
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#8B5CF6"
                   strokeWidth={2}
                   dot={{ fill: '#8B5CF6', strokeWidth: 2 }}
                 />

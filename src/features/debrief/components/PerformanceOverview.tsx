@@ -6,6 +6,12 @@ interface StatCardProps extends StatCard {
   className?: string;
 }
 
+interface Position {
+  risk: number;
+  reward: number;
+  outcome: 'WIN' | 'LOSS';
+}
+
 const StatCardComponent = ({ title, value, icon: Icon, trend, trendUp, className }: StatCardProps) => (
   <Card className={`p-6 ${className}`}>
     <div className="flex items-center justify-between">
@@ -36,8 +42,8 @@ const LoadingSkeleton = () => (
   </>
 );
 
-export const PerformanceOverview = () => {
-  const { statsCards, isLoading, error } = usePerformanceOverview();
+export const PerformanceOverview = ({ positions }: { positions: Position[] | null }) => {
+  const { statsCards, isLoading, error } = usePerformanceOverview(positions);
 
   if (error) {
     return (

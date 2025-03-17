@@ -41,7 +41,7 @@ const formatTrend = (value: number | undefined, includePercentage = true): strin
   return `${prefix}${value}${includePercentage ? '%' : ''}`;
 };
 
-export const usePerformanceOverview = (): PerformanceOverviewReturn => {
+export const usePerformanceOverview = (positions: Position[]): PerformanceOverviewReturn => {
   const [stats, setStats] = useState<PositionStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -49,24 +49,9 @@ export const usePerformanceOverview = (): PerformanceOverviewReturn => {
   useEffect(() => {
     const fetchTodayStats = async () => {
       try {
-        const today = new Date().toISOString().split('T')[0];
-        
-        const { data, error: fetchError } = await supabase
-          .from('positions')
-          .select('pnl, journal_entries(risk, reward)')
-          .eq('date', today);
-
-        if (fetchError) throw new Error(fetchError.message);
-        if (!data) throw new Error('No data received from database');
-
-        const positions: Position[] = data.map((position) => ({
-          risk: position.journal_entries.risk,
-          reward: position.journal_entries.reward,
-          outcome: position.pnl > 0 ? 'WIN' : 'LOSS',
-        }));
-
         const calculatedStats = calculateStats(positions);
         setStats(calculatedStats);
+
         setError(null);
       } catch (err) {
         console.error('Error fetching stats:', err);
@@ -78,7 +63,7 @@ export const usePerformanceOverview = (): PerformanceOverviewReturn => {
     };
 
     fetchTodayStats();
-  }, []);
+  }, [positions]);
 
   const statsCards: StatCard[] = [
     {
