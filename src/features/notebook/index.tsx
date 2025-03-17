@@ -9,19 +9,21 @@ import { TradingStrategy } from './components/TradingStrategy';
 import { TradeOverview } from './components/TradeOverview';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { fetchJournalEntry, saveJournalEntry } from './services/journal';
+import RiskToReward from './components/RiskToReward';
 
 interface Journal {
     user_id: string;
     position_id: string;
     entry_text: string;
     strategy: string;
+    reward:number
     created_at: string;
     updated_at: string;
 }
 
 export const Notebook = () => {
     const [journal, setJournal] = useState<Journal>({
-        user_id: "", position_id: "", entry_text: "", strategy: "", created_at: "", updated_at: "" 
+        user_id: "", position_id: "", entry_text: "", strategy: "", reward: 2, created_at: "", updated_at: "" 
     });
 
     const [emotionTags, setEmotionTags] = useState<string[]>([]);
@@ -61,6 +63,11 @@ export const Notebook = () => {
                             <TradingStrategy
                                 strategy={journal?.strategy}
                                 onChange={(value) => setJournal((prev) => ({ ...prev, strategy: value }))}
+                            />
+
+                            <RiskToReward
+                                value={journal?.reward}
+                                onChange={(value) => setJournal((prev) => ({ ...prev, reward: value }))}
                             />
 
                             <RichTextEditor

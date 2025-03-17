@@ -5,7 +5,7 @@ export const fetchJournalEntry = async (positionId: string, setJournal: Function
 
     const { data, error } = await supabase
         .from("journal_entries")
-        .select("user_id,position_id,entry_text,strategy,created_at,updated_at")
+        .select("user_id,position_id,entry_text,strategy,reward,created_at,updated_at")
         .eq("position_id", positionId)
         .maybeSingle();
 
@@ -20,6 +20,7 @@ export const fetchJournalEntry = async (positionId: string, setJournal: Function
         position_id: positionId,
         entry_text: "",
         strategy: "",
+        reward: 2,
         created_at: null,
         updated_at: null
     });
