@@ -1,7 +1,7 @@
 interface Position {
   risk: number;
   reward: number;
-  outcome: 'win' | 'loss';
+  outcome: 'WIN' | 'LOSS';
   // add other position fields as needed
 }
 
@@ -17,8 +17,8 @@ export const calculateStats = (positions: Position[]) => {
     };
   }
 
-  const wins = positions.filter(p => p.outcome === 'win');
-  const losses = positions.filter(p => p.outcome === 'loss');
+  const wins = positions.filter(p => p.outcome === 'WIN');
+  const losses = positions.filter(p => p.outcome === 'LOSS');
   
   const totalWins = wins.reduce((sum, p) => sum + p.reward, 0);
   const totalLosses = Math.abs(losses.reduce((sum, p) => sum + p.risk, 0));
