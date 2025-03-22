@@ -1,3 +1,27 @@
+export const tradeDebriefPrompt = (tradesByDay) => {
+  return `
+For each trading day, analyze the trading history and provide a comprehensive session debrief that covers:
+
+1. **Behavioral Insights**:
+   - Identify key behavioral patterns (e.g., impulsiveness, hesitation, FOMO).
+   - Highlight any noticeable emotional trends affecting performance.
+
+2. **Strategy Suggestions**:
+   - Recommend specific strategy optimizations based on the day's data.
+   - Suggest adjustments to trading rules or tactics to improve execution and risk management.
+
+3. **Actionable Improvements**:
+   - List the top two improvements the trader should focus on.
+   - Provide clear, practical steps (e.g., refining stop-loss settings or entry/exit criteria).
+
+The trading data is provided below, grouped by trading day:
+
+${JSON.stringify(tradesByDay, null, 2)}
+
+For each day, please provide a concise, integrated debrief that merges these three aspects.
+  `;
+};
+
 export const tradeBehaviorPrompt = (trades): string => {
     return `
         Analyze the following trading history from multiple expert perspectives:
