@@ -11,14 +11,14 @@ export const FileImportDescription = () => {
           <p className="text-sm text-muted-foreground">
             {broker.name}
             {broker.description && (
-              <span className="block mt-1 text-xs">
+              <span className="block mt-1 text-sm">
                 {broker.description}
               </span>
             )}
           </p>
           {broker.asset_types?.length > 0 && (
             <div className="mt-2">
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Supported assets: {broker.asset_types.join(', ')}
               </p>
             </div>

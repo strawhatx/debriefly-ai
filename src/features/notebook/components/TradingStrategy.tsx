@@ -18,14 +18,15 @@ const allStrategies = [
 
 export const TradingStrategy = ({ strategy, onChange }: TradingStrategyProps) => {
     return (
-        <div className="py-3 px-2">
-            <div className="flex mb-4">
+        <div className="py-3 px-2"><p className="text-sm text-gray-400">Trade Strategy</p>
+            <div className="flex">
+            
                 <Listbox as="div" value={strategy} onChange={onChange}>
                     <div className="relative mt-2 w-64">
-                        <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-full border border-gray-600 py-1.5 pr-2 pl-3 text-left text-white outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6">
+                        <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-full border border-gray-600 py-1 pr-2 pl-3 text-left text-white outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6">
                             <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6 text-gray-400">
                                 <Tag className="w-3" />
-                                <span className="block truncate text-xs">{ strategy ? strategy : "Add Strategy" }</span>
+                                <span className="block truncate text-sm">{ strategy ? strategy : "Add Strategy" }</span>
                             </span>
                             <ChevronUpDownIcon aria-hidden="true" className="col-start-1 row-start-1 size-5 self-center justify-self-end text-white sm:size-4" />
                         </ListboxButton>

@@ -59,38 +59,10 @@ const riskDistributionData = [
 ];
 
 export const StrategyOptimizationPage = () => {
-  const [selectedTimeframe, setSelectedTimeframe] = useState('30d');
   const [showBacktestModal, setShowBacktestModal] = useState(false);
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Strategy Optimization</h1>
-          <div className="flex items-center gap-2 text-gray-400">
-            <Brain className="w-4 h-4" />
-            <span>AI-Powered Strategy Analysis & Recommendations</span>
-          </div>
-        </div>
-        <div className="flex gap-4">
-          <select
-            value={selectedTimeframe}
-            onChange={(e) => setSelectedTimeframe(e.target.value)}
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500"
-          >
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-            <option value="90d">Last 90 Days</option>
-            <option value="1y">Last Year</option>
-          </select>
-          <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg">
-            <Settings className="w-4 h-4" />
-            Apply Changes
-          </button>
-        </div>
-      </div>
-
       {/* Strategy Overview Cards */}
       <div className="grid grid-cols-4 gap-6">
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">

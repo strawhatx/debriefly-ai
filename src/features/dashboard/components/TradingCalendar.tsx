@@ -113,7 +113,7 @@ export const TradingCalendar = () => {
                   <span className={`text-base ${tradeInfo.totalPnl >= 0 ? (tradeInfo.totalPnl > 0 ? "text-green-600" : "text-gray-300") : "text-red-600"}`}>
                     ${tradeInfo.totalPnl.toFixed(2)}
                   </span>
-                  <span className="text-xs text-gray-600">Trades: {tradeInfo.count}</span>
+                  <span className="text-sm text-gray-600">Trades: {tradeInfo.count}</span>
                 </>
               )}
 

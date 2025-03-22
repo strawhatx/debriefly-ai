@@ -3,63 +3,52 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AuthGuard from "@/components/AuthGuard";
-import {LandingPage} from "./pages/Landing";
+import { LandingPage } from "./pages/Landing";
 import { BlogPage } from "./pages/Blog";
-import {ContactPage} from "./pages/Contact";
-import {NotFoundPage} from "./pages/NotFound";
-import {LoginPage} from "./pages/Login";
+import { ContactPage } from "./pages/Contact";
+import { NotFoundPage } from "./pages/NotFound";
+import { LoginPage } from "./pages/Login";
 import { StrategyOptimizationPage } from "./pages/StrategyOptimization";
-import {DashboardPage} from "./pages/Dashboard";
+import { DashboardPage } from "./pages/Dashboard";
 import { DebriefPage } from "./pages/Debrief";
 import { TradeHistoryPage } from "./pages/TradeHistory";
 import { BehaviorialPatternsPage } from "./pages/BehaviorialPatterns";
 import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
-import Sidebar from "./components/Sidebar";
-import { Header } from "./components/Header";
 import { NotebookPage } from "./pages/Notebook";
-import TradeSidebar from "./features/notebook/components/TradeSidebar";
 import { EdgeFunctions } from "./pages/EdgeFunctions";
-
+import { DoubleLayout, SidebarLayout } from "./components/layouts/Index";
+import { NavbarLayout } from "./components/layouts/Index";
+import { SignOutButton } from "./features/settings/components/SignOutButton";
+import { BehavioralPatternsHeader } from "./components/layouts/headers/BehavioralPatterns";
+import { StrategyOptimizationHeader } from "./components/layouts/headers/StrategyOptimization";
+import { TradeHistoryHeader } from "./components/layouts/headers/TradeHistory";
+import { DebriefHeader } from "./components/layouts/headers/Debrief";
+import { DashboardHeader } from "./components/layouts/headers/Dashboard";
+import { NotebookHeader } from "./components/layouts/headers/Notebook";
+import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
 const queryClient = new QueryClient();
 
-const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="min-h-screen bg-background flex w-full">
-      <main className="flex-1">
-        <Header />
-        {children}
-      </main>
-    </div>
-  )
-}
-
-const SidebarLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="min-h-screen bg-background flex w-full">
-      <Sidebar />
-      <main className="flex-1">
-        {children}
-      </main>
-    </div>
-  )
-}
-
-const NotebookLayout = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="min-h-screen bg-background flex w-full">
-      <TradeSidebar />
-      <main className="flex-1">
-        {children}
-      </main>
-    </div>
-  )
-}
-
 const App = () => {
+  const NotebookWithSidebar = () => {
+    const { id } = useParams(); // Extracts the dynamic `id` from the route
+
+    return (
+      <DoubleLayout
+        breadcrumbs={[
+          { name: "Trades", href: "/app/trade-history" },
+          { name: `Notebook ${id}`, href: `/app/notebook/${id}` }
+        ]}
+        rightContent={<NotebookHeader />}
+        rightSidebar={<NotebookSidebar id={id} />}
+      >
+        <NotebookPage />
+      </DoubleLayout>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -67,74 +56,84 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SidebarProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={
+              <NavbarLayout>
+                <LandingPage />
+              </NavbarLayout>
+            } />
+            <Route path="/blog" element={
+              <NavbarLayout>
+                <BlogPage />
+              </NavbarLayout>
+            } />
+            <Route path="/contact" element={
+              <NavbarLayout>
+                <ContactPage />
+              </NavbarLayout>
+            } />
+            <Route path="/login" element={<LoginPage />} />
 
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={
-                <NavbarLayout>
-                  <LandingPage />
-                </NavbarLayout>
+            {/* Protected routes */}
+            <Route element={<AuthGuard />}>
+              <Route path="/app/dashboard" element={
+                <SidebarLayout
+                  breadcrumbs={[{ name: "Trading Dashboard", href: "/app/dashboard" }]}
+                  rightContent={<DashboardHeader />}
+                >
+                  <DashboardPage />
+                </SidebarLayout>
               } />
-              <Route path="/blog" element={
-                <NavbarLayout>
-                  <BlogPage />
-                </NavbarLayout>
+              <Route path="/app/debrief" element={
+                <SidebarLayout breadcrumbs={[{ name: "Debrief", href: "/app/debrief" }]}
+                  rightContent={<DebriefHeader />}
+                >
+                  <DebriefPage />
+                </SidebarLayout>
               } />
-              <Route path="/contact" element={
-                <NavbarLayout>
-                  <ContactPage />
-                </NavbarLayout>
+              <Route path="/app/trade-history" element={
+                <SidebarLayout
+                  breadcrumbs={[{ name: "Trade History", href: "/app/trade-history" }]}
+                  rightContent={<TradeHistoryHeader />}
+                >
+                  <TradeHistoryPage />
+                </SidebarLayout>
               } />
-              <Route path="/login" element={<LoginPage />} />
-
-              {/* Protected routes */}
-              <Route element={<AuthGuard />}>
-                <Route path="/app/dashboard" element={
-                  <SidebarLayout>
-                    <DashboardPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/app/debrief" element={
-                  <SidebarLayout>
-                    <DebriefPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/app/trade-history" element={
-                  <SidebarLayout>
-                    <TradeHistoryPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/app/strategy-optimization" element={
-                  <SidebarLayout>
-                    <StrategyOptimizationPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/app/behavioral-patterns" element={
-                  <SidebarLayout>
-                    <BehaviorialPatternsPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/settings" element={
-                  <SidebarLayout>
-                    <SettingsPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/app/trade-import" element={
-                  <SidebarLayout>
-                    <TradeImportPage />
-                  </SidebarLayout>
-                } />
-                <Route path="/app/notebook" element={
-                  <NotebookLayout>
-                    <NotebookPage />
-                  </NotebookLayout>
-                } />
-                <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
-              </Route>
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </SidebarProvider>
+              <Route path="/app/strategy-optimization" element={
+                <SidebarLayout
+                  breadcrumbs={[{ name: "Strategy Optimization", href: "/app/strategy-optimization" }]}
+                  rightContent={<StrategyOptimizationHeader />}
+                >
+                  <StrategyOptimizationPage />
+                </SidebarLayout>
+              } />
+              <Route path="/app/behavioral-patterns" element={
+                <SidebarLayout
+                  breadcrumbs={[{ name: "Behavior Analysis", href: "/app/behavioral-patterns" }]}
+                  rightContent={<BehavioralPatternsHeader />}
+                >
+                  <BehaviorialPatternsPage />
+                </SidebarLayout>
+              } />
+              <Route path="/settings" element={
+                <SidebarLayout
+                  breadcrumbs={[{ name: "Settings", href: "/app/settings" }]}
+                  rightContent={<SignOutButton />}
+                >
+                  <SettingsPage />
+                </SidebarLayout>
+              } />
+              <Route path="/app/trade-import" element={
+                <SidebarLayout breadcrumbs={[{ name: "Trade Import", href: "/app/trade-import" }]}>
+                  <TradeImportPage />
+                </SidebarLayout>
+              } />
+              <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />
+              <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
+            </Route>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

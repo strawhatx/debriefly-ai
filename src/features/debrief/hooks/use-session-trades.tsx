@@ -2,20 +2,23 @@ import { useState } from "react";
 
 // Define strict types for our data structures
 interface Position {
-    id: string;
-    time: string;
-    symbol: string;
-    type: 'LONG' | 'SHORT';
-    entry: number;
-    exit: number;
-    risk: number;
-    reward: number;
-    pnl: number;
-    tags: string[];
+  id: string;
+  time: string;
+  symbol: string;
+  type: 'LONG' | 'SHORT';
+  entry: number;
+  exit: number;
+  risk: number;
+  reward: number;
+  pnl: number;
+  tags: string[];
+
 }
 
 export const useSessionTrades = (positions: Position[]) => {
-    const [sortField, setSortField] = useState<'time' | 'pnl'>('time');
+  if (!positions) return { sortedTrades: [], toggleSort: () => {} };
+  
+  const [sortField, setSortField] = useState<'time' | 'pnl'>('time');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const sortedTrades = [...positions].sort((a, b) => {
@@ -39,5 +42,5 @@ export const useSessionTrades = (positions: Position[]) => {
     }
   };
 
-    return { sortedTrades, toggleSort };
+  return { sortedTrades, toggleSort };
 };

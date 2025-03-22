@@ -7,22 +7,23 @@ import { Tag } from 'lucide-react'
 import { useEmotionalTags } from '../hooks/use-emotional-tags'
 
 interface EmotionalTagProps {
-    emotionTags: string[];
-    onChange: (values: string[]) => void;
+    id: string;
 }
 
-export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
-   const { allEmotionTags, handleTagChange } = useEmotionalTags(onChange)
+export const EmotionalTags = ({ id }: EmotionalTagProps) => {
+    const { emotionTags, allEmotionTags, handleTagChange } = useEmotionalTags(id)
 
     return (
-        <div className="py-3 px-2">
+        <div className="py-3 px-2">            
+            <p className="text-sm text-gray-400">Emotion Tags</p>
             <div className="flex justify-between items-center mb-4">
+
                 <Listbox as="div" value={emotionTags} onChange={handleTagChange} multiple>
                     <div className="relative mt-2 w-64">
-                        <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-full border border-gray-600 py-1.5 pr-2 pl-3 text-left text-white outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6">
+                        <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-full border border-gray-600 py-1 pr-2 pl-3 text-left text-white outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6">
                             <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6 text-gray-400">
                                 <Tag className="w-3" />
-                                <span className="block truncate text-xs">Add Tags</span>
+                                <span className="block truncate text-sm">Add Tags</span>
                             </span>
                             <ChevronUpDownIcon aria-hidden="true" className="col-start-1 row-start-1 size-5 self-center justify-self-end text-white sm:size-4" />
                         </ListboxButton>
@@ -32,7 +33,7 @@ export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
                                 <ListboxOption key={emotion} value={emotion} className="group relative cursor-default py-2 pr-9 pl-3 select-none text-white data-focus:bg-primary">
                                     <div className="flex items-center text-gray-400">
                                         <Tag className="w-4" />
-                                        <span className="ml-3 block truncate font-normal group-data-selected:font-semibold">{emotion}</span>
+                                        <span className="ml-3 block truncate font-normal group-data-selected:font-semibold text-sm">{emotion}</span>
                                     </div>
                                     {emotionTags.includes(emotion) && (
                                         <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary group-not-data-selected:hidden group-data-focus:text-white">
@@ -55,7 +56,7 @@ export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
                 {emotionTags.length > 0 ? (
                     emotionTags.map(tag => (
                         <div key={tag} className="flex items-center gap-1 px-2 py-1 bg-gray-700 rounded-full text-sm">
-                            <span>{tag}</span>
+                            <span className="text-gray-400 text-sm">{tag}</span>
                             <button
                                 onClick={() => handleTagChange(emotionTags.filter(t => t !== tag))}
                                 className="w-4 h-4 flex items-center justify-center rounded-full hover:bg-gray-600"
@@ -65,7 +66,7 @@ export const EmotionalTags = ({ emotionTags, onChange }: EmotionalTagProps) => {
                         </div>
                     ))
                 ) : (
-                    <div className="text-gray-500">No emotions tagged yet</div>
+                    <div className="text-gray-500 text-sm">No emotions tagged yet</div>
                 )}
             </div>
 

@@ -45,7 +45,7 @@ const Authentication = () => {
                         <div className="absolute inset-0 flex items-center">
                             <Separator />
                         </div>
-                        <div className="relative flex justify-center text-xs uppercase">
+                        <div className="relative flex justify-center text-sm uppercase">
                             <span className="bg-gray-800 px-2 text-muted-foreground">
                                 Or continue with email
                             </span>

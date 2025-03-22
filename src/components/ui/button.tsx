@@ -22,9 +22,9 @@ const buttonVariants = cva(
         glow: "border border-input bg-background hover:bg-accent hover:text-accent-foreground shadow-[0_0_1rem_-0.25rem] shadow-primary/50 hover:shadow-[0_0_2rem_-0.25rem] hover:shadow-primary/50",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
+        default: "h-9 px-4 py-2",
+        sm: "h-8 rounded-md px-3",
+        lg: "h-10 rounded-md px-8",
         icon: "h-10 w-10",
       },
     },

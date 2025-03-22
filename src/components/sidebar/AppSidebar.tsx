@@ -15,14 +15,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/app/dashboard" },
-  { title: "Notebook", icon: ClipboardList, url: "/app/notebook" },
   { title: "Debrief", icon: ClipboardList, url: "/app/debrief" },
   { title: "Trade History", icon: History, url: "/app/trade-history" },
   { title: "Behavior", icon: Brain, url: "/app/behavioral-patterns" },
   { title: "Strategy", icon: LineChart, url: "/app/strategy-optimization" },
 ];
 
-const Sidebar = () => {
+export const AppSidebar = () => {
   return (
     <ShadcnSidebar>
       <SidebarContent>
@@ -71,7 +70,7 @@ const Sidebar = () => {
               </Avatar>
               <div className="flex flex-col">
                 <span className="text-sm font-medium">John Doe</span>
-                <span className="text-xs text-muted-foreground">john@example.com</span>
+                <span className="text-sm text-muted-foreground">john@example.com</span>
               </div>
             </div>
           </SidebarMenuItem>
@@ -80,5 +79,3 @@ const Sidebar = () => {
     </ShadcnSidebar>
   );
 };
-
-export default Sidebar;

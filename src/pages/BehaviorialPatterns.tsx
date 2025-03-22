@@ -105,25 +105,6 @@ export const BehaviorialPatternsPage = () => {
 
   return (
     <div className="p-6 space-y-6 animate-fade-up">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Behavior Analysis</h1>
-          <p className="text-muted-foreground">Analyze emotional patterns that impact your trading decisions</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <select 
-            className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500"
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-          >
-            <option value="7d">Last 7 Days</option>
-            <option value="30d">Last 30 Days</option>
-            <option value="90d">Last 90 Days</option>
-            <option value="1y">Last Year</option>
-          </select>
-        </div>
-      </div>
-
       {/* Section 1: Behavior Summary Overview */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Key Behavior Tags */}
@@ -159,7 +140,7 @@ export const BehaviorialPatternsPage = () => {
               <div className="h-2 bg-gray-700 rounded-full">
                 <div className="h-full w-[72%] bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full"></div>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Score based on your last 50 trades. Showing improvement from last month's 6.4/10.</p>
+              <p className="text-sm text-gray-400 mt-2">Score based on your last 50 trades. Showing improvement from last month's 6.4/10.</p>
             </div>
           </div>
         </Card>

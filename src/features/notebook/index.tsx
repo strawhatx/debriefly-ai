@@ -1,91 +1,105 @@
-import { useEffect, useState } from 'react';
-import useTradeStore from '@/store/trade';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { TradeToolbar } from './components/TradeToolbar';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import { useParams } from 'react-router-dom';
+import { useJournal } from './hooks/use-journal';
 import { EmotionalTags } from './components/EmotionalTags';
 import { TradingStrategy } from './components/TradingStrategy';
 import { TradeOverview } from './components/TradeOverview';
-import { RichTextEditor } from '@/components/ui/rich-text-editor';
-import { fetchJournalEntry, saveJournalEntry } from './services/journal';
 import RiskToReward from './components/RiskToReward';
-
-interface Journal {
-    user_id: string;
-    position_id: string;
-    entry_text: string;
-    strategy: string;
-    reward:number
-    created_at: string;
-    updated_at: string;
-}
+import { Separator } from '@/components/ui/separator';
+import { AppSidebar } from '@/components/sidebar/AppSidebar';
 
 export const Notebook = () => {
-    const [journal, setJournal] = useState<Journal>({
-        user_id: "", position_id: "", entry_text: "", strategy: "", reward: 2, created_at: "", updated_at: "" 
-    });
+    const { id } = useParams<{ id: string }>();
+    const {
+        journal,
+        trade,
+        isLoading,
+        error,
+        saveJournal,
+        updateJournalField
+    } = useJournal(id || '');
 
-    const [emotionTags, setEmotionTags] = useState<string[]>([]);
-    const { toast } = useToast();
-    const selectedTrade = useTradeStore((state) => state.selected);
+    if (!id) {
+        return <NoTradeSelected />;
+    }
 
-    useEffect(() => {
-        if (!selectedTrade) return;
+    if (isLoading) {
+        return <LoadingState />;
+    }
 
-        fetchJournalEntry(selectedTrade.id, setJournal);
-    }, [selectedTrade]);
+    if (error) {
+        return <ErrorState error={error} />;
+    }
 
-    const handleSave = async () => {
-        await saveJournalEntry(journal);
-        await fetchJournalEntry(selectedTrade.id, setJournal);
-    };
+    if (!trade || !journal) {
+        return <NoTradeSelected />;
+    }
 
     return (
-        <div className="p-6 space-y-6">
-            <Card className="p-6">
-                {selectedTrade ? (
-                    <>
-                        <TradeToolbar 
-                            symbol={selectedTrade.symbol} 
-                            created_date={journal?.created_at} 
-                            updated_date={journal?.updated_at} 
-                        />
+        <div className="p-4 space-y-6">
+            <div className="gap-6 ">
+                <div className="pt-6 gap-6">
 
-                        <div className="pt-6 gap-6">
-                            <TradeOverview trade={selectedTrade} />
+                    <EmotionalTags id={id} />
 
-                            <EmotionalTags
-                                emotionTags={emotionTags}
-                                onChange={setEmotionTags}
-                            />
+                    <TradingStrategy
+                        strategy={journal.strategy}
+                        onChange={(value) => updateJournalField('strategy', value)}
+                    />
 
-                            <TradingStrategy
-                                strategy={journal?.strategy}
-                                onChange={(value) => setJournal((prev) => ({ ...prev, strategy: value }))}
-                            />
+                    <RiskToReward
+                        value={journal.reward}
+                        onChange={(value) => updateJournalField('reward', value)}
+                    />
 
-                            <RiskToReward
-                                value={journal?.reward}
-                                onChange={(value) => setJournal((prev) => ({ ...prev, reward: value }))}
-                            />
+                    <RichTextEditor
+                        content={journal.entry_text}
+                        onChange={(value) => updateJournalField('entry_text', value)}
+                    />
 
-                            <RichTextEditor
-                                content={journal.entry_text}
-                                onChange={(value) => setJournal((prev) => ({ ...prev, entry_text: value }))}
-                            />
-
-                            <div className="mt-6 flex justify-end">
-                                <Button className="px-6" onClick={handleSave}>Save</Button>
-                            </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 flex items-center justify-center h-64">
-                        <p className="text-gray-400">Select a trade to view details</p>
+                    <div className="mt-6 flex justify-end">
+                        <Button
+                            className="px-6"
+                            onClick={() => saveJournal(journal)}
+                        >
+                            Save
+                        </Button>
                     </div>
-                )}
-            </Card>
+                </div>
+            </div> 
         </div>
     );
 };
+
+// Extracted components for better organization
+const LoadingState = () => (
+    <div className="p-6">
+        <Card className="p-6">
+            <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+            </div>
+        </Card>
+    </div>
+);
+
+const ErrorState = ({ error }: { error: Error }) => (
+    <div className="p-6">
+        <Card className="p-6">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex items-center justify-center h-64">
+                <p className="text-red-500">Error: {error.message}</p>
+            </div>
+        </Card>
+    </div>
+);
+
+const NoTradeSelected = () => (
+    <div className="p-6">
+        <Card className="p-6">
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 flex items-center justify-center h-64">
+                <p className="text-gray-400">Select a trade to view details</p>
+            </div>
+        </Card>
+    </div>
+);

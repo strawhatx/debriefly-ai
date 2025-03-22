@@ -19,7 +19,7 @@ export default function RiskToReward({
     const { inputValue, handleInputChange, adjustRatio } = useRiskReward(value, onChange, min, max, step);
 
     return (
-        <div className="py-3 px-2 flex flex-col gap-y-1">
+        <div className="py-3 px-2 flex flex-col">
             <p className="text-sm text-gray-400">Risk Reward</p>
 
             <div className="flex flex-row items-center gap-4">

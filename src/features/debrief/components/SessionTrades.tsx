@@ -38,7 +38,7 @@ const SortableColumn = ({ label, sortKey, onSort }: SortableColumnProps) => (
 
 const TradeTag = ({ tag }: TradeTagProps) => (
   <span
-    className={`px-2 py-1 rounded-full text-xs ${
+    className={`px-2 py-1 rounded-full text-sm ${
       POSITIVE_TAGS.includes(tag as typeof POSITIVE_TAGS[number])
         ? 'bg-emerald-500/20 text-emerald-300'
         : 'bg-amber-500/20 text-amber-300'
