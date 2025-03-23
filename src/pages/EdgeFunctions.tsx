@@ -9,7 +9,7 @@ export const EdgeFunctions = () => {
     useEffect(() => {
         const runTradeAnalysis = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-behavior-analysis`; // API path
+            const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-analysis`; // API path
             try {
                 const response = await fetch(API_URL, {
                     method: "POST",
