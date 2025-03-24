@@ -1,33 +1,61 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import OpenAI from "https://esm.sh/openai@4.24.1";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 import { tradeDebriefPrompt } from "../utils/prompts.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
-const openai = new OpenAI({ apiKey: Deno.env.get("OPENAI_API_KEY") });
+const GEMINI_API_KEY = Deno.env.get("GOOGLE_GEMINI_API_KEY");
 
-// Add helper function for OpenAI API calls
-async function analyzeWithOpenAI(prompt: string, model:"gpt-4o"| "gpt-4o-mini" | "gpt-3.5-turbo") {
+// Add helper function for Gemini API calls
+async function analyzeWithGemini(prompt: string) {
   try {
-    const completion = await openai.chat.completions.create({
-      model,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      response_format: { type: "json_object" }, // Ensure JSON response
-    });
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+          },
+        }),
+      }
+    );
 
-    const insights = completion.choices[0]?.message?.content;
-    if (!insights) {
-      throw new Error("No response from OpenAI");
+    if (!geminiResponse.ok) {
+      throw new Error(`Gemini API error: ${geminiResponse.statusText}`);
     }
 
-    return {
-      insights: JSON.parse(insights), // Parse JSON response
-      model,
-    };
+    const result = await geminiResponse.json();
+    const insights = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    
+    if (!insights) {
+      throw new Error("No response from Gemini");
+    }
+
+    try {
+      // Try to parse as JSON
+      return {
+        insights: JSON.parse(insights),
+        model: "gemini-pro"
+      };
+    } catch (e) {
+      // If parsing fails, return the raw text
+      console.warn("Failed to parse Gemini response as JSON, using raw text");
+      return {
+        insights,
+        model: "gemini-pro"
+      };
+    }
   } catch (error) {
-    console.error(`⚠️ ${model} analysis failed:`, error);
+    console.error("⚠️ Gemini analysis failed:", error);
     return null;
   }
 }
@@ -82,19 +110,15 @@ serve(async (req) => {
 
     console.log(`📊 Found ${sessionGroups.length} daily sessions to analyze.`);
 
-    // For each daily session, build a prompt and call OpenAI API concurrently
+    // For each daily session, build a prompt and call Gemini API concurrently
     const dailyAnalysisPromises = sessionGroups.map(async (session: any) => {
       const prompt = tradeDebriefPrompt(session);
-      console.log(`🧠 Running AI analysis for session ${session.trade_day}...`);
+      console.log(`🧠 Running Gemini analysis for session ${session.trade_day}...`);
 
-      // Try GPT-4 first
-      const gpt4Result = await analyzeWithOpenAI(prompt, "gpt-4o");
-      
-      // If GPT-4 fails, try GPT-3.5
-      const analysis = gpt4Result || await analyzeWithOpenAI(prompt, "gpt-3.5-turbo");
+      const analysis = await analyzeWithGemini(prompt);
       
       if (!analysis) {
-        throw new Error("Both GPT-4 and GPT-3.5 analysis failed");
+        throw new Error("Gemini analysis failed");
       }
 
       return {
@@ -106,7 +130,7 @@ serve(async (req) => {
       };
     });
 
-    // Await all OpenAI API calls concurrently
+    // Await all Gemini API calls concurrently
     const dailyAnalysisResults = await Promise.all(dailyAnalysisPromises);
 
     // Save each session debrief to your Supabase table (e.g., "trade_analysis")
