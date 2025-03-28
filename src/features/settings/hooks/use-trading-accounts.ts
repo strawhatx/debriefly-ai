@@ -60,24 +60,22 @@ export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
       };
 
       if (editingAccount.isNew) {
-        const { data, error } = await supabase
-          .from("trading_accounts")
-          .insert([payload])
-          .select("*, broker:brokers(*)")
-          .maybeSingle();
+        const { data, error } = await supabase.from("trading_accounts")
+          .insert([payload]).select();
 
         if (error) throw error;
-        return { type: "add", account: data };
+        return { type: "add", account: data[0] };
       } else {
-        const { data, error } = await supabase
-          .from("trading_accounts")
-          .update(payload)
-          .eq("id", editingAccount.id)
-          .select("*, broker:brokers(*)")
-          .maybeSingle();
+        const { data, error } = await supabase.from("trading_accounts")
+          .update(payload).eq("id", editingAccount.id).select();
 
-        if (error) throw error;
-        return { type: "update", account: data };
+        if (error) {
+          if (error.code === 'PGRST116') {
+            throw new Error(`Trading account with ID ${editingAccount.id} not found`);
+          }
+          throw error;
+        }
+        return { type: "update", account: data[0] };
       }
     },
     onSuccess: ({ type, account }) => {

@@ -40,7 +40,7 @@ const columns = [
     header: "Entry",
     cell: ({ row }) => (
       <div className="text-right">
-        {row.getValue("entry").toFixed(2)}
+        {row.getValue("entry")?.toFixed(2)}
       </div>
     ),
   },
@@ -49,7 +49,7 @@ const columns = [
     header: "Exit",
     cell: ({ row }) => (
       <div className="text-right">
-        {row.getValue("exit").toFixed(2)}
+        {row.getValue("exit")?.toFixed(2)}
       </div>
     ),
   },
@@ -60,7 +60,7 @@ const columns = [
       <div className={`text-right ${
         row.getValue("pnl") >= 0 ? 'text-emerald-400' : 'text-red-400'
       }`}>
-        {row.getValue("pnl") >= 0 ? '+' : ''}{row.getValue("pnl").toFixed(2)}
+        {row.getValue("pnl") >= 0 ? '+' : ''}{row.getValue("pnl")?.toFixed(2)}
       </div>
     ),
   },
@@ -72,7 +72,7 @@ const columns = [
 
 export const History = () => {
   const navigate = useNavigate();
-  const { trades, isLoading, error } = useTrades();
+  const { trades, error } = useTrades();
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
   const { data: rawTrade, isLoading: isLoadingRaw, error: rawError } = useRawTrade(selectedTradeId);
 

@@ -102,12 +102,12 @@ export const useFileImport = (selectedAccount: string) => {
       .map(trade => mapTradeData(trade, rawHeaders, userId, accountId, importId))
       .filter(trade => trade.status.toUpperCase() === "FILLED");
 
-    const { error } = await supabase.from('trade_history').insert(transformedTrades);
+    const { data, error } = await supabase.from('trade_history').insert(transformedTrades).select();
     if (error) throw new Error(`Error inserting trades: ${error.message}`);
 
     await updateImportStatus(importId, 'UPLOADED');
 
-    await processTradesIntoPositions(transformedTrades);
+    await processTradesIntoPositions(data);
   };
 
   const processTradesIntoPositions = async (trades: any[]) => {
@@ -128,12 +128,14 @@ export const useFileImport = (selectedAccount: string) => {
       while (remainingQty > 0 && openPositions[oppositeDirection][symbol].length > 0) {
         const entry = openPositions[oppositeDirection][symbol][0];
         const closeQty = Math.min(entry.quantity, remainingQty);
-        const pnl = calculatePnL(symbol, entry.fill_price, fill_price, closeQty, (entry.fees || 0) + (trade.fees || 0));
+        const pnl = await calculatePnL(symbol, entry.fill_price, fill_price, closeQty, (entry.fees || 0) + (trade.fees || 0));
 
         closedPositions.push({
           ...commonPositionFields(entry, trade),
           position_type: oppositeDirection,
           asset_type: assetType,
+          fill_price: entry.fill_price,
+          stop_price: fill_price,
           pnl,
           quantity: closeQty,
         });
@@ -167,7 +169,7 @@ export const useFileImport = (selectedAccount: string) => {
 
   const runTradeAnalysis = async (userId: string) => {
     try {
-      const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-behavior-analysis`;
+      const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-analysis`;
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

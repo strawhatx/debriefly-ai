@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { BarChart2, Settings, ClipboardList, Brain, LineChart, History, Home } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SelectAccount } from "../SelectAccount";
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/app/dashboard" },
@@ -54,16 +55,13 @@ export const AppSidebar = () => {
 
       <SidebarFooter>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/settings" className="flex items-center gap-3 px-4 py-2">
-                <Settings className="w-5 h-5" />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
+          <SidebarMenuItem className="list-none">
+            <div className="px-4 py-3 border-t">
+              <SelectAccount />
+            </div>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <div className="flex items-center gap-3 px-4 py-3 border-t">
+            <Link to="/settings" className="flex items-center gap-3 px-4 py-3 border-t">
               <Avatar>
                 <AvatarImage src="https://github.com/shadcn.png" />
                 <AvatarFallback>JD</AvatarFallback>
@@ -72,7 +70,7 @@ export const AppSidebar = () => {
                 <span className="text-sm font-medium">John Doe</span>
                 <span className="text-sm text-muted-foreground">john@example.com</span>
               </div>
-            </div>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

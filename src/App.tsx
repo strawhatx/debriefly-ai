@@ -4,7 +4,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import AuthGuard from "@/components/AuthGuard";
 import { LandingPage } from "./pages/Landing";
 import { BlogPage } from "./pages/Blog";
@@ -30,6 +29,7 @@ import { DebriefHeader } from "./components/layouts/headers/Debrief";
 import { DashboardHeader } from "./components/layouts/headers/Dashboard";
 import { NotebookHeader } from "./components/layouts/headers/Notebook";
 import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
+import { TradeHistoryGenerator } from "./pages/TradeHistoryGenerator";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -131,6 +131,7 @@ const App = () => {
               } />
               <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />
               <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
+              <Route path="/dev/trade-history-generator" element={<TradeHistoryGenerator />} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

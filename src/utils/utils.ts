@@ -18,15 +18,15 @@ export const mapTradeData = (
     symbol: normalizeSymbol(row[mappedHeaders.symbol]?.trim() || ""),
     side: normalizeSide(row[mappedHeaders.side]?.trim() || ""),
     order_type: row[mappedHeaders.order_type]?.trim() || "",
-    quantity: parseInt(row[mappedHeaders.quantity] || "0", 10),
+    quantity: parseInt(row[mappedHeaders.quantity] || 0, 10),
     fill_price: parseFloat(row[mappedHeaders.entry_price]) || 0,
     stop_price: parseFloat(row[mappedHeaders.exit_price]) || null,
-    entry_date: row[mappedHeaders.entry_date]?.trim() || "",
-    closing_date: row[mappedHeaders.exit_date]?.trim() || "",
+    entry_date: row[mappedHeaders.entry_date]?.trim() || null,
+    closing_date: row[mappedHeaders.exit_date]?.trim() || row[mappedHeaders.entry_date]?.trim() || null,
     status: row[mappedHeaders.status]?.trim() || "",
     fees: parseFloat(row[mappedHeaders.fees]?.trim()) || 0,
     external_id: row[mappedHeaders.external_id]?.trim() || "",
-    leverage: normalizeLeverage(row[mappedHeaders.leverage]?.trim() || ""),
+    leverage: normalizeLeverage(row[mappedHeaders.leverage]?.trim() || 0),
   };
 };
 

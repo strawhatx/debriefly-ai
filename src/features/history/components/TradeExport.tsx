@@ -2,20 +2,8 @@ import { Download } from 'lucide-react';
 import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-
-interface Trade {
-    id: string;
-    symbol: string;
-    entry_date: string;
-    fill_price: number;
-    stop_price: number;
-    quantity: number;
-    side: string;
-    pnl: number | null;
-    emotional_tags: string[]
-  }
+import { Trade } from "@/features/history/hooks/use-trades";
   
-
 interface TradeExportProps {
     trades: Trade[] | null;
 }
@@ -25,12 +13,12 @@ export const TradeExport = ({ trades }: TradeExportProps) => {
         if (!trades || trades.length === 0) return;
 
         // Format trades for CSV
-        const formattedTrades = trades.map(({ id, entry_date, symbol, side, fill_price, stop_price, pnl, emotional_tags }) => ({
-            Date: format(new Date(entry_date), "yyyy-MM-dd"),
-            Symbol: symbol,
-            Type: side,
-            "Entry Price": fill_price,
-            "Stop Price": stop_price,
+        const formattedTrades = trades.map(({ id, date, asset, type, entry, exit, pnl, emotional_tags }) => ({
+            Date: format(new Date(date), "yyyy-MM-dd"),
+            Symbol: asset,
+            Type: type,
+            "Entry Price": entry,
+            "Stop Price": exit,
             "P&L": pnl !== null ? pnl.toFixed(2) : "N/A",
             "Top Emotion": emotional_tags.length > 0 ? emotional_tags[0] : "None",
         }));

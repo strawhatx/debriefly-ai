@@ -79,6 +79,5 @@ Debug Edge Functions:
 - supabase functions serve ai-analysis --env-file supabase/.env --inspect-mode brk
 - supabase functions serve payments --env-file supabase/.env --inspect-mode brk
 
-curl -X POST "http://127.0.0.1:54321/functions/v1/[ai_behavior_analysis]" \
--H "Content-Type: application/json" \
--d '{"user_id": "[47f8e60b-c1d8-4873-8ee1-258efd2365b7]"}'
+Migrations
+ - supabase db diff --use-migra -f [migration name]

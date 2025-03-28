@@ -1,14 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  User,
-  CreditCard,
-  ChartBar,
-  Upload,
-  Bell,
-} from "lucide-react";
+import { User, CreditCard, ChartBar, Upload, Bell } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ProfileSection } from "./components/ProfileSection";
@@ -16,14 +9,24 @@ import { NotificationSection } from "./components/NotificationSection";
 import { SubscriptionSection } from "./components/SubscriptionSection";
 import { TradingAccountsSection } from "./components/TradingAccountsSection";
 import { ImportHistorySection } from "./components/ImportHistorySection";
-import { SignOutButton } from "./components/SignOutButton";
+import { useProfileSection } from "./hooks/use-profile-section";
+
+const TAB_CONFIG = [
+  { value: 'profile', icon: User, label: 'Profile' },
+  { value: 'security', icon: Bell, label: 'Notifications' },
+  { value: 'subscription', icon: CreditCard, label: 'Subscription' },
+  { value: 'trading-accounts', icon: ChartBar, label: 'Trading Accounts' },
+  { value: 'import-history', icon: Upload, label: 'Import History' },
+] as const;
 
 const Settings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [email, setEmail] = useState<any>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [tradingAccounts, setTradingAccounts] = useState<any[]>([]);
+
+  const { profile } = useProfileSection();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -35,26 +38,17 @@ const Settings = () => {
           return;
         }
 
-        //set email
         setEmail(user.email);
 
-        // Fetch profile data
-        const { data: profileData } = await supabase
-          .from('profiles').select('*').eq('id', user.id).maybeSingle();
+        const { data: tradingAccountsData, error } = await supabase
+          .from('trading_accounts')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
 
-        if (profileData) {
-          setProfile(profileData);
-        }
-
-        // Fetch trading accounts
-        const { data: tradingAccountsData } = await supabase.from('trading_accounts')
-          .select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-
-        if (tradingAccountsData) {
-          setTradingAccounts(tradingAccountsData);
-        }
-
-        setLoading(false);
+        if (error) throw error;
+        
+        setTradingAccounts(tradingAccountsData || []);
       } catch (error) {
         console.error('Error fetching user data:', error);
         toast({
@@ -62,11 +56,13 @@ const Settings = () => {
           description: "Failed to load user data",
           variant: "destructive",
         });
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [navigate]);
+  }, [navigate, toast]);
 
   if (loading) {
     return <div className="p-8">Loading...</div>;
@@ -74,34 +70,22 @@ const Settings = () => {
 
   return (
     <div className="p-8">
-     
-
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="mb-8">
-          <TabsTrigger value="profile" className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger value="security" className="flex items-center gap-2">
-            <Bell className="h-4 w-4" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="subscription" className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4" />
-            Subscription
-          </TabsTrigger>
-          <TabsTrigger value="trading-accounts" className="flex items-center gap-2">
-            <ChartBar className="h-4 w-4" />
-            Trading Accounts
-          </TabsTrigger>
-          <TabsTrigger value="import-history" className="flex items-center gap-2">
-            <Upload className="h-4 w-4" />
-            Import History
-          </TabsTrigger>
+          {TAB_CONFIG.map(({ value, icon: Icon, label }) => (
+            <TabsTrigger 
+              key={value}
+              value={value} 
+              className="flex items-center gap-2"
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
         <TabsContent value="profile">
-          <ProfileSection profile={profile} setProfile={setProfile} />
+          <ProfileSection />
         </TabsContent>
 
         <TabsContent value="security">
@@ -113,10 +97,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="trading-accounts">
-          <TradingAccountsSection
-            tradingAccounts={tradingAccounts}
-            setTradingAccounts={setTradingAccounts}
-          />
+          <TradingAccountsSection tradingAccounts={tradingAccounts} />
         </TabsContent>
 
         <TabsContent value="import-history">

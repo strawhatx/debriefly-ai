@@ -18,7 +18,7 @@ export interface RawTrade {
 }
 
 export const useRawTrade = (positionId: string | null) => {
-  const [data, setData] = useState<RawTrade | null>(null);
+  const [data, setData] = useState<RawTrade[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 

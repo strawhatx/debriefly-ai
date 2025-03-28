@@ -5,16 +5,17 @@ import { tradeDebriefPrompt } from "../utils/prompts.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 const GEMINI_API_KEY = Deno.env.get("GOOGLE_GEMINI_API_KEY");
-
 // Add helper function for Gemini API calls
 async function analyzeWithGemini(prompt: string) {
   try {
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // 5. Add request timeout
+          "Keep-Alive": "timeout=30",
         },
         body: JSON.stringify({
           contents: [
@@ -121,10 +122,12 @@ serve(async (req) => {
         throw new Error("Gemini analysis failed");
       }
 
+      var insights = analysis.insights.replace(/```json|```/g, "").trim()
+
       return {
         user_id,
         session_date: session.trade_day,
-        insights: analysis.insights,
+        analysis: JSON.parse(insights) || analysis.insights,
         model: analysis.model,
         created_at: new Date().toISOString(),
       };

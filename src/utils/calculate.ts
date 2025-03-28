@@ -38,7 +38,7 @@ const calculateForexPnL = async (
     return ((exitPrice - entryPrice) * lotSize * contractSize) / conversionRate;
 };
 
-export const calculatePnL = async (symbol, buy_price, sell_price, quantity, fees = 0, option_type = null, premium = null) => {
+export const calculatePnL = async (symbol: string, buy_price: number, sell_price: number, quantity: number, fees = 0, option_type = null, premium = null) => {
     const asset_type = await getAssetType(symbol);
     let pnl = 0;
 

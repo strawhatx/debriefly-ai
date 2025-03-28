@@ -55,7 +55,7 @@ export const TradingAccountsSection = ({ tradingAccounts }
             <tr className="border-b border-gray-700">
               <th className="px-6 py-3 text-left">Name</th>
               <th className="px-6 py-3 text-left">Broker</th>
-              <th className="px-6 py-3 text-left">Profit Calc.</th>
+              <th className="px-6 py-3 text-left">Market</th>
               <th className="px-6 py-3 text-left">Balance</th>
               <th className="px-6 py-3 text-right">Actions</th>
             </tr>
