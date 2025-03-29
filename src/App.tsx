@@ -30,6 +30,8 @@ import { DashboardHeader } from "./components/layouts/headers/Dashboard";
 import { NotebookHeader } from "./components/layouts/headers/Notebook";
 import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
 import { TradeHistoryGenerator } from "./pages/TradeHistoryGenerator";
+import { ReviewPage } from "./pages/Review";
+import { ReviewHeader } from "./components/layouts/headers/Review";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -127,6 +129,15 @@ const App = () => {
               <Route path="/app/trade-import" element={
                 <SidebarLayout breadcrumbs={[{ name: "Trade Import", href: "/app/trade-import" }]}>
                   <TradeImportPage />
+                </SidebarLayout>
+              } />
+              <Route path="/app/trade-import/review" element={
+                <SidebarLayout
+                  breadcrumbs={[
+                    { name: "Trade Import", href: "/app/trade-import" },
+                    { name: "Review", href: "/app/trade-import/review" }]}
+                  rightContent={<ReviewHeader />}>
+                  <ReviewPage />
                 </SidebarLayout>
               } />
               <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />

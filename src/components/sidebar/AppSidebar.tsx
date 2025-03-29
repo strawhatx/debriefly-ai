@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BarChart2, Settings, ClipboardList, Brain, LineChart, History, Home } from "lucide-react";
+import { BarChart2, Settings, ClipboardList, Brain, LineChart, History, Home, Eye } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SelectAccount } from "../SelectAccount";
 
@@ -18,6 +18,7 @@ const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/app/dashboard" },
   { title: "Debrief", icon: ClipboardList, url: "/app/debrief" },
   { title: "Trade History", icon: History, url: "/app/trade-history" },
+  { title: "Trade Review", icon: Eye, url: "/app/trade-import/review" },
   { title: "Behavior", icon: Brain, url: "/app/behavioral-patterns" },
   { title: "Strategy", icon: LineChart, url: "/app/strategy-optimization" },
 ];

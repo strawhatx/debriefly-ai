@@ -136,6 +136,7 @@ export const useFileImport = (selectedAccount: string) => {
           asset_type: assetType,
           fill_price: entry.fill_price,
           stop_price: fill_price,
+          state: "DRAFT",
           pnl,
           quantity: closeQty,
         });

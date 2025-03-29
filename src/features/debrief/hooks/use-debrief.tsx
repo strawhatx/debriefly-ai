@@ -44,8 +44,10 @@ export const useDebrief = () => {
                 fill_price,
                 stop_price, 
                 pnl, 
-                journal_entries(risk, reward, strategy),
-                emotional_tags(tags)`)
+                risk, 
+                reward, 
+                strategy,
+                tags`)
                     .eq('entry_date', today);
 
                 if (fetchError) throw new Error(fetchError.message);
@@ -61,12 +63,12 @@ export const useDebrief = () => {
                     type: position.position_type,
                     entry: position.fill_price,
                     exit: position.stop_price,
-                    strategy: position.journal_entries.strategy,
-                    risk: position.journal_entries.risk,
-                    reward: position.journal_entries.reward,
+                    strategy: position.strategy,
+                    risk: position.risk,
+                    reward: position.reward,
                     outcome: position.pnl > 0 ? 'WIN' : 'LOSS',
                     pnl: position.pnl,
-                    tags: position.emotional_tags.tags
+                    tags: position.tags
                 })));
 
                 setError(null);

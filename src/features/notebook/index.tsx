@@ -5,10 +5,8 @@ import { useParams } from 'react-router-dom';
 import { useJournal } from './hooks/use-journal';
 import { EmotionalTags } from './components/EmotionalTags';
 import { TradingStrategy } from './components/TradingStrategy';
-import { TradeOverview } from './components/TradeOverview';
 import RiskToReward from './components/RiskToReward';
-import { Separator } from '@/components/ui/separator';
-import { AppSidebar } from '@/components/sidebar/AppSidebar';
+
 
 export const Notebook = () => {
     const { id } = useParams<{ id: string }>();

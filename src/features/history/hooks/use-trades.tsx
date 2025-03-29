@@ -65,7 +65,7 @@ export const useTrades = () => {
             quantity, 
             closing_date, 
             pnl, 
-            emotional_tags ( tags )
+            tags
           `)
           .eq("user_id", user.id)
           .order("entry_date", { ascending: false });

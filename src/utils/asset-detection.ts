@@ -59,7 +59,7 @@ const isForex = async (symbol: string): Promise<boolean> => {
 
     if (currency_codes.length === 0) await get_currency_codes();
 
-    const forexRegex = /^[A-Z]{3}\/?.?[A-Z]{3}$/;
+    const forexRegex = /^[A-Za-z]{3}\/?[A-Za-z]{3}$/;
     if (forexRegex.test(symbol)) {
       const [base, quote] = symbol.includes('/') ? symbol.split('/') : [symbol.slice(0, 3), symbol.slice(3, 6)];
       if (currency_codes.some(i => i.code === base) && currency_codes.some(i => i.code === quote)) return true;

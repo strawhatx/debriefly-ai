@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
-  LineChart, 
-  TrendingUp, 
-  ArrowUpRight,
   Settings,
   Target,
   Zap,
@@ -12,7 +9,6 @@ import {
   AlertTriangle,
   CheckCircle,
   ArrowRight,
-  History,
   PlayCircle
 } from 'lucide-react';
 import {
