@@ -1,3 +1,8 @@
+// This file is part of the Trading Journal feature 
+// rigt now its not fully funtional because we move things around 
+// and no longer fit in our sequence but its possible that it may become 
+// a feature request so i wount completely remove the work but as for now the page is disabled.
+
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';

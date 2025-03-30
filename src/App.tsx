@@ -140,7 +140,7 @@ const App = () => {
                   <ReviewPage />
                 </SidebarLayout>
               } />
-              <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />
+              {/* <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />*/}
               <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
               <Route path="/dev/trade-history-generator" element={<TradeHistoryGenerator />} />
             </Route>

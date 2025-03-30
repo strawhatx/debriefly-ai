@@ -14,7 +14,7 @@ import {
   useReactTable,
   Table as TableInstance,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -150,12 +150,11 @@ export function DataTable<TData>({
   showColumnToggle = true,
   showPagination = true,
   className,
-  borderClassName="border-b border-gray-700",
+  borderClassName = "border-b border-gray-700",
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -166,7 +165,6 @@ export function DataTable<TData>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     initialState: {
       pagination: {
@@ -176,26 +174,28 @@ export function DataTable<TData>({
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
-    <div className={className}>
+    <div className={`w-full ${className}`}>
       <TableToolbar
         table={table}
         searchKey={searchKey}
         searchPlaceholder={searchPlaceholder}
         showColumnToggle={showColumnToggle}
       />
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader >
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="w-full">
+          <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className={borderClassName}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={header.column.columnDef.meta?.className || ""}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -216,7 +216,10 @@ export function DataTable<TData>({
                   className={borderClassName}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="px-4 py-2 text-sm">
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.meta?.className || ""}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -240,7 +243,7 @@ export function DataTable<TData>({
       </div>
       {showPagination && <TablePagination table={table} />}
     </div>
-  )
+  );
 }
 
 // Helper function to create sortable column header

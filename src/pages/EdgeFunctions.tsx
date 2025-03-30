@@ -14,7 +14,7 @@ export const EdgeFunctions = () => {
                 const response = await fetch(API_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ user_id: user.id })
+                    body: JSON.stringify({ user_id: user.id, trading_account_id: "all" }),
                 });
 
                 const result = await response.json();

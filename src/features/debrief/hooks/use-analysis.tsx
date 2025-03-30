@@ -1,40 +1,52 @@
 import { supabase } from "@/integrations/supabase/client";
+import useTradingAccountStore from "@/store/trading-account";
 import { useEffect, useState } from "react";
 
 interface Analysis {
   what_went_well: string[],
   areas_for_improvement: string[],
-  strategy_recommendations: { 
-    title:string; 
-    description:string; 
-    predicted_win_rate_increase:string;
+  strategy_recommendations: {
+    title: string;
+    description: string;
+    predicted_win_rate_increase: string;
   }[],
-  behavior_insights: { 
-    title:string; 
-    description:string; 
-    recommendation:string;
+  behavior_insights: {
+    title: string;
+    description: string;
+    recommendation: string;
   }[]
 }
 
 export const useAnalysis = () => {
   const [analysis, setAnalysis] = useState<Analysis>();
+  const [day, setDay] = useState<Date>(new Date());
+
+  const selectedAccount = useTradingAccountStore((state) => state.selected);
 
   const fetchAnalysis = async () => {
-    const today = new Date().toISOString().split('T')[0];
+    const date = day.toISOString().split('T')[0];
 
-    const { data, error: fetchError } = await supabase
-      .from('trade_analysis').select(`analysis`)
-      .eq('entry_date', today);
+    var query = supabase
+      .from('trade_analysis').select(`analysis`).eq('session_date', date);
 
-    if (fetchError) throw new Error(fetchError.message);
-    if (!data) throw new Error('No data received from database');
+    if (selectedAccount) {
+      query = query.eq("trading_account_id", selectedAccount);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      setAnalysis(null);
+      return;
+    }
 
     setAnalysis(data[0].analysis);
   }
 
   useEffect(() => {
     fetchAnalysis();
-  }, []);
+  }, [day]);
 
-  return { analysis };
+  return { analysis, setDay, day };
 };

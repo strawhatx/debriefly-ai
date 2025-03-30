@@ -29,7 +29,7 @@ export const Select: React.FC<SelectProps> = ({ label, options, value, onChange,
 
     return (
         <Listbox as="div" value={value} onChange={handleChange} multiple={multiple}>
-            <div className="relative mt-2 w-64">
+            <div className="relative mt-2 w-full">
                 <ListboxButton className="grid w-full cursor-default grid-cols-1 rounded-full border border-gray-600 py-1 pr-2 pl-3 text-left text-white outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-primary sm:text-sm/6">
                     <span className="col-start-1 row-start-1 flex items-center gap-3 pr-6 text-gray-400">
                         <span className="block truncate text-sm">

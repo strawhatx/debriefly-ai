@@ -23,8 +23,8 @@
     --muted: theme(colors.gray.800);
     --muted-foreground: theme(colors.gray.200);
 
-    --accent: theme(colors.emerald.400);
-    --accent-foreground: theme(colors.gray.600);
+    --accent: theme(colors.gray.800);
+    --accent-foreground: theme(colors.gray.300);
 
     --destructive: theme(colors.red.500);
     --destructive-foreground: theme(colors.gray.100);

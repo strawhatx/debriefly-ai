@@ -53,7 +53,10 @@ export const Review = () => {
   const columns = [
     {
       accessorKey: "date",
-      header: createSortableColumn("Date"),
+      header: "Date",
+      meta: {
+        className: "hidden lg:table-cell", // Hidden on small screens
+      },
     },
     {
       accessorKey: "asset",
@@ -62,6 +65,9 @@ export const Review = () => {
     {
       accessorKey: "type",
       header: "Type",
+      meta: {
+        className: "hidden lg:table-cell", // Hidden on small screens
+      },
       cell: ({ row }) => (
         <span
           className={`flex items-center gap-1 ${row.getValue("type") === "LONG" ? "text-emerald-400" : "text-red-400"
@@ -79,6 +85,9 @@ export const Review = () => {
     {
       accessorKey: "entry",
       header: "Entry",
+      meta: {
+        className: "hidden lg:table-cell", // Hidden on small screens
+      },
       cell: ({ row }) => (
         <div className="text-right">{row.getValue("entry")?.toFixed(2)}</div>
       ),
@@ -86,13 +95,16 @@ export const Review = () => {
     {
       accessorKey: "exit",
       header: "Exit",
+      meta: {
+        className: "hidden lg:table-cell", // Hidden on small screens
+      },
       cell: ({ row }) => (
         <div className="text-right">{row.getValue("exit")?.toFixed(2)}</div>
       ),
     },
     {
       accessorKey: "pnl",
-      header: createSortableColumn("P&L"),
+      header:"P&L",
       cell: ({ row }) => (
         <div
           className={`text-right ${row.getValue("pnl") >= 0 ? "text-emerald-400" : "text-red-400"

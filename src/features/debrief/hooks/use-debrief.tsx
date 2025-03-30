@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import useTradingAccountStore from "@/store/trading-account";
 import { useEffect, useState } from "react";
 
 // Define strict types for our data structures
@@ -25,32 +26,43 @@ export const useDebrief = () => {
     const [positions, setPositions] = useState<Position[] | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
+    const [day, setDay] = useState<Date>(new Date());
+
+    const selectedAccount = useTradingAccountStore((state) => state.selected);
 
     useEffect(() => {
         const fetchTodayStats = async () => {
             setIsLoading(true);
             try {
-                const today = new Date().toISOString().split('T')[0];
+                const date = day.toISOString().split('T')[0];
 
-                const { data, error: fetchError } = await supabase
-                    .from('positions')
+                var query = supabase.from('positions')
                     .select(`
-                id, 
-                entry_date, 
-                closing_date,
-                symbol,
-                asset_type,
-                position_type, 
-                fill_price,
-                stop_price, 
-                pnl, 
-                risk, 
-                reward, 
-                strategy,
-                tags`)
-                    .eq('entry_date', today);
+                        id, 
+                        entry_date, 
+                        closing_date,
+                        symbol,
+                        asset_type,
+                        position_type, 
+                        fill_price,
+                        stop_price, 
+                        pnl, 
+                        risk, 
+                        reward, 
+                        strategy,
+                        tags`)
+                    //range filter for the date
+                    .gte("entry_date", `${date} 00:00:00`)
+                    .lte("entry_date", `${date} 23:59:59`);
 
-                if (fetchError) throw new Error(fetchError.message);
+                if (selectedAccount) {
+                    query = query.eq("trading_account_id", selectedAccount);
+                }
+
+                const { data, error } = await query;
+                if (error) throw error;
+
+                if (error) throw new Error(error.message);
                 if (!data) throw new Error('No data received from database');
 
                 setPositions(data.map((position) => ({
@@ -82,7 +94,7 @@ export const useDebrief = () => {
         };
 
         fetchTodayStats();
-    }, []);
+    }, [day]);
 
-    return { positions, isLoading, error };
+    return { positions, isLoading, error, setDay, day };
 };

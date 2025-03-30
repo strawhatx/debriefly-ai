@@ -67,14 +67,14 @@ const TableHeader = ({ toggleSort }: { toggleSort: (key: string) => void }) => (
         <SortableColumn label="Time" sortKey="time" onSort={toggleSort} />
       </th>
       <th className="px-6 py-3 text-left">Symbol</th>
-      <th className="px-6 py-3 text-left">Type</th>
-      <th className="px-6 py-3 text-left">Entry</th>
-      <th className="px-6 py-3 text-left">Exit</th>
-      <th className="px-6 py-3 text-left">R:R</th>
+      <th className="px-6 py-3 text-left hidden sm:table-cell">Type</th>
+      <th className="px-6 py-3 text-left hidden md:table-cell">Entry</th>
+      <th className="px-6 py-3 text-left hidden lg:table-cell">Exit</th>
+      <th className="px-6 py-3 text-left hidden lg:table-cell">R:R</th>
       <th className="px-6 py-3 text-left">
         <SortableColumn label="P&L" sortKey="pnl" onSort={toggleSort} />
       </th>
-      <th className="px-6 py-3 text-left">Tags</th>
+      <th className="px-6 py-3 text-left hidden lg:table-cell">Tags</th>
     </tr>
   </thead>
 );
@@ -83,16 +83,16 @@ const TradeRow = ({ trade }: { trade: Position }) => (
   <tr className="border-b border-gray-700 hover:bg-gray-700/50 transition-colors">
     <td className="px-6 py-4">{trade.time}</td>
     <td className="px-6 py-4">{trade.symbol}</td>
-    <td className="px-6 py-4">
+    <td className="px-6 py-4 hidden sm:table-cell">
       <TradeTypeIndicator type={trade.type} />
     </td>
-    <td className="px-6 py-4">{trade.entry.toFixed(2)}</td>
-    <td className="px-6 py-4">{trade.exit.toFixed(2)}</td>
-    <td className="px-6 py-4">{trade.risk}:{trade.reward}</td>
+    <td className="px-6 py-4 hidden md:table-cell">{trade.entry.toFixed(2)}</td>
+    <td className="px-6 py-4 hidden lg:table-cell">{trade.exit.toFixed(2)}</td>
+    <td className="px-6 py-4 hidden lg:table-cell">{trade.risk}:{trade.reward}</td>
     <td className={`px-6 py-4 ${trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
       {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
     </td>
-    <td className="px-6 py-4">
+    <td className="px-6 py-4 hidden lg:table-cell">
       <div className="flex gap-2 flex-wrap">
         {trade.tags.map((tag, index) => (
           <TradeTag key={`${trade.id}-${tag}-${index}`} tag={tag} />
@@ -119,7 +119,7 @@ export const SessionTrades = ({ positions }: { positions: Position[] | null }) =
         <h2 className="text-xl font-semibold">Session Trades</h2>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[500px]">
           <TableHeader toggleSort={toggleSort} />
           <tbody>
             {sortedTrades.length > 0 

@@ -37,8 +37,8 @@ export const useFileImport = (selectedAccount: string) => {
       const rawHeaders = result.meta.fields;
 
       await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
-
-      await runTradeAnalysis(user.id);
+      
+      await updateImportStatus(importRecord.id, 'COMPLETED');
 
       return true;
     } catch (error: any) {
@@ -167,22 +167,6 @@ export const useFileImport = (selectedAccount: string) => {
     entry_trade_id: entry.id,
     close_trade_id: exit.id,
   });
-
-  const runTradeAnalysis = async (userId: string) => {
-    try {
-      const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-analysis`;
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId }),
-      });
-
-      const result = await response.json();
-      if (result.error) throw new Error(result.error);
-    } catch (error) {
-      console.error("❌ Error running trade analysis:", error);
-    }
-  };
 
   const showError = (title: string, description: string) => {
     toast({ title, description, variant: "destructive" });

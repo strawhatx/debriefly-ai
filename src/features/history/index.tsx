@@ -9,6 +9,7 @@ import { ArrowUpRight, ArrowDownRight, MoreHorizontal, ClipboardCopy, Database, 
 import { Button } from "@/components/ui/button";
 import type { Trade } from "./hooks/use-trades";
 import { RawTradeModal } from "./components/RawTradeModal";
+import { Card } from "@/components/ui/card";
 
 const columns = [
   {
@@ -38,6 +39,9 @@ const columns = [
   {
     accessorKey: "entry",
     header: "Entry",
+    meta: {
+      className: "hidden lg:table-cell", // Hidden on small screens
+    },
     cell: ({ row }) => (
       <div className="text-right">
         {row.getValue("entry")?.toFixed(2)}
@@ -47,6 +51,9 @@ const columns = [
   {
     accessorKey: "exit",
     header: "Exit",
+    meta: {
+      className: "hidden lg:table-cell", // Hidden on small screens
+    },
     cell: ({ row }) => (
       <div className="text-right">
         {row.getValue("exit")?.toFixed(2)}
@@ -67,6 +74,9 @@ const columns = [
   {
     accessorKey: "topEmotion",
     header: "Top Emotion",
+    meta: {
+      className: "hidden lg:table-cell", // Hidden on small screens
+    },
   },
 ];
 
@@ -78,7 +88,7 @@ export const History = () => {
 
   const handleViewRawData = (tradeId: string) => setSelectedTradeId(tradeId);
 
-  const handleViewNotebook = (tradeId: string) => navigate(`/app/notebook/${tradeId}`);
+  //const handleViewNotebook = (tradeId: string) => navigate(`/app/notebook/${tradeId}`);
 
 
   if (error) {
@@ -100,7 +110,7 @@ export const History = () => {
       {trades.length === 0 ? (
         <p className="text-gray-400">No trades found for this account.</p>
       ) : (
-        <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <Card className="relative w-full overflow-auto">
           <div className="p-4">
             <DataTable
               columns={[
@@ -138,12 +148,14 @@ export const History = () => {
                             <Database className="w-4 h-4 mr-2" />
                             View raw data
                           </DropdownMenuItem>
-                          <DropdownMenuItem
+                          {/*
+                            <DropdownMenuItem
                             onClick={() => handleViewNotebook(trade.id)}
                           >
                             <BookOpen className="w-4 h-4 mr-2" />
                             View notebook
                           </DropdownMenuItem>
+                          */}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )
@@ -156,7 +168,7 @@ export const History = () => {
               pageSize={10}
             />
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Raw Trade Modal */}

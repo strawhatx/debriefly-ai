@@ -26,7 +26,7 @@ export const Debrief = () => {
 
       {/* Performance Chart and AI Analysis */}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SessionPerformance
           positions={mappedSessionPositions}
           isLoading={isLoading}
@@ -39,7 +39,7 @@ export const Debrief = () => {
       <SessionTrades positions={positions} />
 
       {/* Behavioral Trends and Strategy Adjustments */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <BehavioralTrends
           positions={positions}
           isLoading={isLoading}
@@ -50,7 +50,7 @@ export const Debrief = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <button className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium">
           <Save className="w-5 h-5" />
           Save Debrief
