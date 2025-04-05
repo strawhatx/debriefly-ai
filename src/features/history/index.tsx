@@ -97,15 +97,13 @@ const columns = [
 ];
 
 export const History = () => {
-  const navigate = useNavigate();
   const [mappedTrades, setMappedTrades] = useState<Trade[]>(null);
   const { trades, error } = useTrades();
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
   const { data: rawTrade, isLoading: isLoadingRaw, error: rawError } = useRawTrade(selectedTradeId);
 
   const handleViewRawData = (tradeId: string) => setSelectedTradeId(tradeId);
-
-  useEffect(() => {
+    useEffect(() => {
     // Perform any side effects or data fetching here
     // For example, you might want to fetch trades or update the state
     var result = trades.map((trade) => {

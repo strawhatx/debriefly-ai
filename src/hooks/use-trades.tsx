@@ -6,7 +6,7 @@ interface Trade {
   id: string;
   symbol: string;
   position_type: "LONG" | "SHORT";
-  fill_price: number; 
+  fill_price: number;
   stop_price: number;
   entry_date: string; // ISO date string
   closing_date: string | null; // ISO date string or null, 
@@ -18,17 +18,18 @@ interface Trade {
   reward: number;
   pnl: number;
   tags: string[] | null;
-  score: number; 
+  score: number;
   leverage: number | null;
 }
 
-export const useTrades = () => {
+export const useTrades = (isReview: boolean = false) => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const selectedAccount = useTradingAccountStore((state) => state.selected);
 
+  // Fetch trades from the database
   // Fetch trades from the database
   const fetchTrades = async () => {
     try {
@@ -41,13 +42,15 @@ export const useTrades = () => {
       let query = supabase
         .from("positions")
         .select(`
-          id, symbol, asset_type,  position_type, fill_price, stop_price, entry_date, 
-          closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
-        `)
+            id, symbol, asset_type,  position_type, fill_price, stop_price, entry_date, 
+            closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
+          `)
         .eq("user_id", user.id)
-        .eq("state", "DRAFT")
         .order("entry_date", { ascending: false });
 
+      if (isReview) {
+        query = query.eq("state", "DRAFT");
+      }
       if (selectedAccount) {
         query = query.eq("trading_account_id", selectedAccount);
       }
@@ -101,7 +104,7 @@ export const useTrades = () => {
 
   useEffect(() => {
     fetchTrades();
-  }, [selectedAccount]);
+  }, [selectedAccount, isReview]);
 
   return { trades, setTrades, isLoading, error, fetchTrades, saveTrades };
 };

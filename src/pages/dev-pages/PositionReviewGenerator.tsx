@@ -36,7 +36,7 @@ export const allTags = [
 
 export const PositionReviewGenerator = () => {
     const [trades, setTrades] = useState<any[]>();
-    const [analysis, setAnalysis] = useState({});
+    const [analysis, setAnalysis] = useState<any[]>();
 
     const generatePositionUpdate = async () => {
         for (const trade of trades) {
@@ -89,7 +89,7 @@ export const PositionReviewGenerator = () => {
 
             const result = await response.json();
 
-            setAnalysis(result);
+            setAnalysis(result.insights);
 
             console.log("AI analysis result:", result);
 
@@ -163,11 +163,11 @@ export const PositionReviewGenerator = () => {
                 Generate & Download CSV
             </button>
 
-            {analysis && Object.keys(analysis).length > 0 && (
+            {analysis && analysis.length > 0 && (
                 <div className="mt-4">
-                    {Object.entries(analysis).map(([date, trades]) => (
-                        <div key={date} className="bg-gray-800 p-4 rounded-lg mb-6">
-                            <h3 className="text-lg font-semibold">Session: {date}</h3>
+                    {analysis.map(({ session_date, trades }) => (
+                        <div key={session_date} className="bg-gray-800 p-4 rounded-lg mb-6">
+                            <h3 className="text-lg font-semibold">Session: {session_date}</h3>
                             {trades.map((entry) => (
                                 <div key={entry.position_id} className="mt-2">
                                     <p className="text-gray-400">{entry.insights}</p>

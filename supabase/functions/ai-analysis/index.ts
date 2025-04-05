@@ -113,8 +113,15 @@ serve(async (req) => {
 
     // For each daily session, build a prompt and call Gemini API concurrently
     const dailyAnalysisPromises = sessionGroups.map(async (session: any) => {
-      const prompt = tradeDebriefPrompt(session);
-      console.log(`🧠 Running Gemini analysis for session ${session.trade_day}...`);
+      // Check if session has trade data
+      if (!session.trade_data || session.trade_data.length === 0) {
+        console.warn(`⚠️ No trade data for session ${session.trade_day}`);
+        return null;
+      }
+
+      var data = session.trade_data;
+      const prompt = tradeDebriefPrompt(data);
+      console.log(`🧠 Running Gemini analysis for session ${data.trade_day}...`);
 
       const analysis = await analyzeWithGemini(prompt);
       
@@ -126,7 +133,8 @@ serve(async (req) => {
 
       return {
         user_id,
-        session_date: session.trade_day,
+        trading_account_id,
+        session_date: data.trade_day,
         analysis: JSON.parse(insights) || analysis.insights,
         model: analysis.model,
         created_at: new Date().toISOString(),
@@ -138,9 +146,7 @@ serve(async (req) => {
 
     // Save each session debrief to your Supabase table (e.g., "trade_analysis")
     const { error: saveError } = await supabase
-      .from("trade_analysis")
-      .insert(dailyAnalysisResults)
-      .select();
+      .from("trade_analysis").insert(dailyAnalysisResults).select();
 
     if (saveError) {
       console.error("❌ Error saving AI insights:", saveError.message);

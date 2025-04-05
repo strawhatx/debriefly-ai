@@ -8,7 +8,7 @@ import { Columns } from "./components/Columns";
 
 export const Review = () => {
   const [mappedTrades, setMappedTrades] = useState([]);
-  const { trades, setTrades, saveTrades, error } = useTrades();
+  const { trades, setTrades, saveTrades, error } = useTrades(true);
   const { event, setLoading } = useEventStore();
   const { toast } = useToast();
 
