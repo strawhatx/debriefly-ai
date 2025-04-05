@@ -18,7 +18,7 @@ import { BehaviorialPatternsPage } from "./pages/BehaviorialPatterns";
 import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
 import { NotebookPage } from "./pages/Notebook";
-import { EdgeFunctions } from "./pages/EdgeFunctions";
+import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
 import { DoubleLayout, SidebarLayout } from "./components/layouts/Index";
 import { NavbarLayout } from "./components/layouts/Index";
 import { SignOutButton } from "./features/settings/components/SignOutButton";
@@ -29,9 +29,10 @@ import { DebriefHeader } from "./components/layouts/headers/Debrief";
 import { DashboardHeader } from "./components/layouts/headers/Dashboard";
 import { NotebookHeader } from "./components/layouts/headers/Notebook";
 import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
-import { TradeHistoryGenerator } from "./pages/TradeHistoryGenerator";
+import { TradeHistoryGenerator } from "./pages/dev-pages/TradeHistoryGenerator";
 import { ReviewPage } from "./pages/Review";
 import { ReviewHeader } from "./components/layouts/headers/Review";
+import { PositionReviewGenerator } from "./pages/dev-pages/PositionReviewGenerator";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -143,6 +144,7 @@ const App = () => {
               {/* <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />*/}
               <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
               <Route path="/dev/trade-history-generator" element={<TradeHistoryGenerator />} />
+              <Route path="/dev/position-review-generator" element={<PositionReviewGenerator />} />
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

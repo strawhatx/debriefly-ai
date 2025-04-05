@@ -1,0 +1,31 @@
+export const allStrategies = [
+    "BREAKOUT",
+    "PULLBACK",
+    "REVERSALS",
+    "TREND FOLLOWING",
+    "RANGE TRADING",
+    "SCALPING",
+    "MOMENTUM",
+    "SWING TRADING",
+    "ORDER BLOCK",
+    "FVG",
+  ];
+  
+  export const allTags = [
+    "CALM",
+    "CONFIDENT",
+    "DISCIPLINED",
+    "PATIENT",
+    "HESITANT",
+    "ANXIOUS",
+    "FEARFUL",
+    "DOUBTFUL",
+    "FOMO",
+    "GREEDY",
+    "EXCITED",
+    "OVERCONFIDENT",
+    "REVENGE",
+    "ANGRY",
+    "FRUSTRATED",
+    "IMPULSIVE",
+  ];

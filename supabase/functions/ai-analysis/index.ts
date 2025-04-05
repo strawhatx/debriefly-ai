@@ -91,8 +91,7 @@ serve(async (req) => {
 
     // Call Supabase RPC that returns daily grouped positions
     const { data: sessionGroups, error: rpcError } = await supabase.rpc("get_unanalyzed_positions", {
-      user_id_param: user_id,
-      trading_account_id_param: trading_account_id,
+      trading_acccount_id_param: trading_account_id, user_id_param: user_id
     });
 
     if (rpcError) {

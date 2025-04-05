@@ -1,20 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TradeStatistics } from "./components/TradeStatistics";
-import { useTrades } from "./hooks/use-trades";
 import { useRawTrade } from "./hooks/use-raw-trade";
 import { DataTable, createSortableColumn } from "@/components/ui/data-table";
 import { ArrowUpRight, ArrowDownRight, MoreHorizontal, ClipboardCopy, Database, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Trade } from "./hooks/use-trades";
 import { RawTradeModal } from "./components/RawTradeModal";
 import { Card } from "@/components/ui/card";
+import { useTrades } from "@/hooks/use-trades";
+import { format } from "date-fns";
+
+interface Trade {
+  id: string;
+  date: string;
+  asset: string;
+  type: 'LONG' | 'SHORT';
+  entry: number;
+  exit: number;
+  pnl: number;
+  topEmotion: string;
+  fees: number;
+  emotional_tags: string[] | null;
+}
 
 const columns = [
   {
     accessorKey: "date",
     header: createSortableColumn("Date"),
+    cell: ({ row }) => (
+      <div>
+        {format(new Date(row.getValue("date")), "yyyy-MM-dd")}
+      </div>
+    ),
   },
   {
     accessorKey: "asset",
@@ -24,9 +42,8 @@ const columns = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => (
-      <span className={`flex items-center gap-1 ${
-        row.getValue("type") === 'LONG' ? 'text-emerald-400' : 'text-red-400'
-      }`}>
+      <span className={`flex items-center gap-1 ${row.getValue("type") === 'LONG' ? 'text-emerald-400' : 'text-red-400'
+        }`}>
         {row.getValue("type") === 'LONG' ? (
           <ArrowUpRight className="w-4 h-4" />
         ) : (
@@ -43,7 +60,7 @@ const columns = [
       className: "hidden lg:table-cell", // Hidden on small screens
     },
     cell: ({ row }) => (
-      <div className="text-right">
+      <div>
         {row.getValue("entry")?.toFixed(2)}
       </div>
     ),
@@ -55,7 +72,7 @@ const columns = [
       className: "hidden lg:table-cell", // Hidden on small screens
     },
     cell: ({ row }) => (
-      <div className="text-right">
+      <div>
         {row.getValue("exit")?.toFixed(2)}
       </div>
     ),
@@ -64,9 +81,8 @@ const columns = [
     accessorKey: "pnl",
     header: createSortableColumn("P&L"),
     cell: ({ row }) => (
-      <div className={`text-right ${
-        row.getValue("pnl") >= 0 ? 'text-emerald-400' : 'text-red-400'
-      }`}>
+      <div className={`${row.getValue("pnl") >= 0 ? 'text-emerald-400' : 'text-red-400'
+        }`}>
         {row.getValue("pnl") >= 0 ? '+' : ''}{row.getValue("pnl")?.toFixed(2)}
       </div>
     ),
@@ -82,14 +98,33 @@ const columns = [
 
 export const History = () => {
   const navigate = useNavigate();
+  const [mappedTrades, setMappedTrades] = useState<Trade[]>(null);
   const { trades, error } = useTrades();
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
   const { data: rawTrade, isLoading: isLoadingRaw, error: rawError } = useRawTrade(selectedTradeId);
 
   const handleViewRawData = (tradeId: string) => setSelectedTradeId(tradeId);
 
-  //const handleViewNotebook = (tradeId: string) => navigate(`/app/notebook/${tradeId}`);
+  useEffect(() => {
+    // Perform any side effects or data fetching here
+    // For example, you might want to fetch trades or update the state
+    var result = trades.map((trade) => {
+      return {
+        id: trade.id,
+        date: trade.entry_date,
+        asset: trade.symbol,
+        type: trade.position_type,
+        entry: trade.fill_price,
+        exit: trade.stop_price,
+        pnl: trade.pnl,
+        topEmotion: trade.tags[0] || "None",
+        fees: trade.fees,
+        emotional_tags: trade.tags || null,
+      }
+    });
 
+    setMappedTrades(result);
+  }, [trades]);
 
   if (error) {
     return (
@@ -107,7 +142,7 @@ export const History = () => {
       <TradeStatistics trades={trades} />
 
       {/* Trade Table */}
-      {trades.length === 0 ? (
+      {!mappedTrades || mappedTrades.length === 0 ? (
         <p className="text-gray-400">No trades found for this account.</p>
       ) : (
         <Card className="relative w-full overflow-auto">
@@ -119,7 +154,7 @@ export const History = () => {
                   id: "actions",
                   enableHiding: false,
                   cell: ({ row }) => {
-                    const trade = row.original as Trade;
+                    const trade = row.original;
                     return (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -162,7 +197,7 @@ export const History = () => {
                   },
                 },
               ]}
-              data={trades}
+              data={mappedTrades}
               searchKey="asset"
               searchPlaceholder="Search by asset..."
               pageSize={10}

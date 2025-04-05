@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 // Define strict types for our data structures
 interface Position {
     id: string;
+    date: string;
+    score: number;
     time: string;
     entry_date: string;
     closing_date: string;
@@ -50,7 +52,8 @@ export const useDebrief = () => {
                         risk, 
                         reward, 
                         strategy,
-                        tags`)
+                        tags,
+                        score`)
                     //range filter for the date
                     .gte("entry_date", `${date} 00:00:00`)
                     .lte("entry_date", `${date} 23:59:59`);
@@ -67,7 +70,10 @@ export const useDebrief = () => {
 
                 setPositions(data.map((position) => ({
                     id: position.id,
-                    time: new Date(position.entry_date).toLocaleTimeString(),
+                    date: new Date(position.entry_date).toLocaleDateString(),
+                    time: new Date(position.entry_date).toLocaleString('en-US', {
+                        hour: 'numeric',minute: 'numeric', hour12: true
+                    }),
                     entry_date: position.entry_date,
                     closing_date: position.closing_date,
                     symbol: position.symbol,
@@ -80,7 +86,8 @@ export const useDebrief = () => {
                     reward: position.reward,
                     outcome: position.pnl > 0 ? 'WIN' : 'LOSS',
                     pnl: position.pnl,
-                    tags: position.tags
+                    tags: position.tags,
+                    score: position.score,
                 })));
 
                 setError(null);

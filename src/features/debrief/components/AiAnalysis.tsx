@@ -10,68 +10,72 @@ interface AnalysisProps {
 }
 
 // Reusable list item component
-const AnalysisListItem = ({ 
-    icon: Icon, 
-    text, 
-    iconColor 
-}: { 
+const AnalysisListItem = ({
+    icon: Icon,
+    text,
+    iconColor
+}: {
     icon: React.ElementType;
     text: string;
     iconColor: string;
 }) => (
-    <li className="flex items-start gap-2">
-        <Icon className={`w-4 h-4 ${iconColor} mt-1`} />
+    <li className="flex items-start text-sm gap-2">
+        <Icon className={`w-6 h-6 ${iconColor} mt-1`} />
         <span>{text}</span>
     </li>
 );
 
 // Add a reusable empty state component
 const EmptyState = ({ message }: { message: string }) => (
-  <div className="text-gray-400 text-sm italic flex items-center justify-center p-4">
-    {message}
-  </div>
+    <div className="text-gray-400 text-sm italic flex items-center justify-center p-4">
+        {message}
+    </div>
 );
 
 // Reusable section component
 const AnalysisSection = ({
-    title,
-    icon: Icon,
-    iconColor,
-    items,
-    itemIcon,
+    title, icon: Icon, iconColor, items, itemIcon,
 }: {
     title: string;
     icon: React.ElementType;
     iconColor: string;
     items: string[] | null | undefined;
     itemIcon: React.ElementType;
-}) => (
-    <div className="p-4 bg-gray-900/50 rounded-lg">
-        <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-            <Icon className={`w-4 h-4 ${iconColor}`} />
-            {title}
-        </h3>
-        {!items?.length ? (
-            <EmptyState message={`No ${title.toLowerCase()} data available`} />
-        ) : (
-            <ul className="space-y-2">
-                {items.map((text, index) => (
+}) => {
+    const [first, second] = items
+    return (
+        <div className="p-4 bg-gray-900/50 rounded-lg">
+            <h3 className="text-md font-medium mb-2 flex items-center gap-2">
+                <Icon className={`w-4 h-4 ${iconColor}`} />
+                {title}
+            </h3>
+            {!items?.length ? (
+                <EmptyState message={`No ${title.toLowerCase()} data available`} />
+            ) : (
+                <ul className="space-y-2">
                     <AnalysisListItem
-                        key={`${title}-${index}`}
+                        key={`${title}-${0}`}
                         icon={itemIcon}
-                        text={text}
+                        text={first}
                         iconColor={iconColor}
                     />
-                ))}
-            </ul>
-        )}
-    </div>
-);
+                    <AnalysisListItem
+                        key={`${title}-${1}`}
+                        icon={itemIcon}
+                        text={second}
+                        iconColor={iconColor}
+                    />
+                </ul>
+            )}
+        </div>
+    )
+};
 
-export const AiAnalysis = ({ 
-    what_went_well = [], 
-    areas_for_improvement = [] 
+export const AiAnalysis = ({
+    what_went_well = [],
+    areas_for_improvement = []
 }: Partial<AnalysisProps>) => {
+
     // Early return if both sections are empty
     if (!what_went_well?.length && !areas_for_improvement?.length) {
         return (

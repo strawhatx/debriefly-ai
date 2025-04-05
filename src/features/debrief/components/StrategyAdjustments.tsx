@@ -25,26 +25,16 @@ const RecommendationCard = ({ recommendation }: { recommendation: StrategyRecomm
             {recommendation.description}
         </p>
         <div className="flex gap-2">
-            <span
-                className={`px-2 py-1 bg-emerald-500/20 text-emerald-300 rounded text-sm
-                    ${recommendation.predicted_win_rate_increase > 5 ? 'bg-emerald-500/20' : 'bg-blue-500/20'}`}
-            >
-                +{recommendation.predicted_win_rate_increase}% Win Rate Potential
+            <span className="px-2 py-1 bg-emerald-500/20 text-emerald-300 rounded text-sm">
+                +{recommendation.predicted_win_rate_increase} Win Rate Potential
             </span>
         </div>
     </div>
 );
 
 export const StrategyAdjustments = ({
-    strategy_recommendations = []
-}: Partial<StrategyProps>) => {
-    // Data validation
-    const validRecommendations = strategy_recommendations.filter(rec =>
-        rec.title &&
-        rec.description &&
-        typeof rec.predicted_win_rate_increase === 'number'
-    );
-
+    strategy_recommendations = [] }: Partial<StrategyProps>) => {
+   
     return (
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -52,10 +42,10 @@ export const StrategyAdjustments = ({
                 Strategy Adjustments
             </h2>
             <div className="space-y-4">
-                {!validRecommendations.length ? (
+                {!strategy_recommendations.length ? (
                     <EmptyState />
                 ) : (
-                    validRecommendations.map((recommendation, index) => (
+                    strategy_recommendations.map((recommendation, index) => (
                         <RecommendationCard
                             key={`strategy-${index}-${recommendation.title}`}
                             recommendation={recommendation}

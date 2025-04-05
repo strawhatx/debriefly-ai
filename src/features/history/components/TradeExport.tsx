@@ -2,8 +2,20 @@ import { Download } from 'lucide-react';
 import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Trade } from "@/features/history/hooks/use-trades";
-  
+
+interface Trade {
+    id: string;
+    date: string;
+    asset: string;
+    type: 'LONG' | 'SHORT';
+    entry: number;
+    exit: number;
+    pnl: number;
+    topEmotion: string;
+    fees: number;
+    emotional_tags: string[] | null;
+}
+
 interface TradeExportProps {
     trades: Trade[] | null;
 }

@@ -4,17 +4,22 @@ import useTradingAccountStore from "@/store/trading-account";
 
 interface Trade {
   id: string;
-  asset: string;
-  type: "LONG" | "SHORT";
-  entry: number;
-  exit: number;
-  date: string;
+  symbol: string;
+  position_type: "LONG" | "SHORT";
+  fill_price: number; 
+  stop_price: number;
+  entry_date: string; // ISO date string
+  closing_date: string | null; // ISO date string or null, 
+  asset_type: string;
+  fees: number;
   quantity: number;
   strategy: string | null;
   risk: number;
   reward: number;
   pnl: number;
   tags: string[] | null;
+  score: number; 
+  leverage: number | null;
 }
 
 export const useTrades = () => {
@@ -36,8 +41,8 @@ export const useTrades = () => {
       let query = supabase
         .from("positions")
         .select(`
-          id, symbol, position_type, fill_price, stop_price, entry_date, 
-          quantity, pnl, strategy, risk, reward, tags
+          id, symbol, asset_type,  position_type, fill_price, stop_price, entry_date, 
+          closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
         `)
         .eq("user_id", user.id)
         .eq("state", "DRAFT")
@@ -50,22 +55,7 @@ export const useTrades = () => {
       const { data, error } = await query;
       if (error) throw error;
 
-      const formattedTrades: Trade[] = data.map((trade) => ({
-        id: trade.id,
-        date: new Date(trade.entry_date).toLocaleDateString(),
-        asset: trade.symbol,
-        type: trade.position_type,
-        entry: trade.fill_price,
-        exit: trade.stop_price,
-        quantity: trade.quantity,
-        pnl: trade.pnl,
-        strategy: trade.strategy || null,
-        risk: trade.risk || 0,
-        reward: trade.reward || 0,
-        tags: trade.tags || null,
-      }));
-
-      setTrades(formattedTrades);
+      setTrades(data);
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to fetch trades"));
       console.error("Error fetching trades:", err);
@@ -75,7 +65,7 @@ export const useTrades = () => {
   };
 
   // Save trades to the database
-  const saveTrades = async (updatedTrades: Trade[]) => {
+  const saveTrades = async (updatedTrades: any[]) => {
     try {
       setIsLoading(true);
       setError(null);
