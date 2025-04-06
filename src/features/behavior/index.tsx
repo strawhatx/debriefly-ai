@@ -1,35 +1,6 @@
 
-import React, { useState } from 'react';
-import { 
-  Brain, 
-  Calendar, 
-  TrendingDown, 
-  AlertTriangle,
-  Activity,
-  Clock,
-  BarChart2,
-  LineChart as LineChartIcon,
-  ChevronRight,
-  ArrowUpRight,
-  Filter,
-  ThumbsUp,
-  Lock
-} from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Legend
-} from 'recharts';
 import { Link } from 'react-router-dom';
 import { DetectedBehaviorPatterns } from './components/DetectedBehaviorPatterns';
 import { useTrades } from './hooks/use-trades';
@@ -39,22 +10,11 @@ import { Insights } from './components/Insights';
 import { WinRate } from './components/WinRate';
 import { RiskReward } from './components/RiskReward';
 import { TradeReview } from './components/TradeReview';
-
-// Sample data for trend graphs
-const behaviorTrendData = [
-  { date: 'Mon', FOMO: 5, Hesitation: 3, Revenge: 2, Calm: 8 },
-  { date: 'Tue', FOMO: 3, Hesitation: 2, Revenge: 1, Calm: 7 },
-  { date: 'Wed', FOMO: 2, Hesitation: 4, Revenge: 1, Calm: 6 },
-  { date: 'Thu', FOMO: 4, Hesitation: 2, Revenge: 3, Calm: 5 },
-  { date: 'Fri', FOMO: 6, Hesitation: 3, Revenge: 4, Calm: 4 },
-  { date: 'Sat', FOMO: 4, Hesitation: 2, Revenge: 2, Calm: 8 },
-  { date: 'Sun', FOMO: 2, Hesitation: 1, Revenge: 1, Calm: 9 },
-];
-
+import { BehaviorChart } from './components/BehaviorChart';
+import { ChevronRight, Lock, ThumbsUp } from 'lucide-react';
 
 export const Behavior = () => {
-  
-  const { trades, isLoading, error } = useTrades();
+  const { trades } = useTrades();
   const { insights } = useAnalysis();
 
   return (
@@ -76,33 +36,7 @@ export const Behavior = () => {
 
       {/* Behavioral Trend Graph */}
       <section>
-        <Card className="bg-gray-800 border border-gray-700 p-4">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            <LineChartIcon className="text-blue-400" />
-            Behavior Frequency Over Time
-          </h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={behaviorTrendData}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="date" stroke="#9ca3af" />
-                <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151' }}
-                  labelStyle={{ color: '#f9fafb' }}
-                />
-                <Legend />
-                <Line type="monotone" dataKey="FOMO" stroke="#f59e0b" strokeWidth={2} />
-                <Line type="monotone" dataKey="Hesitation" stroke="#3b82f6" strokeWidth={2} />
-                <Line type="monotone" dataKey="Revenge" stroke="#ef4444" strokeWidth={2} />
-                <Line type="monotone" dataKey="Calm" stroke="#10b981" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+        <BehaviorChart />
       </section>
 
       {/* Section 3: AI-Powered Insights */}
