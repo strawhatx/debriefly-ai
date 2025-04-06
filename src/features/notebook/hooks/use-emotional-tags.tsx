@@ -1,16 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
+import { allTags } from "@/utils/constants";
 import { useEffect, useState } from "react";
 
 export const useEmotionalTags = (id: string) => {
     const [emotionTags, setEmotionTags] = useState<string[]>([]);
-    
-    // Available emotion tags
-    const allEmotionTags = [
-        'CALM', 'CONFIDENT', 'DISCIPLINED', 'PATIENT',
-        'HESITANT', 'ANXIOUS', 'FEARFUL', 'DOUBTFUL',
-        'FOMO', 'GREEDY', 'EXCITED', 'OVERCONFIDENT',
-        'REVENGE', 'ANGRY', 'FRUSTRATED', 'IMPULSIVE'
-    ];
     
     useEffect(() => {
         const fetchEmotionTags = async () => {
@@ -45,7 +38,7 @@ export const useEmotionalTags = (id: string) => {
         }
     };
     return {
-        allEmotionTags,
+        allTags,
         handleTagChange,
         emotionTags
     };

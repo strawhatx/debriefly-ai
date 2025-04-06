@@ -14,7 +14,7 @@ import { StrategyOptimizationPage } from "./pages/StrategyOptimization";
 import { DashboardPage } from "./pages/Dashboard";
 import { DebriefPage } from "./pages/Debrief";
 import { TradeHistoryPage } from "./pages/TradeHistory";
-import { BehaviorialPatternsPage } from "./pages/BehaviorialPatterns";
+import { BehaviorPage } from "./pages/Behavior";
 import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
 import { NotebookPage } from "./pages/Notebook";
@@ -22,7 +22,7 @@ import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
 import { DoubleLayout, SidebarLayout } from "./components/layouts/Index";
 import { NavbarLayout } from "./components/layouts/Index";
 import { SignOutButton } from "./features/settings/components/SignOutButton";
-import { BehavioralPatternsHeader } from "./components/layouts/headers/BehavioralPatterns";
+import { BehaviorHeader } from "./components/layouts/headers/Behavior";
 import { StrategyOptimizationHeader } from "./components/layouts/headers/StrategyOptimization";
 import { TradeHistoryHeader } from "./components/layouts/headers/TradeHistory";
 import { DebriefHeader } from "./components/layouts/headers/Debrief";
@@ -114,9 +114,9 @@ const App = () => {
               <Route path="/app/behavioral-patterns" element={
                 <SidebarLayout
                   breadcrumbs={[{ name: "Behavior Analysis", href: "/app/behavioral-patterns" }]}
-                  rightContent={<BehavioralPatternsHeader />}
+                  rightContent={<BehaviorHeader />}
                 >
-                  <BehaviorialPatternsPage />
+                  <BehaviorPage />
                 </SidebarLayout>
               } />
               <Route path="/settings" element={

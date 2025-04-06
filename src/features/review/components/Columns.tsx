@@ -1,6 +1,6 @@
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Select } from "./Select";
-import { allStrategies, allTags } from "../utils/constants";
+import { allStrategies, allTags } from "../../../utils/constants";
 
 export const Columns = (handleUpdate: (id: string, key: string, value: any) => void) => [
   {

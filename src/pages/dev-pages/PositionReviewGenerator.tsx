@@ -1,38 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateBehaviorScore } from "../../utils/calculate-behavioral-score";
-
-export const allStrategies = [
-    "BREAKOUT",
-    "PULLBACK",
-    "REVERSALS",
-    "TREND FOLLOWING",
-    "RANGE TRADING",
-    "SCALPING",
-    "MOMENTUM",
-    "SWING TRADING",
-    "ORDER BLOCK",
-    "FVG",
-];
-
-export const allTags = [
-    "CALM",
-    "CONFIDENT",
-    "DISCIPLINED",
-    "PATIENT",
-    "HESITANT",
-    "ANXIOUS",
-    "FEARFUL",
-    "DOUBTFUL",
-    "FOMO",
-    "GREEDY",
-    "EXCITED",
-    "OVERCONFIDENT",
-    "REVENGE",
-    "ANGRY",
-    "FRUSTRATED",
-    "IMPULSIVE",
-];
+import { allStrategies, allTags } from "@/utils/constants";
 
 export const PositionReviewGenerator = () => {
     const [trades, setTrades] = useState<any[]>();

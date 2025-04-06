@@ -4,17 +4,7 @@ import { useEffect, useState } from "react";
 
 interface Analysis {
   what_went_well: string[],
-  areas_for_improvement: string[],
-  strategy_recommendations: {
-    title: string;
-    description: string;
-    predicted_win_rate_increase: string;
-  }[],
-  behavior_insights: {
-    title: string;
-    description: string;
-    recommendation: string;
-  }[]
+  areas_for_improvement: string[]
 }
 
 export const useAnalysis = () => {
@@ -27,7 +17,8 @@ export const useAnalysis = () => {
     const date = day.toISOString().split('T')[0];
 
     var query = supabase
-      .from('trade_analysis').select(`analysis`).eq('session_date', date);
+      .from('trade_analysis').select(`analysis`)
+      .eq('session_date', date);
 
     if (selectedAccount) {
       query = query.eq("trading_account_id", selectedAccount);
