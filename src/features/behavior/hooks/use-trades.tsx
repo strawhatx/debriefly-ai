@@ -47,6 +47,10 @@ export const useTrades = () => {
       const end_date = new Date(today);
       end_date.setDate(today.getDate() - days);
 
+      // Adjust the date range for the query
+      const startDate = today.toISOString();
+      const endDate = `${end_date.toISOString()} 23:59:59`;
+
       let query = supabase
         .from("positions")
         .select(`
@@ -67,8 +71,8 @@ export const useTrades = () => {
           `)
         .eq("user_id", user.id)
         //range filter for the date
-        .gte("entry_date", today.toISOString())
-        .lte("entry_date", `${end_date.toLocaleDateString()} 23:59:59`);
+        .gte("entry_date", startDate)
+        .lte("entry_date", endDate);
 
       if (selectedAccount) {
         query = query.eq("trading_account_id", selectedAccount);

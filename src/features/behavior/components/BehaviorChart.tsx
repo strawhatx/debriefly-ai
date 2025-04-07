@@ -95,7 +95,7 @@ export const BehaviorChart = ({ trades }: BehaviorChartProps) => {
           <LineChartIcon className="text-blue-400" />
           Behavior Metrics Over Time
         </h2>
-        <p className="text-gray-400">No data available to display.</p>
+        <p className="text-gray-400 text-sm">No data available to display.</p>
       </Card>
     );
   }

@@ -36,14 +36,14 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
           <Brain className="text-purple-400" />
           Detected Behavior Patterns
         </h2>
-        <p className="text-gray-400">No trades available to analyze.</p>
+        <p className="text-gray-400 text-sm">No trades available to analyze.</p>
       </Card>
     );
   }
 
   return (
     <Card className="bg-gray-800 border border-gray-700 p-6 col-span-2">
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
         <Brain className="text-purple-400" />
         Detected Behavior Patterns
       </h2>

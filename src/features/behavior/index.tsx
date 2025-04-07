@@ -29,7 +29,7 @@ export const Behavior = () => {
       </section>
 
       {/* Emotional Patterns Overview */}
-      <section className="grid grid-cols-2 gap-4">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <WinRate trades={trades} />
         <RiskReward trades={trades} />
       </section>

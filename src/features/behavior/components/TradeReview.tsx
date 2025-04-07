@@ -58,7 +58,7 @@ const TradeTypeIndicator = ({ type }: { type: Position['type'] }) => (
 
 const TableHeader = ({ toggleSort }: { toggleSort: (key: string) => void }) => (
   <thead>
-    <tr className="border-b border-gray-700">
+    <tr className="border-b border-t border-gray-700">
       <th className="px-6 py-3 text-left">
         <SortableColumn label="Date" sortKey="date" onSort={toggleSort} />
       </th>
@@ -94,7 +94,7 @@ const TradeRow = ({ trade }: { trade: Position }) => (
 
 const EmptyState = () => (
   <tr>
-    <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+    <td colSpan={8} className="px-6 py-8 text-center text-gray-500 text-sm">
       No trades available for this session
     </td>
   </tr>
@@ -110,7 +110,7 @@ export const TradeReview = ({ trades }: { trades: Position[] | null }) => {
 
   return (
     <div className="bg-gray-800 rounded-xl border border-gray-700">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center p-4">
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <Calendar className="text-blue-400" />
           Detailed Trade Review

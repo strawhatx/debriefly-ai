@@ -16,7 +16,7 @@ export const AiSummary = ({ insights }: AiSummaryProps) => {
           <Activity className="text-blue-400" />
           AI Quick Insights
         </h2>
-        <p className="text-gray-400">No insights available at the moment.</p>
+        <p className="text-gray-400 text-sm">No insights available at the moment.</p>
       </Card>
     );
   }
@@ -31,7 +31,7 @@ export const AiSummary = ({ insights }: AiSummaryProps) => {
         {limitedInsights.map((insight, index) => (
           <div key={index} className="p-4 bg-gray-900/70 rounded-lg">
             <p className="text-sm text-gray-300">
-              <span className="block font-medium text-white mb-1">{insight.title}</span>
+              <span className="block text-white mb-1">{insight.title}</span>
               {insight.description}
             </p>
           </div>
