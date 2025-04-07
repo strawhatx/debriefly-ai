@@ -1,120 +1,150 @@
 import { Card } from "@/components/ui/card";
 import { LineChartIcon } from "lucide-react";
-import { 
-    LineChart, 
-    Line, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip, 
-    ResponsiveContainer,
-    Legend
-} from 'recharts';
-import { useMemo, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { useMemo } from "react";
+import { useDateStore } from "@/store/date";
+import { calculateConfidence } from "@/utils/calculate-confidence";
+import { calculateDiscipline } from "@/utils/calculate-discipline";
+import { calculateBehaviorScore } from "@/utils/calculate-behavioral-score";
 
 interface Trade {
-    pnl: number;
-    tags: string[] | null | undefined;
-    date: string; // Assuming trades have a `date` field in 'YYYY-MM-DD' format
+  pnl: number;
+  tags?: string[] | null;
+  date: string;
 }
 
 interface BehaviorChartProps {
-    trades: Trade[];
+  trades: Trade[] | null | undefined;
 }
 
 export const BehaviorChart = ({ trades }: BehaviorChartProps) => {
-    const [timeFrame, setTimeFrame] = useState<'7d' | '30d' | '3m' | '6m' | '1y'>('30d');
+  const days = useDateStore((state) => state.days);
 
-    // Helper function to group data based on the selected time frame
-    const groupDataByTimeFrame = (data: any[], interval: number) => {
-        const groupedData: any[] = [];
-        for (let i = 0; i < data.length; i += interval) {
-            const chunk = data.slice(i, i + interval);
-            const aggregated = chunk.reduce(
-                (acc, curr) => {
-                    acc.date = `${chunk[0].date} - ${chunk[chunk.length - 1].date}`;
-                    Object.keys(curr).forEach((key) => {
-                        if (key !== 'date') {
-                            acc[key] = (acc[key] || 0) + curr[key];
-                        }
-                    });
-                    return acc;
-                },
-                { date: '' }
-            );
-            groupedData.push(aggregated);
-        }
-        return groupedData;
-    };
+  const trendData = useMemo(() => {
+    if (!trades || trades.length === 0) return [];
 
-    // Process trades to generate behaviorTrendData
-    const behaviorTrendData = useMemo(() => {
-        const tagCountsByDate: { [date: string]: { [tag: string]: number } } = {};
+    const sortedTrades = trades
+      .filter((trade) => trade?.date)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-        trades.forEach((trade) => {
-            const date = new Date(trade.date).toLocaleDateString('en-US', { weekday: 'short' }); // Convert to day of the week
-            if (!tagCountsByDate[date]) {
-                tagCountsByDate[date] = { FOMO: 0, Hesitation: 0, Revenge: 0, Calm: 0 };
-            }
+    const points = sortedTrades.map((trade) => {
+      const emotionalScore = calculateBehaviorScore(trade) ?? 0;
+      const discipline = calculateDiscipline(trade) ?? 0;
+      const confidence = calculateConfidence(trade) ?? 0;
 
-            trade.tags?.forEach((tag) => {
-                if (tagCountsByDate[date][tag] !== undefined) {
-                    tagCountsByDate[date][tag]++;
-                }
-            });
-        });
+      return {
+        date: trade?.date
+          ? new Date(trade.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+            })
+          : "Unknown Date",
+        emotionalScore,
+        discipline,
+        confidence,
+      };
+    });
 
-        const rawData = Object.entries(tagCountsByDate).map(([date, tags]) => ({
-            date,
-            ...tags,
-        }));
+    // Reduce to ~30 points max for clarity if necessary
+    const MAX_POINTS = 30;
+    if (points.length <= MAX_POINTS) return points;
 
-        // Determine the grouping interval based on the selected time frame
-        const interval = timeFrame === '7d' ? 1 : timeFrame === '30d' ? 3 : timeFrame === '3m' ? 7 : timeFrame === '6m' ? 14 : 30;
+    const chunkSize = Math.ceil(points.length / MAX_POINTS);
+    const batched = [];
 
-        return groupDataByTimeFrame(rawData, interval);
-    }, [trades, timeFrame]);
+    for (let i = 0; i < points.length; i += chunkSize) {
+      const chunk = points.slice(i, i + chunkSize);
+      const avg = (key: keyof typeof chunk[0]) =>
+        chunk.reduce((sum, p) => sum + (p[key] as number), 0) / chunk.length;
 
+      batched.push({
+        date: `${chunk[0].date} - ${chunk[chunk.length - 1].date}`,
+        emotionalScore: avg("emotionalScore"),
+        discipline: avg("discipline"),
+        confidence: avg("confidence"),
+      });
+    }
+
+    return batched;
+  }, [trades, days]);
+
+  // Null check for trendData before rendering the chart
+  if (!trendData || trendData.length === 0) {
     return (
-        <Card className="bg-gray-800 border border-gray-700 p-4">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <LineChartIcon className="text-blue-400" />
-                Behavior Frequency Over Time
-            </h2>
-            <div className="mb-4">
-                <select
-                    value={timeFrame}
-                    onChange={(e) => setTimeFrame(e.target.value as '7d' | '30d' | '3m' | '6m' | '1y')}
-                    className="bg-gray-700 text-white p-2 rounded"
-                >
-                    <option value="7d">Last 7 Days</option>
-                    <option value="30d">Last 30 Days</option>
-                    <option value="3m">Last 3 Months</option>
-                    <option value="6m">Last 6 Months</option>
-                    <option value="1y">Last Year</option>
-                </select>
-            </div>
-            <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                        data={behaviorTrendData}
-                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="date" stroke="#9ca3af" />
-                        <YAxis stroke="#9ca3af" />
-                        <Tooltip
-                            contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151' }}
-                            labelStyle={{ color: '#f9fafb' }}
-                        />
-                        <Legend />
-                        <Line type="monotone" dataKey="FOMO" stroke="#f59e0b" strokeWidth={2} />
-                        <Line type="monotone" dataKey="Hesitation" stroke="#3b82f6" strokeWidth={2} />
-                        <Line type="monotone" dataKey="Revenge" stroke="#ef4444" strokeWidth={2} />
-                        <Line type="monotone" dataKey="Calm" stroke="#10b981" strokeWidth={2} />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
-        </Card>
+      <Card className="bg-gray-800 border border-gray-700 p-4">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+          <LineChartIcon className="text-blue-400" />
+          Behavior Metrics Over Time
+        </h2>
+        <p className="text-gray-400">No data available to display.</p>
+      </Card>
     );
+  }
+
+  return (
+    <Card className="bg-gray-800 border border-gray-700 p-4">
+      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+        <LineChartIcon className="text-blue-400" />
+        Behavior Metrics Over Time
+      </h2>
+      <div className="h-80">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={trendData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis
+              dataKey="date"
+              stroke="#9CA3AF"
+              tick={{ fill: "#9CA3AF", fontSize: 12 }}
+              minTickGap={10}
+            />
+            <YAxis
+              stroke="#9CA3AF"
+              tick={{ fill: "#9CA3AF", fontSize: 12 }}
+              domain={[0, 10]}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#1F2937",
+                border: "1px solid #374151",
+                borderRadius: "0.5rem",
+              }}
+              labelStyle={{ color: "#9CA3AF" }}
+            />
+            <Line
+              type="monotone"
+              dataKey="emotionalScore"
+              stroke="#10B981"
+              strokeWidth={2}
+              dot={{ fill: "#10B981", strokeWidth: 2 }}
+              name="Emotional Score"
+            />
+            <Line
+              type="monotone"
+              dataKey="discipline"
+              stroke="#3B82F6"
+              strokeWidth={2}
+              dot={{ fill: "#3B82F6", strokeWidth: 2 }}
+              name="Discipline"
+            />
+            <Line
+              type="monotone"
+              dataKey="confidence"
+              stroke="#8B5CF6"
+              strokeWidth={2}
+              dot={{ fill: "#8B5CF6", strokeWidth: 2 }}
+              name="Confidence"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </Card>
+  );
 };

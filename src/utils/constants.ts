@@ -31,10 +31,7 @@ export const allTags = [
 ];
 
 // Emotion colors and icons dictionary using Tailwind classes
-export const emotionAttributes: Record<
-  string,
-  { colorClass: string; icon: string }
-> = {
+export const emotionAttributes: Record< string, { colorClass: string; icon: string } > = {
   // Good emotions (emerald)
   CALM: { colorClass: "text-emerald-400 bg-emerald-900/50 border border-emerald-500/50", icon: "🧘" },
   CONFIDENT: { colorClass: "text-emerald-400 bg-emerald-900/50 border border-emerald-500/50", icon: "💪" },
