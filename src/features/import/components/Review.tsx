@@ -103,7 +103,7 @@ export const Review = () => {
             {/* Trade Review Table */}
             <div className="bg-gray-800 rounded-xl border border-gray-700">
                 <div className="p-4 border-b border-gray-700">
-                    <h2 className="text-xl font-semibold">Review Trades</h2>
+                    <h2 className="text-lg font-semibold">Review Trades</h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full">

@@ -36,7 +36,7 @@ export const Behavior = () => {
 
       {/* Behavioral Trend Graph */}
       <section>
-        <BehaviorChart />
+        <BehaviorChart trades={trades} />
       </section>
 
       {/* Section 3: AI-Powered Insights */}

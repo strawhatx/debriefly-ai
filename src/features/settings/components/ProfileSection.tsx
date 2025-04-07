@@ -41,7 +41,7 @@ export const ProfileSection = () => {
 
       <div className="col-span-2">
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-6">Personal Details</h2>
+          <h2 className="text-lg font-semibold mb-6">Personal Details</h2>
           <div className="space-y-4">
             <div>
               <Label className="text-sm mb-2 block">Full Name</Label>

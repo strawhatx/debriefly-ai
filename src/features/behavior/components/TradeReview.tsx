@@ -111,7 +111,7 @@ export const TradeReview = ({ trades }: { trades: Position[] | null }) => {
   return (
     <div className="bg-gray-800 rounded-xl border border-gray-700">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <Calendar className="text-blue-400" />
           Detailed Trade Review
         </h2>

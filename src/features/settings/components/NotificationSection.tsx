@@ -14,7 +14,7 @@ export const NotificationSection = () => {
   return (
     <Card className="p-6">
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold mb-6">Notification Preferences</h2>
+        <h2 className="text-lg font-semibold mb-6">Notification Preferences</h2>
         <div className="space-y-6">
           {[
             {

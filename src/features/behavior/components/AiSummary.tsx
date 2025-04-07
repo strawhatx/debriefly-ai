@@ -23,7 +23,7 @@ export const AiSummary = ({ insights }: AiSummaryProps) => {
 
   return (
     <Card className="bg-gray-800 border border-gray-700 p-6">
-      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <Activity className="text-blue-400" />
         AI Quick Insights
       </h2>

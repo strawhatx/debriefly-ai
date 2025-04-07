@@ -80,7 +80,7 @@ export const AiAnalysis = ({
     if (!what_went_well?.length && !areas_for_improvement?.length) {
         return (
             <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Brain className="text-purple-400" />
                     AI Analysis
                 </h2>
@@ -91,7 +91,7 @@ export const AiAnalysis = ({
 
     return (
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Brain className="text-purple-400" />
                 AI Analysis
             </h2>

@@ -11,7 +11,7 @@ interface TradeStatisticsProps {
 const StatCard = ({ title, value, textColor = "text-white" }: { title: string, value: string | number, textColor?: string }) => (
     <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
         <span className="text-gray-400 text-sm">{title}</span>
-        <div className={`text-xl font-semibold mt-1 ${textColor}`}>{value}</div>
+        <div className={`text-lg font-semibold mt-1 ${textColor}`}>{value}</div>
     </div>
 );
 

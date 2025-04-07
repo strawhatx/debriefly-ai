@@ -23,7 +23,7 @@ export const Dashboard = () => {
 
         <div className="col-span-1 grid grid-rows-2 gap-6">
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <LineChart className="text-purple-400" />
               Emotion Analysis
             </h2>
@@ -41,7 +41,7 @@ export const Dashboard = () => {
           </div>
 
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <TrendingUp className="text-blue-400" />
               Strategy Performance
             </h2>

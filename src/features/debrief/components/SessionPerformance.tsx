@@ -68,7 +68,7 @@ export const SessionPerformance = ({
   if (isLoading) {
     return (
       <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <LineChartIcon className="text-blue-400" />
           Session Performance
         </h2>
@@ -80,7 +80,7 @@ export const SessionPerformance = ({
   if (!positions?.length) {
     return (
       <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <LineChartIcon className="text-blue-400" />
           Session Performance
         </h2>
@@ -91,7 +91,7 @@ export const SessionPerformance = ({
 
   return (
     <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
-      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <LineChartIcon className="text-blue-400" />
         Session Performance
       </h2>

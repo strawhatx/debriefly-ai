@@ -16,9 +16,20 @@ import { calculateDiscipline } from "@/utils/calculate-discipline";
 import { calculateBehaviorScore } from "@/utils/calculate-behavioral-score";
 
 interface Trade {
-  pnl: number;
-  tags?: string[] | null;
+  id: string;
   date: string;
+  symbol: string;
+  market: string;
+  type: 'LONG' | 'SHORT';
+  entry: number;
+  exit: number;
+  pnl: number;
+  entry_date: Date;
+  closing_date: Date;
+  risk: number;
+  reward: number;
+  strategy: string | null;
+  tags: string[];
 }
 
 interface BehaviorChartProps {
@@ -80,7 +91,7 @@ export const BehaviorChart = ({ trades }: BehaviorChartProps) => {
   if (!trendData || trendData.length === 0) {
     return (
       <Card className="bg-gray-800 border border-gray-700 p-4">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
           <LineChartIcon className="text-blue-400" />
           Behavior Metrics Over Time
         </h2>
@@ -91,7 +102,7 @@ export const BehaviorChart = ({ trades }: BehaviorChartProps) => {
 
   return (
     <Card className="bg-gray-800 border border-gray-700 p-4">
-      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
         <LineChartIcon className="text-blue-400" />
         Behavior Metrics Over Time
       </h2>

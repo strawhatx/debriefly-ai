@@ -116,7 +116,7 @@ export const SessionTrades = ({ positions }: { positions: Position[] | null }) =
   return (
     <div className="bg-gray-800 rounded-xl border border-gray-700">
       <div className="p-4 border-b border-gray-700">
-        <h2 className="text-xl font-semibold">Session Trades</h2>
+        <h2 className="text-lg font-semibold">Session Trades</h2>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[500px]">

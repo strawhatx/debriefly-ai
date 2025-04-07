@@ -37,7 +37,7 @@ export const StrategyAdjustments = ({
    
     return (
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Target className="text-blue-400" />
                 Strategy Adjustments
             </h2>

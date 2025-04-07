@@ -86,7 +86,7 @@ export const StrategyOptimizationPage = () => {
       {/* Strategy Performance Analysis */}
       <div className="grid grid-cols-2 gap-6">
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <BarChartIcon className="text-blue-400" />
             Strategy Win Rates
           </h2>
@@ -125,7 +125,7 @@ export const StrategyOptimizationPage = () => {
         </div>
 
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Brain className="text-purple-400" />
             AI Recommendations
           </h2>
@@ -181,7 +181,7 @@ export const StrategyOptimizationPage = () => {
       {/* Risk Analysis Section */}
       <div className="grid grid-cols-2 gap-6">
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Target className="text-red-400" />
             Risk vs Reward Analysis
           </h2>
@@ -227,7 +227,7 @@ export const StrategyOptimizationPage = () => {
         </div>
 
         <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <PieChart className="text-blue-400" />
             Risk Distribution
           </h2>
@@ -291,7 +291,7 @@ export const StrategyOptimizationPage = () => {
       {showBacktestModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-xl p-6 max-w-lg w-full mx-4">
-            <h3 className="text-xl font-semibold mb-4">Backtest Configuration</h3>
+            <h3 className="text-lg font-semibold mb-4">Backtest Configuration</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
