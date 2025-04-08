@@ -3,7 +3,7 @@ import { Activity } from "lucide-react";
 
 interface Trade {
   tags: string[]; // Tags (emotions) associated with the trade
-  riskReward?: number; // Optional risk/reward ratio for the trade
+  reward?: number; // Optional risk/reward ratio for the trade
 }
 
 interface RiskRewardProps {
@@ -13,7 +13,7 @@ interface RiskRewardProps {
 export const RiskReward = ({ trades }: RiskRewardProps) => {
   // Group trades by tags and calculate average risk/reward
   const riskRewardByEmotion = trades.reduce((acc, trade) => {
-    const { tags, riskReward } = trade;
+    const { tags, reward } = trade;
 
     // Ensure tags exist and are valid
     if (!Array.isArray(tags)) return acc;
@@ -24,7 +24,7 @@ export const RiskReward = ({ trades }: RiskRewardProps) => {
       }
 
       // Use provided risk/reward ratio or fallback to a default value
-      const rr = typeof riskReward === "number" ? riskReward : 1; // Default to 1 if missing
+      const rr =  reward ?? 1; // Default to 1 if missing
       acc[tag].totalRiskReward += rr;
       acc[tag].count += 1;
     });

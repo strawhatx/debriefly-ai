@@ -100,10 +100,14 @@ const validateTrade = (trade: Trade): void => {
   if (trade.reward < 0 || trade.risk < 0) {
     throw new Error('Trade must have valid risk/reward values');
   }
-  // Add more validation as needed
 };
 
+const scaleScore = (raw: number, from: number, to: number): number => 
+  Math.max(0, Math.min(to, (raw / from) * to));
+
 export const calculateBehaviorScore = (trade: Trade): number => {
+  validateTrade(trade);
+
   const scoreComponents: ScoreComponents = {
     riskRewardScore: calculateRiskRewardScore(trade.reward),
     pnlScore: calculatePnLScore(trade.pnl),
@@ -114,9 +118,8 @@ export const calculateBehaviorScore = (trade: Trade): number => {
     emotionScore: calculateEmotionScore(trade.tags),
   };
 
-  const totalScore = Object.values(scoreComponents).reduce((sum, score) => sum + score, 0);
-
-  return Math.max(0, Math.min(100, totalScore));
+  const rawScore = Object.values(scoreComponents).reduce((sum, score) => sum + score, 0);
+  return scaleScore(rawScore, 100, 10);
 };
 
 interface ScoreResult {
@@ -125,7 +128,9 @@ interface ScoreResult {
 }
 
 export const calculateBehaviorScoreWithBreakdown = (trade: Trade): ScoreResult => {
-  const breakdown = {
+  validateTrade(trade);
+
+  const breakdown: ScoreComponents = {
     riskRewardScore: calculateRiskRewardScore(trade.reward),
     pnlScore: calculatePnLScore(trade.pnl),
     holdingTimeScore: calculateHoldingTimeScore(
@@ -135,9 +140,11 @@ export const calculateBehaviorScoreWithBreakdown = (trade: Trade): ScoreResult =
     emotionScore: calculateEmotionScore(trade.tags),
   };
 
+  const rawScore = Object.values(breakdown).reduce((sum, score) => sum + score, 0);
+
   return {
-    total: calculateBehaviorScore(trade),
-    breakdown
+    total: scaleScore(rawScore, 100, 10),
+    breakdown,
   };
 };
 
@@ -148,7 +155,7 @@ const trade: Trade = {
   closing_date: "2025-03-17T10:30:00Z",
   symbol: "ES",
   market: "futures",
-  type: "long",
+  type: "LONG",
   entry: 5000,
   exit: 5050,
   risk: 1,

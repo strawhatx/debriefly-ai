@@ -11,7 +11,7 @@ export const AiSummary = ({ insights }: AiSummaryProps) => {
 
   if (limitedInsights.length === 0) {
     return (
-      <Card className="bg-gray-800 border border-gray-700 p-6">
+      <Card className="bg-gray-800 border border-gray-700 p-6 col-span-2">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Activity className="text-blue-400" />
           AI Quick Insights
@@ -22,7 +22,7 @@ export const AiSummary = ({ insights }: AiSummaryProps) => {
   }
 
   return (
-    <Card className="bg-gray-800 border border-gray-700 p-6">
+    <Card className="bg-gray-800 border border-gray-700 p-6 col-span-2">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <Activity className="text-blue-400" />
         AI Quick Insights

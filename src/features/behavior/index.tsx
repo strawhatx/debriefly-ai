@@ -20,7 +20,7 @@ export const Behavior = () => {
   return (
     <div className="space-y-4 animate-fade-up">
       {/* Section 1: Behavior Summary Overview */}
-      <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <section className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Key Behavior Tags */}
         <DetectedBehaviorPatterns trades={trades} />
 

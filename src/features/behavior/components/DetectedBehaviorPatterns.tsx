@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
 import { emotionAttributes } from "@/utils/constants";
-import { Badge, Brain } from "lucide-react";
+import { Brain } from "lucide-react";
 import { useMemo } from "react";
 
 interface DetectedBehaviorPatternsProps {
@@ -31,7 +32,7 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
   // Handle empty trades
   if (!totalTrades) {
     return (
-      <Card className="bg-gray-800 border border-gray-700 p-6 col-span-2">
+      <Card className="bg-gray-800 border border-gray-700 p-6 col-span-3">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Brain className="text-purple-400" />
           Detected Behavior Patterns
@@ -42,7 +43,7 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
   }
 
   return (
-    <Card className="bg-gray-800 border border-gray-700 p-6 col-span-2">
+    <Card className="bg-gray-800 border border-gray-700 p-6 col-span-3">
       <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
         <Brain className="text-purple-400" />
         Detected Behavior Patterns
@@ -58,9 +59,9 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
             return (
               <Badge
                 key={tag}
-                className={`py-2 px-3 border border-gray-500/50 hover:bg-gray-900/70 ${colorClass}`}
+                className={`py-2 px-3 text-sm border border-gray-500/50 hover:bg-gray-900/70 ${colorClass}`}
               >
-                {icon} {tag} ({percentage}%)
+                {icon} {tag} ({percentage})%
               </Badge>
             );
           })}
