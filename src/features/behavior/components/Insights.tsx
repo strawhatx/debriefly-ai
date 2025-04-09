@@ -7,7 +7,7 @@ interface InsightProps {
 
 // Reusable empty state component
 const EmptyState = () => (
-    <div className="text-gray-400 text-sm italic flex items-center justify-center p-4">
+    <div className="text-gray-400 text-sm italic flex items-center justify-center p-4 min-h-44">
         No insights & recommendations available
     </div>
 );
@@ -32,7 +32,7 @@ const InsightCard = ({ insight }: { insight: BehaviorInsight }) => (
 export const Insights = ({ insights = [] }: Partial<InsightProps>) => {
 
     return (
-        <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
+        <div className="bg-gray-800 rounded-xl p-4 border border-gray-700 min-h-64">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Target className="text-blue-400" />
                 AI-Powered Insights & Recommendations

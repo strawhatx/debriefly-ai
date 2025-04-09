@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { TradeStatistics } from "./components/TradeStatistics";
 import { useRawTrade } from "./hooks/use-raw-trade";
 import { DataTable, createSortableColumn } from "@/components/ui/data-table";
-import { ArrowUpRight, ArrowDownRight, MoreHorizontal, ClipboardCopy, Database, BookOpen } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, MoreHorizontal, ClipboardCopy, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RawTradeModal } from "./components/RawTradeModal";
 import { Card } from "@/components/ui/card";

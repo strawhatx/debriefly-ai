@@ -39,14 +39,14 @@ export const WinRate = ({ trades }: WinRateProps) => {
     }, [trades]);
 
     return (
-        <Card className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <Card className="bg-gray-800 rounded-xl p-6 border border-gray-700 ">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Activity className="text-blue-400" />
                 Win Rate by Emotion
             </h2>
 
             {winRates.length === 0 ? (
-                <p className="text-gray-400 text-sm">No valid trade data available.</p>
+                <p className="text-gray-400 flex items-center justify-center text-sm min-h-44">No valid trade data available.</p>
             ) : (
                 <div className="space-y-2">
                     {winRates.map(({ emotion, winRate }) => (

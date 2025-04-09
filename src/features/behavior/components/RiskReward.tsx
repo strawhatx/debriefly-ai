@@ -47,7 +47,7 @@ export const RiskReward = ({ trades }: RiskRewardProps) => {
 
       <div className="space-y-2">
         {riskRewardRatios.length === 0 ? (
-          <p className="text-gray-400 text-sm">No valid trade data available.</p>
+          <p className="text-gray-400 flex items-center justify-center text-sm min-h-44">No valid trade data available.</p>
         ) : (
           riskRewardRatios.map(({ emotion, riskReward }) => (
             <div key={emotion} className="flex justify-between items-center">

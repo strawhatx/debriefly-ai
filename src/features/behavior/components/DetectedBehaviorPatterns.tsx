@@ -37,7 +37,7 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
           <Brain className="text-purple-400" />
           Detected Behavior Patterns
         </h2>
-        <p className="text-gray-400 text-sm">No trades available to analyze.</p>
+        <p className="text-gray-400 text-sm flex items-center justify-center min-h-44">No trades available to analyze.</p>
       </Card>
     );
   }

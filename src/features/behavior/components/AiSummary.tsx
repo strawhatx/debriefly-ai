@@ -16,7 +16,7 @@ export const AiSummary = ({ insights }: AiSummaryProps) => {
           <Activity className="text-blue-400" />
           AI Quick Insights
         </h2>
-        <p className="text-gray-400 text-sm">No insights available at the moment.</p>
+        <p className="text-gray-400 flex items-center justify-center text-sm min-h-44">No insights available at the moment.</p>
       </Card>
     );
   }

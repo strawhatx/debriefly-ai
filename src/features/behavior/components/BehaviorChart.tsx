@@ -90,18 +90,18 @@ export const BehaviorChart = ({ trades }: BehaviorChartProps) => {
   // Null check for trendData before rendering the chart
   if (!trendData || trendData.length === 0) {
     return (
-      <Card className="bg-gray-800 border border-gray-700 p-4">
+      <Card className="bg-gray-800 border border-gray-700 p-4 ">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
           <LineChartIcon className="text-blue-400" />
           Behavior Metrics Over Time
         </h2>
-        <p className="text-gray-400 text-sm">No data available to display.</p>
+        <p className="text-gray-400 flex items-center justify-center text-sm min-h-44">No data available to display.</p>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-gray-800 border border-gray-700 p-4">
+    <Card className="bg-gray-800 border border-gray-700 p-4 min-h-64">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
         <LineChartIcon className="text-blue-400" />
         Behavior Metrics Over Time

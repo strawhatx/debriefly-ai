@@ -41,6 +41,7 @@ interface DataTableProps<TData> {
   pageSize?: number
   showColumnToggle?: boolean
   showPagination?: boolean
+  toolbarEnabled?: boolean
   className?: string
   borderClassName?: string
 }
@@ -62,7 +63,7 @@ const TableToolbar = <TData,>({
   searchKey,
   searchPlaceholder = "Search...",
   showColumnToggle = true,
-  inputClassName="max-w-sm border-gray-600 bg-gray-800",
+  inputClassName = "max-w-sm border-gray-600 bg-gray-800",
 }: TableToolbarProps<TData>) => {
   return (
     <div className="flex items-center justify-between py-4 gap-4">
@@ -78,7 +79,7 @@ const TableToolbar = <TData,>({
       )}
       {showColumnToggle && (
         <DropdownMenu>
-          <DropdownMenuTrigger  asChild>
+          <DropdownMenuTrigger asChild>
             <Button variant="outline" className={`${inputClassName} h-9 text-sm`}>
               Columns <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
@@ -147,6 +148,7 @@ export function DataTable<TData>({
   searchKey,
   searchPlaceholder,
   pageSize = 10,
+  toolbarEnabled = true,
   showColumnToggle = true,
   showPagination = true,
   className,
@@ -180,12 +182,14 @@ export function DataTable<TData>({
 
   return (
     <div className={`w-full ${className}`}>
-      <TableToolbar
-        table={table}
-        searchKey={searchKey}
-        searchPlaceholder={searchPlaceholder}
-        showColumnToggle={showColumnToggle}
-      />
+      {toolbarEnabled && (
+        <TableToolbar
+          table={table}
+          searchKey={searchKey}
+          searchPlaceholder={searchPlaceholder}
+          showColumnToggle={showColumnToggle}
+        />
+      )}
       <div className="rounded-md border overflow-x-auto">
         <Table className="w-full">
           <TableHeader>
@@ -199,9 +203,9 @@ export function DataTable<TData>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
