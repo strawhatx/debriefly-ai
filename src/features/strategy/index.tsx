@@ -1,18 +1,5 @@
 import { useState } from 'react';
-import {
-    Settings,
-    PieChart,
-    ArrowRight,
-    PlayCircle
-} from 'lucide-react';
-import {
-    Tooltip,
-    ResponsiveContainer,
-    Cell,
-    Pie,
-    PieChart as RechartsPieChart,
-    Legend
-} from 'recharts';
+import { Settings, ArrowRight, PlayCircle } from 'lucide-react';
 import { StrategyMetrics } from './components/StrategyMetrics';
 import { WinRate } from './components/WinRate';
 import { RiskReward } from './components/RiskReward';
@@ -20,19 +7,15 @@ import { StrategyAdjustments } from '@/components/StrategyAdjustments';
 import { RiskRewardAnalysis } from './components/RiskRewardAnalysis';
 import { useTrades } from './hooks/use-trades';
 import { useAnalysis } from './hooks/use-analysis';
-
-// Mock data for risk distribution pie chart
-const riskDistributionData = [
-    { name: 'Low Risk (0.5-1%)', value: 40, color: '#10B981' },
-    { name: 'Medium Risk (1-1.5%)', value: 35, color: '#3B82F6' },
-    { name: 'High Risk (1.5-2%)', value: 25, color: '#EF4444' }
-];
+import { RiskDistribution } from './components/RiskDistribution';
+import { EquityCurve } from './components/EquityCurve';
+import { WinLossDistribution } from './components/WinLossDistribution';
 
 export const Strategy = () => {
     const [showBacktestModal, setShowBacktestModal] = useState(false);
 
     const { trades } = useTrades();
-      const { recommendations } = useAnalysis();
+    const { recommendations } = useAnalysis();
 
     return (
         <div className="space-y-6">
@@ -45,52 +28,20 @@ export const Strategy = () => {
                 <RiskReward trades={trades} />
             </section>
 
-
             {/* Risk Analysis Section */}
-            <div className="grid grid-cols-2 gap-6">
-                {/* Risk vs Reward Analysis */} 
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Risk vs Reward Analysis */}
                 <RiskRewardAnalysis trades={trades} />
 
-                <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-                    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <PieChart className="text-blue-400" />
-                        Risk Distribution
-                    </h2>
-                    <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RechartsPieChart>
-                                <Pie
-                                    data={riskDistributionData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {riskDistributionData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{
-                                        backgroundColor: '#1F2937',
-                                        border: '1px solid #374151',
-                                        borderRadius: '0.5rem',
-                                    }}
-                                    labelStyle={{ color: '#9CA3AF' }}
-                                />
-                                <Legend
-                                    verticalAlign="bottom"
-                                    height={36}
-                                    formatter={(value) => (
-                                        <span className="text-gray-300">{value}</span>
-                                    )}
-                                />
-                            </RechartsPieChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                {/* Risk Distribution Chart */}
+                <RiskDistribution />
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <EquityCurve trades={trades} />
+
+                {/* Win/Loss Distribution Chart */}
+                <WinLossDistribution trades={trades} />
             </div>
 
             {/* AI Recommendations Secti                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     on */}

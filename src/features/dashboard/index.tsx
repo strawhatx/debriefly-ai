@@ -16,13 +16,13 @@ export const Dashboard = () => {
         <TradingAccountsOverview />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-6 col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <Card className="p-4 lg:col-span-3 bg-gray-800 border border-gray-700 rounded-xl">
           <TradingCalendar />
         </Card>
 
-        <div className="col-span-1 grid grid-rows-2 gap-6">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <div className="grid lg:grid-rows-2 gap-4 lg:col-span-2">
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <LineChart className="text-purple-400" />
               Emotion Analysis
@@ -40,7 +40,7 @@ export const Dashboard = () => {
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <TrendingUp className="text-blue-400" />
               Strategy Performance
