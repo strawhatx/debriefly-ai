@@ -1,7 +1,7 @@
 
 import { useDateStore } from "@/store/date";
 
-export const BehaviorHeader = () => {
+export const DateRangeHeader = () => {
   const { days, setDays } = useDateStore()
   return (
     <div className="relative">

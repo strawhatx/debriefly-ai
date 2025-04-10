@@ -10,7 +10,7 @@ import { BlogPage } from "./pages/Blog";
 import { ContactPage } from "./pages/Contact";
 import { NotFoundPage } from "./pages/NotFound";
 import { LoginPage } from "./pages/Login";
-import { StrategyOptimizationPage } from "./pages/StrategyOptimization";
+import { StrategyPage } from "./pages/Strategy";
 import { DashboardPage } from "./pages/Dashboard";
 import { DebriefPage } from "./pages/Debrief";
 import { TradeHistoryPage } from "./pages/TradeHistory";
@@ -22,8 +22,7 @@ import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
 import { DoubleLayout, SidebarLayout } from "./components/layouts/Index";
 import { NavbarLayout } from "./components/layouts/Index";
 import { SignOutButton } from "./features/settings/components/SignOutButton";
-import { BehaviorHeader } from "./components/layouts/headers/Behavior";
-import { StrategyOptimizationHeader } from "./components/layouts/headers/StrategyOptimization";
+import { DateRangeHeader } from "./components/layouts/headers/DateRange";
 import { TradeHistoryHeader } from "./components/layouts/headers/TradeHistory";
 import { DebriefHeader } from "./components/layouts/headers/Debrief";
 import { DashboardHeader } from "./components/layouts/headers/Dashboard";
@@ -106,15 +105,15 @@ const App = () => {
               <Route path="/app/strategy-optimization" element={
                 <SidebarLayout
                   breadcrumbs={[{ name: "Strategy Optimization", href: "/app/strategy-optimization" }]}
-                  rightContent={<StrategyOptimizationHeader />}
+                  rightContent={<DateRangeHeader />}
                 >
-                  <StrategyOptimizationPage />
+                  <StrategyPage />
                 </SidebarLayout>
               } />
               <Route path="/app/behavioral-patterns" element={
                 <SidebarLayout
                   breadcrumbs={[{ name: "Behavior Analysis", href: "/app/behavioral-patterns" }]}
-                  rightContent={<BehaviorHeader />}
+                  rightContent={<DateRangeHeader />}
                 >
                   <BehaviorPage />
                 </SidebarLayout>

@@ -5,6 +5,13 @@ import { useEffect, useState } from "react";
 interface Analysis {
   what_went_well: string[],
   areas_for_improvement: string[]
+  strategy_recommendations: [
+    {
+      title: string,
+      description: string,
+      predicted_win_rate_increase: string
+    }
+  ],
 }
 
 export const useAnalysis = () => {
