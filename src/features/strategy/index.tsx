@@ -4,10 +4,8 @@ import { StrategyMetrics } from './components/StrategyMetrics';
 import { WinRate } from './components/WinRate';
 import { RiskReward } from './components/RiskReward';
 import { StrategyAdjustments } from '@/components/StrategyAdjustments';
-import { RiskRewardAnalysis } from './components/RiskRewardAnalysis';
 import { useTrades } from './hooks/use-trades';
 import { useAnalysis } from './hooks/use-analysis';
-import { RiskDistribution } from './components/RiskDistribution';
 import { EquityCurve } from './components/EquityCurve';
 import { WinLossDistribution } from './components/WinLossDistribution';
 
