@@ -4,12 +4,12 @@ import { useMemo } from "react";
 
 interface Trade {
   id: number;
-  asset: string; // Asset name (e.g., BTC/USD)
+  symbol: string; // Asset name (e.g., BTC/USD)
   type: "Long" | "Short"; // Trade type
   entry: number; // Entry price
   exit: number; // Exit price
   pnl: number; // Profit or loss
-  time: string; // Time of the trade
+  date: string; // Time of the trade
 }
 
 interface RecentTradesProps {

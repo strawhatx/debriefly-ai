@@ -12,7 +12,7 @@ import {
 import { useMemo } from "react";
 
 interface Trade {
-  time: string; // Time of the trade (e.g., "9:30")
+  date: string; // Time of the trade (e.g., "9:30")
   pnl: number;  // Profit or loss for the trade
 }
 

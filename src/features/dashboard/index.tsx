@@ -5,29 +5,34 @@ import { StrategyPerformance } from './components/StrategyPerformance';
 import { AiInsights } from './components/AiInsights';
 import { RecentTrades } from './components/RecentTrades';
 import { ClipboardList, PlusCircle } from 'lucide-react';
+import { useTrades } from './hooks/use-trades';
+import { useAnalysis } from './hooks/use-analysis';
 
 export const Dashboard = () => {
+  const { trades } = useTrades();
+      const { recommendations } = useAnalysis();
+
   return (
     <div className="space-y-4">
       {/* Performance Overview Cards */}
-      <PerformanceOverview />
+      <PerformanceOverview  trades={trades}/>
 
       {/* Charts Section */}
       <div className="grid grid-cols-2 gap-6">
         {/* Performance Chart */}
-        <PerformanceChart />
+        <PerformanceChart trades={trades} />
 
         {/* Strategy Performance */}
-        <StrategyPerformance />
+        <StrategyPerformance trades={trades}/>
       </div>
 
       {/* AI Insights and Recent Trades */}
       <div className="grid grid-cols-2 gap-6">
         {/* AI Insights */}
-        <AiInsights />
+        <AiInsights analysis={recommendations} />
 
         {/* Recent Trades */}
-        <RecentTrades />
+        <RecentTrades trades={trades} />
       </div>
 
       {/* Quick Actions */}
