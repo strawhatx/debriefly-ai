@@ -34,7 +34,7 @@ export const WinRate = ({ trades }: WinRateProps) => {
   }, [trades]);
 
   return (
-    <Card className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+    <Card className="bg-gray-800 rounded-xl p-4 border border-gray-700">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <Activity className="text-blue-400" />
         Win Rate by Strategy

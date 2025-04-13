@@ -13,12 +13,11 @@ import { WinLossDistribution } from './components/WinLossDistribution';
 
 export const Strategy = () => {
     const [showBacktestModal, setShowBacktestModal] = useState(false);
-
     const { trades } = useTrades();
     const { recommendations } = useAnalysis();
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Strategy Overview Cards */}
             <StrategyMetrics positions={trades} />
 
@@ -28,16 +27,7 @@ export const Strategy = () => {
                 <RiskReward trades={trades} />
             </section>
 
-            {/* Risk Analysis Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Risk vs Reward Analysis */}
-                <RiskRewardAnalysis trades={trades} />
-
-                {/* Risk Distribution Chart */}
-                <RiskDistribution />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <EquityCurve trades={trades} />
 
                 {/* Win/Loss Distribution Chart */}
@@ -50,7 +40,7 @@ export const Strategy = () => {
             </section>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-4">
                 <button className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium">
                     <Settings className="w-5 h-5" />
                     Apply Strategy Changes
