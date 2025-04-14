@@ -74,7 +74,7 @@ export const useTrades = () => {
 
       setTrades(data.map((trade) => ({
         ...trade,
-        date: format(new Date(trade.entry_date), "dd/MM/yyyy"),
+        date: format(new Date(trade.entry_date), "MM/dd"),
         type: trade.position_type,
         entry: trade.fill_price,
         exit: trade.stop_price,

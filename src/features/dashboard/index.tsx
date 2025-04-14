@@ -10,12 +10,12 @@ import { useAnalysis } from './hooks/use-analysis';
 
 export const Dashboard = () => {
   const { trades } = useTrades();
-      const { recommendations } = useAnalysis();
+  const { recommendations } = useAnalysis();
 
   return (
     <div className="space-y-4">
       {/* Performance Overview Cards */}
-      <PerformanceOverview  trades={trades}/>
+      <PerformanceOverview trades={trades} />
 
       {/* Charts Section */}
       <div className="grid grid-cols-2 gap-6">
@@ -23,7 +23,7 @@ export const Dashboard = () => {
         <PerformanceChart trades={trades} />
 
         {/* Strategy Performance */}
-        <StrategyPerformance trades={trades}/>
+        <StrategyPerformance trades={trades} />
       </div>
 
       {/* AI Insights and Recent Trades */}
@@ -37,15 +37,13 @@ export const Dashboard = () => {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 gap-6">
-        <Link
-          to="/trade-entry"
+        <Link to="/trade-entry"
           className="bg-emerald-600 hover:bg-emerald-700 p-4 rounded-lg text-white font-medium flex items-center justify-center gap-2"
         >
           <PlusCircle className="w-5 h-5" />
           Add New Trade
         </Link>
-        <Link
-          to="/debrief"
+        <Link to="/debrief"
           className="bg-blue-600 hover:bg-blue-700 p-4 rounded-lg text-white font-medium flex items-center justify-center gap-2"
         >
           <ClipboardList className="w-5 h-5" />

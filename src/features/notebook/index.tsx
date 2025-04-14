@@ -80,7 +80,7 @@ export const Notebook = () => {
 const LoadingState = () => (
     <div className="p-6">
         <Card className="p-6">
-            <div className="flex items-center justify-center h-64">
+            <div className="flex items-center justify-center h-44">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
             </div>
         </Card>
@@ -90,7 +90,7 @@ const LoadingState = () => (
 const ErrorState = ({ error }: { error: Error }) => (
     <div className="p-6">
         <Card className="p-6">
-            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex items-center justify-center h-64">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-6 flex items-center justify-center h-44">
                 <p className="text-red-500">Error: {error.message}</p>
             </div>
         </Card>
@@ -100,7 +100,7 @@ const ErrorState = ({ error }: { error: Error }) => (
 const NoTradeSelected = () => (
     <div className="p-6">
         <Card className="p-6">
-            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 flex items-center justify-center h-64">
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 flex items-center justify-center h-44">
                 <p className="text-gray-400">Select a trade to view details</p>
             </div>
         </Card>

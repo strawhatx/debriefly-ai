@@ -101,7 +101,7 @@ export const BehaviorChart = ({ trades }: BehaviorChartProps) => {
   }
 
   return (
-    <Card className="bg-gray-800 border border-gray-700 p-4 min-h-64">
+    <Card className="bg-gray-800 border border-gray-700 p-4 min-h-44">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
         <LineChartIcon className="text-blue-400" />
         Behavior Metrics Over Time

@@ -44,7 +44,7 @@ import {
           Equity Curve
         </h2>
   
-        <div className="h-64">
+        <div className="h-44">
           {hasData ? (
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={equityCurveData}>

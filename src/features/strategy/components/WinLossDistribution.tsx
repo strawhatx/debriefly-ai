@@ -49,7 +49,7 @@ import {
         </h2>
   
         {hasTrades ? (
-          <div className="h-64">
+          <div className="h-44">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={winLossDistribution}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -65,7 +65,7 @@ import {
             </ResponsiveContainer>
           </div>
         ) : (
-          <div className="text-gray-400 text-sm h-64 flex items-center justify-center border border-dashed border-gray-600 rounded-md">
+          <div className="text-gray-400 text-sm h-44 flex items-center justify-center border border-dashed border-gray-600 rounded-md">
             No trade data available.
           </div>
         )}

@@ -41,11 +41,11 @@ export const StrategyPerformance = ({ trades }: StrategyPerformanceProps) => {
       to="/strategy"
       className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-emerald-500/50 transition-colors"
     >
-      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <BarChart4 className="text-purple-400" />
         Strategy Performance
       </h2>
-      <div className="h-64">
+      <div className="h-44 text-sm flex items-center justify-center">
         {strategyData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={strategyData}>
@@ -54,6 +54,7 @@ export const StrategyPerformance = ({ trades }: StrategyPerformanceProps) => {
                 dataKey="name"
                 stroke="#9CA3AF"
                 tick={{ fill: "#9CA3AF" }}
+                
               />
               <YAxis
                 stroke="#9CA3AF"

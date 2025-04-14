@@ -61,7 +61,7 @@ export const useAnalysis = () => {
 
     const topRecommendations = Object.values(recommendationMap)
       .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      .slice(0, 3);
 
     setRecommendations(topRecommendations);
   }, [days, selectedAccount]);

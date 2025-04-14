@@ -48,12 +48,12 @@ const CustomTooltip = ({
 
 const LoadingSkeleton = () => (
   <div className="animate-pulse">
-    <div className="h-64 bg-gray-700/20 rounded-lg" />
+    <div className="h-44 bg-gray-700/20 rounded-lg" />
   </div>
 );
 
 const EmptyState = () => (
-  <div className="h-64 flex items-center justify-center">
+  <div className="h-44 flex items-center justify-center">
     <p className="text-gray-500">No performance data available</p>
   </div>
 );
@@ -95,7 +95,7 @@ export const SessionPerformance = ({
         <LineChartIcon className="text-blue-400" />
         Session Performance
       </h2>
-      <div className="h-64">
+      <div className="h-44">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsLineChart data={chartData}>
             <CartesianGrid 
