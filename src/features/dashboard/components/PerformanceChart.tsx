@@ -41,12 +41,12 @@ export const PerformanceChart = ({ trades }: PerformanceChartProps) => {
       </h2>
 
       {hasData ? (
-        <div className="h-44 text-sm">
+        <div className="h-64 text-sm">
           <ResponsiveContainer width="100%" height="100%">
             <RechartsLineChart data={performanceData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis
-                dataKey="time"
+                dataKey="date"
                 stroke="#9CA3AF"
                 tick={{ fill: "#9CA3AF" }}
                 

@@ -13,7 +13,6 @@ import { useProfileSection } from "./hooks/use-profile-section";
 
 const TAB_CONFIG = [
   { value: 'profile', icon: User, label: 'Profile' },
-  { value: 'security', icon: Bell, label: 'Notifications' },
   { value: 'subscription', icon: CreditCard, label: 'Subscription' },
   { value: 'trading-accounts', icon: ChartBar, label: 'Trading Accounts' },
   { value: 'import-history', icon: Upload, label: 'Import History' },
@@ -86,10 +85,6 @@ const Settings = () => {
 
         <TabsContent value="profile">
           <ProfileSection />
-        </TabsContent>
-
-        <TabsContent value="security">
-          <NotificationSection />
         </TabsContent>
 
         <TabsContent value="subscription">

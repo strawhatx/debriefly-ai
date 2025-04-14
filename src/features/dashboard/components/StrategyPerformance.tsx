@@ -45,7 +45,7 @@ export const StrategyPerformance = ({ trades }: StrategyPerformanceProps) => {
         <BarChart4 className="text-purple-400" />
         Strategy Performance
       </h2>
-      <div className="h-44 text-sm flex items-center justify-center">
+      <div className="h-56 text-sm">
         {strategyData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={strategyData}>
@@ -85,7 +85,7 @@ export const StrategyPerformance = ({ trades }: StrategyPerformanceProps) => {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-gray-400 text-center">No strategy data available.</p>
+          <p className="text-gray-400 h-full text-sm flex items-center justify-center">No strategy data available.</p>
         )}
       </div>
     </Link>

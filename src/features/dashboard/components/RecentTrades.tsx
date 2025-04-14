@@ -39,11 +39,11 @@ export const RecentTrades = ({ trades }: RecentTradesProps) => {
           <ChevronRight className="w-4 h-4" />
         </Link>
       </div>
-      <div className="space-y-4 text-sm h-44 flex items-center justify-center">
+      <div className="space-y-4 ">
         {recentTrades?.length > 0 ? (
           recentTrades.map((trade) => <TradeCard key={trade.id} trade={trade} />)
         ) : (
-          <p className="text-gray-400 text-center">No recent trades available.</p>
+          <p className="text-gray-400 text-sm h-44 flex items-center justify-center">No recent trades available.</p>
         )}
       </div>
     </div>

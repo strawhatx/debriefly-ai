@@ -10,9 +10,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { BarChart2, Settings, ClipboardList, Brain, LineChart, History, Home, Eye } from "lucide-react";
+import { BarChart2, ClipboardList, Brain, LineChart, History, Home, Eye } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SelectAccount } from "../SelectAccount";
+import { useProfile } from "@/hooks/use-profile";
 
 const navigationItems = [
   { title: "Dashboard", icon: Home, url: "/app/dashboard" },
@@ -24,6 +25,8 @@ const navigationItems = [
 ];
 
 export const AppSidebar = () => {
+  const { profile } = useProfile();
+
   return (
     <ShadcnSidebar>
       <SidebarContent>
@@ -64,12 +67,12 @@ export const AppSidebar = () => {
           <SidebarMenuItem>
             <Link to="/settings" className="flex items-center gap-3 px-4 py-3 border-t">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarImage src={profile.avatar} />
+                <AvatarFallback>{profile.avatar_backup}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">John Doe</span>
-                <span className="text-sm text-muted-foreground">john@example.com</span>
+                <span className="text-sm font-medium">{profile.full_name}</span>
+                <span className="text-sm text-muted-foreground">{profile.email}</span>
               </div>
             </Link>
           </SidebarMenuItem>
