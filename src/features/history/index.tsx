@@ -10,6 +10,7 @@ import { RawTradeModal } from "./components/RawTradeModal";
 import { Card } from "@/components/ui/card";
 import { useTrades } from "@/hooks/use-trades";
 import { format } from "date-fns";
+import { NoDataModal } from "@/components/NoDataModal";
 
 interface Trade {
   id: string;
@@ -97,13 +98,15 @@ const columns = [
 ];
 
 export const History = () => {
+  const [showModal, setShowModal] = useState(false);
   const [mappedTrades, setMappedTrades] = useState<Trade[]>(null);
   const { trades, error } = useTrades();
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
   const { data: rawTrade, isLoading: isLoadingRaw, error: rawError } = useRawTrade(selectedTradeId);
 
   const handleViewRawData = (tradeId: string) => setSelectedTradeId(tradeId);
-    useEffect(() => {
+
+  useEffect(() => {
     // Perform any side effects or data fetching here
     // For example, you might want to fetch trades or update the state
     var result = trades.map((trade) => {
@@ -124,6 +127,17 @@ export const History = () => {
     setMappedTrades(result);
   }, [trades]);
 
+  useEffect(() => {
+    // Example: data fetching
+    // setData(fetchedData)
+    if (!trades || trades.length === 0) {
+      setShowModal(true);
+    }
+    else if (showModal) {
+      setShowModal(false);
+    }
+  }, [trades]);
+
   if (error) {
     return (
       <div className="p-6">
@@ -136,6 +150,8 @@ export const History = () => {
 
   return (
     <div className="space-y-4">
+      <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
+      
       {/* Trade Statistics */}
       <TradeStatistics trades={trades} />
 

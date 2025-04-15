@@ -6,7 +6,7 @@ interface Profile {
   email: string;
   full_name: string;
   avatar: string | null;
-  avatar_backup: string | null;
+  avatar_backup: string;
 }
 
 export const useProfile = () => {
@@ -20,33 +20,44 @@ export const useProfile = () => {
           data: { user },
           error,
         } = await supabase.auth.getUser();
-        if (error) throw error;
+
+        if (error || !user) throw error || new Error("User not found");
 
         const { data, error: profileError } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", user?.id)
+          .eq("id", user.id)
           .single();
 
         if (profileError) throw profileError;
 
-        // Generate avatar backup initials from full_name
-        const fullName = data?.full_name || "";
-        const initials = fullName
-          .split(" ")
-          .map((name) => name[0]?.toUpperCase())
-          .join("")
-          .slice(0, 2); // Get the first two initials
+        const fullName = data?.full_name?.trim() || "";
+        const email = user.email || "";
+
+        // Avatar fallback logic
+        let avatarBackup = "";
+
+        if (fullName) {
+          const parts = fullName.split(" ").filter(Boolean);
+          const firstInitial = parts[0]?.[0]?.toUpperCase() || "";
+          const lastInitial = parts.length > 1 ? parts[parts.length - 1][0]?.toUpperCase() : "";
+          avatarBackup = `${firstInitial}${lastInitial}` || "";
+        }
+
+        // Fallback to first 2 characters of email if full name isn't usable
+        if (!avatarBackup && email) {
+          avatarBackup = email.slice(0, 2).toUpperCase();
+        }
 
         setProfile({
           id: user.id,
-          email: user.email,
-          full_name: fullName || null,
+          email,
+          full_name: fullName || "Unknown User",
           avatar: data?.avatar_url || null,
-          avatar_backup: initials || null,
+          avatar_backup: avatarBackup || "NA",
         });
-      } catch (error) {
-        console.error("Error fetching profile:", error);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
       } finally {
         setLoading(false);
       }

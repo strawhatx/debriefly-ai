@@ -26,7 +26,7 @@ const Authentication = () => {
     };
 
     return (
-        <div className="mx-auto my-auto p-4">
+        <div className="min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 <Card className="p-6 space-y-6 bg-gray-800 border-gray-800">
                     <AuthHeader isSignUp={isSignUp} />

@@ -12,13 +12,29 @@ import { RiskReward } from './components/RiskReward';
 import { TradeReview } from './components/TradeReview';
 import { BehaviorChart } from './components/BehaviorChart';
 import { ChevronRight, Lock, ThumbsUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { NoDataModal } from '@/components/NoDataModal';
 
 export const Behavior = () => {
+  const [showModal, setShowModal] = useState(false);
   const { trades } = useTrades();
   const { insights } = useAnalysis();
 
+    useEffect(() => {
+      // Example: data fetching
+      // setData(fetchedData)
+      if (!trades || trades.length === 0) {
+        setShowModal(true);
+      }
+      else if (showModal) {
+        setShowModal(false);
+      }
+    }, [trades]);
+
   return (
     <div className="space-y-4 animate-fade-up">
+      <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
+      
       {/* Section 1: Behavior Summary Overview */}
       <section className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Key Behavior Tags */}

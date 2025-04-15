@@ -88,7 +88,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="subscription">
-          <SubscriptionSection email={email} userId={profile.id} />
+          <SubscriptionSection email={email} userId={profile?.id} />
         </TabsContent>
 
         <TabsContent value="trading-accounts">

@@ -7,13 +7,29 @@ import { RecentTrades } from './components/RecentTrades';
 import { ClipboardList, PlusCircle } from 'lucide-react';
 import { useTrades } from './hooks/use-trades';
 import { useAnalysis } from './hooks/use-analysis';
+import { useEffect, useState } from 'react';
+import { NoDataModal } from '@/components/NoDataModal';
 
-export const Dashboard = () => {
+export const Dashboard = () => {  
+  const [showModal, setShowModal] = useState(false);
   const { trades } = useTrades();
   const { recommendations } = useAnalysis();
 
+  useEffect(() => {
+    // Example: data fetching
+    // setData(fetchedData)
+    if (!trades || trades.length === 0) {
+      setShowModal(true);
+    }
+    else if (showModal) {
+      setShowModal(false);
+    }
+  }, [trades]);
+
   return (
     <div className="space-y-4">
+      <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
+
       {/* Performance Overview Cards */}
       <PerformanceOverview trades={trades} />
 

@@ -5,8 +5,10 @@ import { useEventStore } from "@/store/event";
 import { SummaryCards } from "./components/SummaryCards";
 import { TradeTable } from "./components/TradeTable";
 import { Columns } from "./components/Columns";
+import { NoDataModal } from "@/components/NoDataModal";
 
 export const Review = () => {
+  const [showModal, setShowModal] = useState(false);
   const [mappedTrades, setMappedTrades] = useState([]);
   const { trades, setTrades, saveTrades, error } = useTrades(true);
   const { event, setLoading } = useEventStore();
@@ -62,6 +64,18 @@ export const Review = () => {
     setMappedTrades(result);
   }, [trades]);
 
+  useEffect(() => {
+    // Example: data fetching
+    // setData(fetchedData)
+    if (!trades || trades.length === 0) {
+      setShowModal(true);
+    }
+    else if (showModal) {
+      setShowModal(false);
+    }
+  }, [trades]);
+
+
   if (error) {
     return (
       <div className="p-6">
@@ -74,6 +88,9 @@ export const Review = () => {
 
   return (
     <div className="space-y-4">
+      <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
+
+      {/* Trade Statistics */}
       {(!mappedTrades || mappedTrades.length === 0) ? (
         <section className="text-gray-400 text-center p-4 bg-gray-800 rounded-xl border border-gray-700">
           No trade data available.

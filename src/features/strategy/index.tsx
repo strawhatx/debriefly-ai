@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Settings, ArrowRight, PlayCircle } from 'lucide-react';
 import { StrategyMetrics } from './components/StrategyMetrics';
 import { WinRate } from './components/WinRate';
@@ -8,14 +8,30 @@ import { useTrades } from './hooks/use-trades';
 import { useAnalysis } from './hooks/use-analysis';
 import { EquityCurve } from './components/EquityCurve';
 import { WinLossDistribution } from './components/WinLossDistribution';
+import { NoDataModal } from '@/components/NoDataModal';
 
 export const Strategy = () => {
+    const [showModal, setShowModal] = useState(false);
     const [showBacktestModal, setShowBacktestModal] = useState(false);
     const { trades } = useTrades();
     const { recommendations } = useAnalysis();
 
+    useEffect(() => {
+      // Example: data fetching
+      // setData(fetchedData)
+      if (!trades || trades.length === 0) {
+        setShowModal(true);
+      }
+      else if (showModal) {
+        setShowModal(false);
+      }
+    }, [trades]);
+
     return (
         <div className="space-y-4">
+            <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
+
+            {/* Strategy Overview Section */}
             {/* Strategy Overview Cards */}
             <StrategyMetrics positions={trades} />
 

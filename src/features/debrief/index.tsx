@@ -13,6 +13,7 @@ import { StrategyAdjustments } from '../../components/StrategyAdjustments';
 import { useAnalysis } from './hooks/use-analysis';
 import { useEffect, useState } from 'react';
 import { useDateStore } from '@/store/date';
+import { NoDataModal } from '@/components/NoDataModal';
 
 interface OverviewPosition {
   risk: number;
@@ -26,6 +27,7 @@ interface SessionPosition {
 }
 
 export const Debrief = () => {
+  const [showModal, setShowModal] = useState(false);
   const [mappedOverviewPositions, setMappedOverviewPositions] = useState<OverviewPosition[] | null>();
   const [mappedSessionPositions, setMappedSessionPositions] = useState<SessionPosition[] | null>();
 
@@ -59,8 +61,22 @@ export const Debrief = () => {
     }
   }, [positions, date]);
 
+  useEffect(() => {
+    // Example: data fetching
+    // setData(fetchedData)
+    if (!positions || positions.length === 0) {
+      setShowModal(true);
+    }
+    else if (showModal) {
+      setShowModal(false);
+    }
+  }, [positions]);
+
+
   return (
     <div className="space-y-4">
+      <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
+      
       {/* Performance Overview */}
       <PerformanceOverview positions={mappedOverviewPositions} />
 

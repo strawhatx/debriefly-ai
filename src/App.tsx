@@ -19,7 +19,7 @@ import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
 import { NotebookPage } from "./pages/Notebook";
 import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
-import { DoubleLayout, SidebarLayout } from "./components/layouts/Index";
+import { DoubleLayout, PlainLayout, SidebarLayout } from "./components/layouts/Index";
 import { NavbarLayout } from "./components/layouts/Index";
 import { SignOutButton } from "./features/settings/components/SignOutButton";
 import { DateRangeHeader } from "./components/layouts/headers/DateRange";
@@ -75,7 +75,7 @@ const App = () => {
                 <ContactPage />
               </NavbarLayout>
             } />
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={ <LoginPage /> } />
 
             {/* Protected routes */}
             <Route element={<AuthGuard />}>

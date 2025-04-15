@@ -7,6 +7,18 @@ import { Separator } from "../ui/separator";
 import { AppSidebar } from "../sidebar/AppSidebar";
 import { NotebookSidebar } from "../sidebar/NotebookSidebar";
 
+
+// Plain Layout
+export const PlainLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="min-h-screen bg-background flex w-full">
+      <main className="flex-1">
+        {children}
+      </main>
+    </div>
+  );
+}
+
 // Navbar Layout
 export const NavbarLayout = ({ children }: { children: React.ReactNode }) => {
   return (
