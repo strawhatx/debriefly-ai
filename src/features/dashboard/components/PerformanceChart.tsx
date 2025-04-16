@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 interface Trade {
-  date: string; // Format like "9:30"
+  date: string; // Format like "YYYY-MM-DD"
   pnl: number;
 }
 
@@ -22,13 +22,32 @@ interface PerformanceChartProps {
 export const PerformanceChart = ({ trades }: PerformanceChartProps) => {
   const hasData = trades.length > 0;
 
-  const performanceData = hasData
-    ? trades.reduce((acc, trade, index) => {
-        const cumulativePnl = (acc[index - 1]?.cumulativePnl || 0) + trade.pnl;
-        acc.push({ date: trade.date, cumulativePnl });
+  // Group trades by date and calculate total PnL for each day
+  const groupedData = hasData
+    ? trades.reduce((acc, trade) => {
+        const existing = acc.find((item) => item.date === trade.date);
+        if (existing) {
+          existing.pnl += trade.pnl;
+        } else {
+          acc.push({ date: trade.date, pnl: trade.pnl });
+        }
         return acc;
-      }, [] as { date: string; cumulativePnl: number }[])
+      }, [] as { date: string; pnl: number }[])
     : [];
+
+  // Calculate cumulative PnL for the grouped data
+  const performanceData = groupedData.reduce((acc, trade, index) => {
+    const cumulativePnl = (acc[index - 1]?.cumulativePnl || 0) + trade.pnl;
+    acc.push({ date: trade.date, cumulativePnl });
+    return acc;
+  }, [] as { date: string; cumulativePnl: number }[]);
+
+  // Function to abbreviate large numbers
+  const abbreviateNumber = (value: number) => {
+    if (value >= 1_000_000) return `${(value / 1_000_000)}M`;
+    if (value >= 1_000) return `${(value / 1_000)}K`;
+    return value.toString();
+  };
 
   return (
     <Link
@@ -37,7 +56,7 @@ export const PerformanceChart = ({ trades }: PerformanceChartProps) => {
     >
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <IconLineChart className="text-blue-400" />
-        Today's Performance
+        Months Performance
       </h2>
 
       {hasData ? (
@@ -49,11 +68,11 @@ export const PerformanceChart = ({ trades }: PerformanceChartProps) => {
                 dataKey="date"
                 stroke="#9CA3AF"
                 tick={{ fill: "#9CA3AF" }}
-                
               />
               <YAxis
                 stroke="#9CA3AF"
                 tick={{ fill: "#9CA3AF" }}
+                tickFormatter={abbreviateNumber} // Use custom formatter
                 label={{
                   value: "Cumulative PnL",
                   angle: -90,

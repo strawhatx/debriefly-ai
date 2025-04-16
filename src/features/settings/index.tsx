@@ -70,7 +70,7 @@ const Settings = () => {
   return (
     <div className="p-8">
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="mb-8">
+        <TabsList className="grid h-full grid-cols-1 lg:grid-cols-4">
           {TAB_CONFIG.map(({ value, icon: Icon, label }) => (
             <TabsTrigger 
               key={value}

@@ -65,6 +65,13 @@ export const SessionPerformance = ({
 }: SessionPerformanceProps) => {
   const chartData = useMemo(() => positions || [], [positions]);
 
+  // Function to abbreviate large numbers
+  const abbreviateNumber = (value: number) => {
+    if (value >= 1_000_000) return `${(value / 1_000_000)}M`;
+    if (value >= 1_000) return `${(value / 1_000)}K`;
+    return value.toString();
+  };
+
   if (isLoading) {
     return (
       <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
@@ -110,7 +117,7 @@ export const SessionPerformance = ({
             <YAxis
               stroke={CHART_CONFIG.colors.text}
               tick={{ fill: CHART_CONFIG.colors.text }}
-              tickFormatter={(value) => `${value.toFixed(2)}`}
+              tickFormatter={abbreviateNumber} // Use custom formatter
             />
             <Tooltip content={<CustomTooltip />} />
             <Line

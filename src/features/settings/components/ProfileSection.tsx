@@ -27,7 +27,7 @@ export const ProfileSection = () => {
   }
 
   return (
-    <div className="grid grid-cols-3 gap-8">
+    <div className="grid mt-4 grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="col-span-1">
         <Card className="p-6">
           <AvatarUpload
@@ -39,7 +39,7 @@ export const ProfileSection = () => {
         </Card>
       </div>
 
-      <div className="col-span-2">
+      <div className="col-span-1 lg:col-span-2">
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-6">Personal Details</h2>
           <div className="space-y-4">

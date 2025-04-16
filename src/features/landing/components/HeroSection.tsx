@@ -46,10 +46,10 @@ export const HeroSection = () => {
         </div>
       </div>
       <div className="@container relative h-[20rem] md:h-[35rem] w-full">
-        <div className="absolute inset-x-10 top-10 bottom-0 overflow-hidden rounded-t-[5cqw] border-x-[1cqw] border-t-[1cqw] border-gray-700 bg-gray-900 shadow-2xl">
+        <div className="absolute inset-x-10 top-10 bottom-0 overflow-hidden rounded-t-[3cqw] border-x-[1cqw] border-t-[1cqw] border-gray-700 bg-gray-900 shadow-2xl">
           <img
-            className="size-full object-cover object-top"
-            src="https://tailwindui.com/plus-assets/img/component-images/dark-project-app-screenshot.png"
+            className="size-full object-cover object-left-top"
+            src="/landing/dashboard.png"
             alt=""
           />
         </div>

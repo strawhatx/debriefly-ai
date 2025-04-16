@@ -1,34 +1,82 @@
-import { Import, Search } from "lucide-react";
-import { ImportsTable } from "./ImportsTable";
-import { Input } from "@/components/ui/input";
-import { Link } from "react-router-dom";
 import { useImportHistorySection } from "../hooks/use-import-history-section";
+import { DataTable, createSortableColumn } from "@/components/ui/data-table";
+import { format } from "date-fns";
+import { ColumnDef } from "@tanstack/react-table";
+
+interface Import {
+  id: string;
+  trading_account_id: string;
+  import_type: string;
+  status: string;
+  error_message: string | null;
+  created_at: string;
+  account_name?: string;
+  original_filename?: string;
+  file_size?: number;
+  file_type?: string;
+}
 
 export const ImportHistorySection = () => {
   const { imports, loading } = useImportHistorySection();
 
-  return (
-    <section className="bg-gray-800 rounded-xl border border-gray-700" >
-      <div className="overflow-x-auto">
-        <div className="p-6 flex justify-between items-center">
-          <h3 className="text-lg font-bold">Trading Accounts</h3>
-          <div className="flex gap-4">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <Input
-                type="text"
-                placeholder="Search accounts..."
-                className="pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              />
-            </div>
-            <Link to="/app/trade-import" className="inline-flex items-center gap-2 px-6 text-background py-2 bg-primary rounded-lg font-medium group">
-            <Import className="" />
-            Import Trades
-            </Link>
-          </div>
-        </div>
+  const columns: ColumnDef<Import>[] = [
+    {
+      accessorKey: "created_at",
+      header: createSortableColumn("Date"),
+      cell: ({ row }) =>
+        format(new Date(row.original.created_at), "MMM d, yyyy HH:mm"),
+    },
+    {
+      accessorKey: "account_name",
+      header: "Account",
+      meta: {
+        className: "hidden lg:table-cell", // Hidden on small screens
+      },
+    },
+    {
+      accessorKey: "original_filename",
+      header: "File",
+      cell: ({ row }) => row.original.original_filename || "-",
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const getStatusColor = (status: string) => {
+          switch (status) {
+            case "completed":
+              return "text-green-500";
+            case "failed":
+              return "text-red-500";
+            case "processing":
+              return "text-yellow-500";
+            default:
+              return "text-gray-500";
+          }
+        };
+        return (
+          <span className={getStatusColor(row.original.status)}>
+            {row.original.status}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "error_message",
+      header: "Error Msg",
+      cell: ({ row }) => (
+        <span className="text-red-500">{row.original.error_message || "-"}</span>
+      ),
+      meta: {
+        className: "hidden lg:table-cell", // Hidden on small screens
+      },
+    },
+  ];
 
-        <div className="space-y-4">
+  return (
+    <section className="bg-gray-800 mt-4 rounded-xl border border-gray-700">
+        <div className="space-y-4 p-4">
+          <h3 className="text-lg font-bold">Trading Accounts</h3>
           {loading ? (
             <p className="text-center py-4">Loading...</p>
           ) : imports.length === 0 ? (
@@ -36,10 +84,18 @@ export const ImportHistorySection = () => {
               No import history available yet.
             </p>
           ) : (
-            <ImportsTable imports={imports} />
+            <DataTable
+              columns={columns}
+              data={imports}
+              searchKey="account_name"
+              searchPlaceholder="Search accounts..."
+              pageSize={5}
+              showPagination
+              showColumnToggle={false}
+              toolbarEnabled
+            />
           )}
         </div>
-      </div>
     </section>
   );
 };

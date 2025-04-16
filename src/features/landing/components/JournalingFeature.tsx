@@ -19,44 +19,37 @@ const features = [
   },
 ]
 
+
 export const JournalingFeature = () => {
   return (
-    <section className="overflow-hidden py-24 sm:py-32">
+    <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-          <div className="lg:pt-4 lg:pr-8">
-            <div className="lg:max-w-lg">
-              <h2 className="text-base/7 font-semibold text-primary">Challenge the Status Quo</h2>
-              <p className="mt-2 text-4xl font-semibold tracking-tight text-pretty sm:text-5xl">
-              Journaling Alone Won’t Make You a Better Trader
-              </p>
-              <p className="mt-6 text-lg/8 text-gray-400">
-              You don’t need more logs. You need real insights.
-              We combine AI analysis + trading psychology to show you what really drives your wins & losses.
-              </p>
-              <dl className="mt-10 max-w-xl space-y-8 text-base/7 text-gray-400 lg:max-w-none">
-                {features.map((feature) => (
-                  <div key={feature.name} className="relative pl-9">
-                    <dt className="inline font-semibold text-gray-100">
-                      <feature.icon aria-hidden="true" className="absolute top-1 left-1 size-5 text-destructive" />
-                      {feature.name}
-                    </dt>{' '}
-                    <dd className="inline">{feature.description}</dd>
+        <div className="mx-auto max-w-2xl lg:max-w-4xl">
+          <h2 className="text-base/7 font-semibold text-primary">Challenge the Status Quo</h2>
+          <p className="mt-2 text-4xl font-semibold tracking-tight text-pretty text-gray-900 sm:text-5xl lg:text-balance">
+          Journaling Alone Won’t Make You a Better Trader
+          </p>
+          <p className="mt-6 text-lg/8 text-gray-600">
+          You don’t need more logs. You need real insights.
+          We combine AI analysis + trading psychology to show you what really drives your wins & losses.
+          </p>
+        </div>
+        <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
+          <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-3 lg:gap-y-16">
+            {features.map((feature) => (
+              <div key={feature.name} className="relative pl-16">
+                <dt className="text-base/7 font-semibold text-gray-900">
+                  <div className="absolute top-0 left-0 flex size-10 items-center justify-center rounded-lg bg-destructive">
+                    <feature.icon aria-hidden="true" className="size-6 text-white" />
                   </div>
-                ))}
-              </dl>
-            </div>
-          </div>
-          <img
-            alt="Product screenshot"
-            src="https://tailwindui.com/plus-assets/img/component-images/dark-project-app-screenshot.png"
-            width={2432}
-            height={1442}
-            className="w-[48rem] max-w-none rounded-xl ring-1 shadow-xl ring-gray-400/10 sm:w-[57rem] md:-ml-4 lg:-ml-0"
-          />
+                  {feature.name}
+                </dt>
+                <dd className="mt-2 text-base/7 text-gray-600">{feature.description}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
-

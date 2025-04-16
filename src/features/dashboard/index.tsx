@@ -34,7 +34,7 @@ export const Dashboard = () => {
       <PerformanceOverview trades={trades} />
 
       {/* Charts Section */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Performance Chart */}
         <PerformanceChart trades={trades} />
 
@@ -43,7 +43,7 @@ export const Dashboard = () => {
       </div>
 
       {/* AI Insights and Recent Trades */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* AI Insights */}
         <AiInsights analysis={recommendations} />
 
@@ -52,7 +52,7 @@ export const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link to="/trade-entry"
           className="bg-emerald-600 hover:bg-emerald-700 p-4 rounded-lg text-white font-medium flex items-center justify-center gap-2"
         >

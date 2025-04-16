@@ -1,6 +1,6 @@
 
 import { HeroSection } from "./components/HeroSection";
-import { SolutionBentoGrid } from "./components/SolutionBentoGrid";
+import { Solutions } from "./components/Solutions";
 import { PricingSection } from "./components/PricingSection";
 import { HowItWorks } from "./components/HowItWorks";
 import { JournalingFeature } from "./components/JournalingFeature";
@@ -12,7 +12,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background">
       <HeroSection />
       <JournalingFeature />
-      <SolutionBentoGrid />
+      <Solutions />
       <HowItWorks />
       <PricingSection />
       <CtaSection />
