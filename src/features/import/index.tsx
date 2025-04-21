@@ -31,28 +31,28 @@ const Import = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="w-[400px] mb-6">
+        <TabsList className="w-[400px]">
           <TabsTrigger value="file" className="flex-1">File Upload</TabsTrigger>
-          <TabsTrigger value="broker" className="flex-1">Broker Sync</TabsTrigger>
+          <TabsTrigger value="broker" disabled className="flex-1">Broker Sync (Coming Soon.)</TabsTrigger>
         </TabsList>
 
         <TabsContent value="file">
-          <div className="grid grid-cols-2 gap-6">
-            <Card className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="p-6 order-2 lg:order-1">
               <FileImport />
             </Card>
-            <Card className="p-6">
+            <Card className="p-6 order-1 lg:order-2">
               <FileImportDescription />
             </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="broker">
-          <div className="grid grid-cols-2 gap-6">
-            <Card className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Card className="p-6 order-2 lg:order-1">
               <BrokerSync />
             </Card>
-            <Card className="p-6">
+            <Card className="p-6 order-1 lg:order-2">
               <h3 className="text-lg font-semibold mb-4">How to Sync with Your Broker</h3>
               <div className="space-y-4 text-sm text-muted-foreground">
                 <p>Currently, direct broker sync is supported for:</p>
@@ -75,6 +75,13 @@ const Import = () => {
                   the background, and you can check its status in the settings page
                   under "Import History".
                 </p>
+                <p>
+                  Once your trades are processed, they will be marked as drafts,
+                  allowing you to review and make changes before analysis. You
+                  will be automatically redirected to that page once the sync is
+                  complete.
+                </p>
+
               </div>
             </Card>
           </div>

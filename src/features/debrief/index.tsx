@@ -31,7 +31,7 @@ export const Debrief = () => {
   const [mappedOverviewPositions, setMappedOverviewPositions] = useState<OverviewPosition[] | null>();
   const [mappedSessionPositions, setMappedSessionPositions] = useState<SessionPosition[] | null>();
 
-  const { positions, isLoading, setDay: setDebriefDate } = useDebrief();
+  const { positions, isLoading: positionsLoading, setDay: setDebriefDate } = useDebrief();
   const { analysis, setDay: setAnalysisDate } = useAnalysis();
   const date = useDateStore((state) => state.date);
 
@@ -62,15 +62,14 @@ export const Debrief = () => {
   }, [positions, date]);
 
   useEffect(() => {
-    // Example: data fetching
-    // setData(fetchedData)
+    if (positionsLoading) return; // Don't run until data is done loading
+  
     if (!positions || positions.length === 0) {
       setShowModal(true);
-    }
-    else if (showModal) {
+    } else {
       setShowModal(false);
     }
-  }, [positions]);
+  }, [positions, positionsLoading]);
 
 
   return (
@@ -85,7 +84,7 @@ export const Debrief = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SessionPerformance
           positions={mappedSessionPositions}
-          isLoading={isLoading}
+          isLoading={positionsLoading}
         />
 
         <AiAnalysis areas_for_improvement={analysis?.areas_for_improvement} what_went_well={analysis?.what_went_well} />

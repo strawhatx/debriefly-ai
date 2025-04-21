@@ -3,7 +3,7 @@ import useAssetStore from "@/store/assets";
 import { normalizeSymbol } from "./utils";
 
 interface FuturesAssetConfig {
-  tick_size: number; 
+  tick_size: number;
   tick_value: number;
 }
 
@@ -21,6 +21,24 @@ const getCryptoInfo = async (symbol: string): Promise<number> => {
     const data = await response.json();
 
     return data[symbol.toLowerCase()]?.usd || 1;
+  } catch (error) {
+    console.error(`Crypto API error for ${symbol}:`, error);
+    return 1;
+  }
+};
+
+const getForexInfo = async (symbol: string): Promise<{}> => {
+  try {
+    // Use an API to confirm the symbol exists
+    const response = await fetch(
+      `https://api.twelvedata.com/symbol_search?symbol=${symbol}&apikey=${import.meta.env.VITE_TWELVE_DATA_API_KEY}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+    const data = await response.json();
+    return data; // Assuming the API returns a field `exists` to confirm the symbol 
   } catch (error) {
     console.error(`Crypto API error for ${symbol}:`, error);
     return 1;
@@ -55,20 +73,18 @@ const isOptions = (symbol: string): boolean => {
 
 const isForex = async (symbol: string): Promise<boolean> => {
   try {
-    const { currency_codes, get_currency_codes } = useAssetStore.getState();
-
-    if (currency_codes.length === 0) await get_currency_codes();
+    const normalizedSymbol = symbol.includes('/') ? symbol.replace('/', '') : symbol;
 
     const forexRegex = /^[A-Za-z]{3}\/?[A-Za-z]{3}$/;
     if (forexRegex.test(symbol)) {
-      const [base, quote] = symbol.includes('/') ? symbol.split('/') : [symbol.slice(0, 3), symbol.slice(3, 6)];
-      if (currency_codes.some(i => i.code === base) && currency_codes.some(i => i.code === quote)) return true;
+      const found = await getForexInfo(normalizedSymbol);
+      if (found) return true;
     }
 
-    return false;
+    return false
   }
   catch (error) {
-    console.error(`Crypto API error for ${symbol}:`, error);
+    console.error(`Error validating Forex symbol ${symbol}:`, error);
     return false;
   }
 };

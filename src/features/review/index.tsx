@@ -10,7 +10,7 @@ import { NoDataModal } from "@/components/NoDataModal";
 export const Review = () => {
   const [showModal, setShowModal] = useState(false);
   const [mappedTrades, setMappedTrades] = useState([]);
-  const { trades, setTrades, saveTrades, error } = useTrades(true);
+  const { trades, setTrades, saveTrades, isLoading: tradesLoading, error } = useTrades(true);
   const { event, setLoading } = useEventStore();
   const { toast } = useToast();
 
@@ -65,15 +65,14 @@ export const Review = () => {
   }, [trades]);
 
   useEffect(() => {
-    // Example: data fetching
-    // setData(fetchedData)
+    if (tradesLoading) return; // Don't run until data is done loading
+  
     if (!trades || trades.length === 0) {
       setShowModal(true);
-    }
-    else if (showModal) {
+    } else {
       setShowModal(false);
     }
-  }, [trades]);
+  }, [trades, tradesLoading]);
 
 
   if (error) {

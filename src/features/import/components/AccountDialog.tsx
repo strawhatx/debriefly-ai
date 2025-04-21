@@ -6,13 +6,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
@@ -31,7 +24,7 @@ export const AccountDialog = ({ onSave }: AccountDialogProps) => {
   const handleSave = async () => {
     await save();
     onSave();
-  }
+  };
 
   return (
     <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
@@ -56,41 +49,39 @@ export const AccountDialog = ({ onSave }: AccountDialogProps) => {
           {/* Broker Selection */}
           <div className="space-y-2">
             <Label>Broker</Label>
-            <Select
-              value={account?.broker_id}
-              onValueChange={(value) => setAccount({ ...account, broker_id: value })}
+            <select
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              value={account?.broker_id || ""}
+              onChange={(e) => setAccount({ ...account, broker_id: e.target.value })}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select broker" />
-              </SelectTrigger>
-              <SelectContent>
-                {brokers?.map((broker) => (
-                  <SelectItem key={broker.id} value={broker.id}>
-                    {broker.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <option value="" disabled>
+                Select broker
+              </option>
+              {brokers?.map((broker) => (
+                <option key={broker.id} value={broker.id}>
+                  {broker.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Market Selection */}
           <div className="space-y-2">
             <Label>Market</Label>
-            <Select
-              value={account?.market}
-              onValueChange={(value) => setAccount({ ...account, market: value as MARKET })}
+            <select
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              value={account?.market || ""}
+              onChange={(e) => setAccount({ ...account, market: e.target.value as MARKET })}
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Select market" />
-              </SelectTrigger>
-              <SelectContent>
-                {['STOCKS', 'OPTIONS', 'CRYPTO', 'FOREX', 'FUTURES'].map((market) => (
-                  <SelectItem key={market} value={market}>
-                    {market}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <option value="" disabled>
+                Select market
+              </option>
+              {['STOCKS', 'OPTIONS', 'CRYPTO', 'FOREX', 'FUTURES'].map((market) => (
+                <option key={market} value={market}>
+                  {market}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Account Balance */}
@@ -107,7 +98,7 @@ export const AccountDialog = ({ onSave }: AccountDialogProps) => {
           </div>
 
           {/* Save Button */}
-          <Button size="icon" disabled={isUploading} onClick={handleSave}>
+          <Button variant="default" disabled={isUploading} onClick={handleSave} className="w-full">
             <Check className="h-4 w-4" />
             {isUploading ? "Uploading..." : "Start Import"}
           </Button>

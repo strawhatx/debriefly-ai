@@ -1,7 +1,7 @@
 import useBrokerStore from "@/store/broker";
 
 export const FileImportDescription = () => {
-  const broker  = useBrokerStore((state) => state.selected);
+  const broker = useBrokerStore((state) => state.selected);
 
   return (
     <>
@@ -38,6 +38,12 @@ export const FileImportDescription = () => {
         <p>
           Your trades will be processed in the background. You can check the
           import status in the settings page under "Import History".
+        </p>
+        <p>
+          Once your trades are processed, they will be marked as drafts,
+          allowing you to review and make changes before analysis. You
+          will be automatically redirected to that page once the sync is
+          complete.
         </p>
       </div>
     </>

@@ -11,8 +11,8 @@ export const FileImport = () => {
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { selected: broker, update: setBroker} = useBrokerStore();
-  
+  const { selected: broker, update: setBroker } = useBrokerStore();
+
   const { isUploading, handleImport } = useFileImport(selectedAccount);
 
   const handleStartImport = useCallback(async () => {
@@ -30,29 +30,32 @@ export const FileImport = () => {
   }, [selectedFile, handleImport]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <BrokerInfo onBrokerSelect={setBroker} selectedBrokerId={broker?.id} />
 
-      {broker?.id && (
-        <div className="space-y-6">
+      <div className="space-y-4">
+        {broker?.id && (
           <AccountSelect
             brokerId={broker.id}
             selectedAccount={selectedAccount}
             onAccountSelected={setSelectedAccount}
           />
+        )}
 
+        {broker?.id && selectedAccount && (
           <FileUploader onFileSelect={setSelectedFile} />
+        )}
 
-          <Button
-            onClick={handleStartImport}
-            disabled={isUploading || !selectedFile}
-            className="w-full"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            {isUploading ? "Uploading..." : "Start Import"}
-          </Button>
-        </div>
-      )}
+        <Button
+          onClick={handleStartImport}
+          disabled={!broker?.id || !selectedAccount || isUploading || !selectedFile}
+          className="w-full"
+        >
+          <Upload className="h-4 w-4 mr-2" />
+          {isUploading ? "Uploading..." : "Start Import"}
+        </Button>
+      </div>
+
     </div>
   );
 };

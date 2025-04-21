@@ -17,19 +17,18 @@ import { NoDataModal } from '@/components/NoDataModal';
 
 export const Behavior = () => {
   const [showModal, setShowModal] = useState(false);
-  const { trades } = useTrades();
+  const { trades, isLoading: tradesLoading } = useTrades();
   const { insights } = useAnalysis();
 
-    useEffect(() => {
-      // Example: data fetching
-      // setData(fetchedData)
-      if (!trades || trades.length === 0) {
-        setShowModal(true);
-      }
-      else if (showModal) {
-        setShowModal(false);
-      }
-    }, [trades]);
+  useEffect(() => {
+    if (tradesLoading) return; // Don't run until data is done loading
+  
+    if (!trades || trades.length === 0) {
+      setShowModal(true);
+    } else {
+      setShowModal(false);
+    }
+  }, [trades, tradesLoading]);
 
   return (
     <div className="space-y-4 animate-fade-up">

@@ -1,5 +1,8 @@
 // ✅ Advanced P&L Calculator (Futures, Forex, Stocks, Crypto, Options) with Real-Time Currency Conversion
+import { supabase } from "@/integrations/supabase/client";
 import { getAssetType, getFuturesInfo } from "./asset-detection";
+
+// Local cache to avoid duplicate calls (in-memory for now)
 
 const convertForexUnitsToLots = (quantity: number): number => {
     if (quantity >= 100000) return quantity / 100000; // Standard Lot
@@ -8,20 +11,48 @@ const convertForexUnitsToLots = (quantity: number): number => {
     return quantity; // Already in lots
 };
 
-const getForexConversionRate = async (quoteCurrency: string, accountCurrency: string = "USD"): Promise<number> => {
+const getForexConversionRate = async (
+    quoteCurrency: string, accountCurrency: string = "USD" 
+): Promise<number> => {
     try {
         if (quoteCurrency === accountCurrency) return 1;
 
-        const response = await fetch(`https://api.exchangerate.host/latest?base=${quoteCurrency}&symbols=${accountCurrency}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-          });
-      
-          const data = await response.json();
-      
-          return data.rates[accountCurrency] || 1;
-    } catch (error) {
-        console.error(`Forex API error:`, error);
+        const today = new Date().toISOString().split("T")[0]; // format: YYYY-MM-DD
+
+        // 1. Check Supabase for cached rate
+        const { data: cachedRate, error } = await supabase
+            .from("forex_rates")
+            .select("rate")
+            .eq("base_currency", quoteCurrency)
+            .eq("quote_currency", accountCurrency)
+            .eq("rate_date", today)
+            .maybeSingle();
+
+        if (cachedRate?.rate) {
+            return parseFloat(cachedRate.rate);
+        }
+
+        // 2. Fetch from CurrencyFreaks if not cached
+        const response = await fetch(
+            `https://api.currencyfreaks.com/latest?apikey=${import.meta.env.VITE_CURRENCY_FREAKS_API_KEY}&symbols=${accountCurrency}&base=${quoteCurrency}`
+        );
+
+        const data = await response.json();
+        const rate = parseFloat(data.rates[accountCurrency]);
+
+        if (!isNaN(rate)) {
+            // 3. Save to Supabase for future use
+            await supabase.from("forex_rates").insert({
+                base_currency: quoteCurrency, quote_currency: accountCurrency, rate, rate_date: today,
+            });
+
+            return rate;
+        }
+
+        console.warn("Invalid rate from CurrencyFreaks. Defaulting to 1.");
+        return 1;
+    } catch (err) {
+        console.error("Error getting forex rate:", err);
         return 1;
     }
 };
@@ -38,7 +69,15 @@ const calculateForexPnL = async (
     return ((exitPrice - entryPrice) * lotSize * contractSize) / conversionRate;
 };
 
-export const calculatePnL = async (symbol: string, buy_price: number, sell_price: number, quantity: number, fees = 0, option_type = null, premium = null) => {
+export const calculatePnL = async (
+    symbol: string,
+    buy_price: number,
+    sell_price: number,
+    quantity: number,
+    fees = 0,
+    option_type = null,
+    premium = null
+) => {
     const asset_type = await getAssetType(symbol);
     let pnl = 0;
 
@@ -47,14 +86,25 @@ export const calculatePnL = async (symbol: string, buy_price: number, sell_price
         case "CRYPTO":
             pnl = (sell_price - buy_price) * quantity - fees;
             break;
-        case "FUTURES":
+        case "FUTURES": {
             const { tick_size, tick_value } = await getFuturesInfo(symbol);
             pnl = ((sell_price - buy_price) / tick_size) * tick_value * quantity - fees;
             break;
+        }
         case "FOREX": {
-            const [baseCurrency, quoteCurrency] = symbol.includes("/") ? symbol.split("/") : [symbol.slice(0, 3), symbol.slice(3, 6)];
-            pnl = await calculateForexPnL(buy_price, sell_price, convertForexUnitsToLots(quantity), 100000, quoteCurrency);
-            pnl -= fees;
+            const [baseCurrency, quoteCurrency] = symbol.includes("/")
+                ? symbol.split("/")
+                : [symbol.slice(0, 3), symbol.slice(3, 6)];
+
+            pnl =
+                (await calculateForexPnL(
+                    buy_price,
+                    sell_price,
+                    convertForexUnitsToLots(quantity),
+                    100000,
+                    quoteCurrency,
+                    baseCurrency
+                )) - fees;
             break;
         }
         case "OPTIONS": {
@@ -66,6 +116,6 @@ export const calculatePnL = async (symbol: string, buy_price: number, sell_price
             break;
         }
     }
+
     return pnl;
 };
-

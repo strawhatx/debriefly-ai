@@ -100,7 +100,7 @@ const columns = [
 export const History = () => {
   const [showModal, setShowModal] = useState(false);
   const [mappedTrades, setMappedTrades] = useState<Trade[]>(null);
-  const { trades, error } = useTrades();
+  const { trades, isLoading: tradesLoading ,error } = useTrades();
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
   const { data: rawTrade, isLoading: isLoadingRaw, error: rawError } = useRawTrade(selectedTradeId);
 
@@ -128,15 +128,14 @@ export const History = () => {
   }, [trades]);
 
   useEffect(() => {
-    // Example: data fetching
-    // setData(fetchedData)
+    if (tradesLoading) return; // Don't run until data is done loading
+  
     if (!trades || trades.length === 0) {
       setShowModal(true);
-    }
-    else if (showModal) {
+    } else {
       setShowModal(false);
     }
-  }, [trades]);
+  }, [trades, tradesLoading]);
 
   if (error) {
     return (
