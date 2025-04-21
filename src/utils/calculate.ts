@@ -12,10 +12,10 @@ const convertForexUnitsToLots = (quantity: number): number => {
 };
 
 const getForexConversionRate = async (
-    quoteCurrency: string, accountCurrency: string = "USD" 
+     baseCurrency: string = "USD", quoteCurrency: string,
 ): Promise<number> => {
     try {
-        if (quoteCurrency === accountCurrency) return 1;
+        if (quoteCurrency === baseCurrency) return 1;
 
         const today = new Date().toISOString().split("T")[0]; // format: YYYY-MM-DD
 
@@ -23,8 +23,8 @@ const getForexConversionRate = async (
         const { data: cachedRate, error } = await supabase
             .from("forex_rates")
             .select("rate")
-            .eq("base_currency", quoteCurrency)
-            .eq("quote_currency", accountCurrency)
+            .eq("base_currency", baseCurrency)
+            .eq("quote_currency", quoteCurrency)
             .eq("rate_date", today)
             .maybeSingle();
 
@@ -34,16 +34,16 @@ const getForexConversionRate = async (
 
         // 2. Fetch from CurrencyFreaks if not cached
         const response = await fetch(
-            `https://api.currencyfreaks.com/latest?apikey=${import.meta.env.VITE_CURRENCY_FREAKS_API_KEY}&symbols=${accountCurrency}&base=${quoteCurrency}`
+            `https://api.forexrateapi.com/v1/latest?api_key=${import.meta.env.VITE_FOREX_RATE_API_KEY}&currencies=${quoteCurrency}&base=${baseCurrency}`
         );
 
         const data = await response.json();
-        const rate = parseFloat(data.rates[accountCurrency]);
+        const rate = parseFloat(data.rates[quoteCurrency]);
 
         if (!isNaN(rate)) {
             // 3. Save to Supabase for future use
             await supabase.from("forex_rates").insert({
-                base_currency: quoteCurrency, quote_currency: accountCurrency, rate, rate_date: today,
+                base_currency: baseCurrency, quote_currency: quoteCurrency, rate, rate_date: today,
             });
 
             return rate;
@@ -62,10 +62,10 @@ const calculateForexPnL = async (
     exitPrice: number,
     lotSize: number,
     contractSize: number = 100000,
+    baseCurrency: string = "USD",
     quoteCurrency: string,
-    accountCurrency: string = "USD"
 ): Promise<number> => {
-    const conversionRate = await getForexConversionRate(quoteCurrency, accountCurrency);
+    const conversionRate = await getForexConversionRate(baseCurrency, quoteCurrency);
     return ((exitPrice - entryPrice) * lotSize * contractSize) / conversionRate;
 };
 
@@ -102,8 +102,8 @@ export const calculatePnL = async (
                     sell_price,
                     convertForexUnitsToLots(quantity),
                     100000,
-                    quoteCurrency,
-                    baseCurrency
+                    baseCurrency,
+                    quoteCurrency
                 )) - fees;
             break;
         }
