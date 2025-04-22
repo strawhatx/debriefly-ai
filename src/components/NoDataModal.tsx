@@ -5,9 +5,8 @@ import {
     DialogTitle,
     DialogDescription,
 } from "@/components/ui/dialog";
-import { ClipboardList, FileWarning, MessageCircleWarning } from "lucide-react";
+import {FileWarning} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { on } from "events";
 import { useNavigate } from "react-router-dom";
 
 interface NoDataModalProps {

@@ -6,6 +6,7 @@ import { SummaryCards } from "./components/SummaryCards";
 import { TradeTable } from "./components/TradeTable";
 import { Columns } from "./components/Columns";
 import { NoDataModal } from "@/components/NoDataModal";
+import { TradeList } from "./components/TradeList";
 
 export const Review = () => {
   const [showModal, setShowModal] = useState(false);
@@ -53,6 +54,7 @@ export const Review = () => {
       date: trade.entry_date,
       asset: trade.symbol,
       type: trade.position_type,
+      market: trade.asset_type,
       entry: trade.fill_price,
       exit: trade.stop_price,
       pnl: trade.pnl,
@@ -66,7 +68,7 @@ export const Review = () => {
 
   useEffect(() => {
     if (tradesLoading) return; // Don't run until data is done loading
-  
+
     if (!trades || trades.length === 0) {
       setShowModal(true);
     } else {
@@ -97,7 +99,17 @@ export const Review = () => {
       ) : (
         <>
           <SummaryCards trades={mappedTrades} />
-          <TradeTable columns={Columns(handleUpdate)} data={mappedTrades} />
+
+          {/* Desktop-only Component */}
+          <div className="hidden lg:block">
+            <TradeTable columns={Columns(handleUpdate)} data={mappedTrades} />
+          </div>
+
+          {/* Mobile-only Component */}
+          <div className="block lg:hidden">
+            <TradeList data={mappedTrades} />
+          </div>
+          
         </>
       )}
     </div>

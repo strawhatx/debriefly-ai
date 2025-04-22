@@ -90,7 +90,7 @@ const TradeRow = ({ trade }: { trade: Position }) => (
     <td className="px-6 py-4 hidden lg:table-cell">{trade.exit.toFixed(2)}</td>
     <td className="px-6 py-4 hidden lg:table-cell">{trade.risk}:{trade.reward}</td>
     <td className={`px-6 py-4 ${trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-      {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
+      {trade.pnl >= 0 ? '+' : '-'}${Math.abs(trade.pnl).toFixed(2)}
     </td>
     <td className="px-6 py-4 hidden lg:table-cell">
       <div className="flex gap-2 flex-wrap">

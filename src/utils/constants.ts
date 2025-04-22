@@ -30,6 +30,25 @@ export const allTags = [
   "IMPULSIVE",
 ];
 
+export const allTagObjects = [
+  { label: "CALM", value: "CALM" },
+  { label: "CONFIDENT", value: "CONFIDENT" },
+  { label: "DISCIPLINED", value: "DISCIPLINED" },
+  { label: "PATIENT", value: "PATIENT" },
+  { label: "HESITANT", value: "HESITANT" },
+  { label: "ANXIOUS", value: "ANXIOUS" },
+  { label: "FEARFUL", value: "FEARFUL" },
+  { label: "DOUBTFUL", value: "DOUBTFUL" },
+  { label: "FOMO", value: "FOMO" },
+  { label: "GREEDY", value: "GREEDY" },
+  { label: "EXCITED", value: "EXCITED" },
+  { label: "OVERCONFIDENT", value: "OVERCONFIDENT" },
+  { label: "REVENGE", value: "REVENGE" },
+  { label: "ANGRY", value: "ANGRY" },
+  { label: "FRUSTRATED", value: "FRUSTRATED" },
+  { label: "IMPULSIVE", value: "IMPULSIVE" }
+];
+
 // Emotion colors and icons dictionary using Tailwind classes
 export const emotionAttributes: Record<string, { colorClass: string; icon: string }> = {
   // Good emotions (emerald)

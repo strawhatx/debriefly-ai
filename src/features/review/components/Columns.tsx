@@ -1,6 +1,7 @@
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Select } from "./Select";
-import { allStrategies, allTags } from "../../../utils/constants";
+import { allStrategies, allTagObjects as allTags } from "../../../utils/constants";
+import { MultiSelect } from "./MultiSelect";
 
 export const Columns = (handleUpdate: (id: string, key: string, value: any) => void) => [
   {
@@ -39,26 +40,6 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
     ),
   },
   {
-    accessorKey: "entry",
-    header: "Entry",
-    meta: {
-      className: "hidden lg:table-cell", // Hidden on small screens
-    },
-    cell: ({ row }) => (
-      <div className="text-right">{row.getValue("entry")?.toFixed(2)}</div>
-    ),
-  },
-  {
-    accessorKey: "exit",
-    header: "Exit",
-    meta: {
-      className: "hidden lg:table-cell", // Hidden on small screens
-    },
-    cell: ({ row }) => (
-      <div className="text-right">{row.getValue("exit")?.toFixed(2)}</div>
-    ),
-  },
-  {
     accessorKey: "pnl",
     header: "P&L",
     cell: ({ row }) => (
@@ -84,7 +65,6 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
 
       return (
         <Select
-          label="Strategy"
           options={allStrategies}
           value={strategy}
           onChange={handleStrategyChange}
@@ -98,7 +78,7 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
     cell: ({ row }) => (
       <input
         type="number"
-        className="bg-gray-800 text-right text-white border border-gray-600 rounded px-2 py-1"
+        className="bg-gray-800 text-right text-white border border-gray-600 rounded px-4 py-2"
         value={row.getValue("reward")}
         min={0.5}
         max={10}
@@ -113,19 +93,17 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
     accessorKey: "tags",
     header: "Emotions",
     cell: ({ row }) => {
-      const tags = row.getValue("tags");
+      const tags: string[] = row.getValue("tags");
 
-      const handleTagsChange = (newTags) => {
+      const handleTagsChange = (newTags: string[]) => {
         handleUpdate(row.original.id, "tags", newTags);
       };
 
       return (
-        <Select
-          label="Emotions"
+        <MultiSelect
           options={allTags}
-          value={tags}
-          onChange={handleTagsChange}
-          multiple={true}
+          values={tags}
+          onValueChange={handleTagsChange}
         />
       );
     },

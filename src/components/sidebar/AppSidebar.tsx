@@ -56,7 +56,7 @@ const AppSidebar = () => {
   const email = profile?.email || "Not available";
 
   return (
-    <ShadcnSidebar>
+    <ShadcnSidebar className="bg-background">
       <SidebarContent>
         {/* Branding */}
         <div className="p-4">

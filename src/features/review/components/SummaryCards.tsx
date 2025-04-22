@@ -36,12 +36,12 @@ export const SummaryCards = ({ trades }: TradeStatisticsProps) => {
             <StatCard title="Win Rate" value={`${winRate.toFixed(2)}%`} textColor="text-emerald-400" />
             <StatCard 
                 title="Total P&L" 
-                value={`$${totalPnL.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+                value={`${totalPnL >= 0 ? '+' : '-'} $${Math.abs(totalPnL).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
                 textColor={totalPnL >= 0 ? 'text-emerald-400' : 'text-red-400'} 
             />
             <StatCard 
                 title="Avg Trade" 
-                value={`$${avgTrade.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
+                value={`${avgTrade >= 0 ? '+' : '-'} $${Math.abs(avgTrade).toLocaleString(undefined, { minimumFractionDigits: 2 })}`} 
                 textColor={avgTrade >= 0 ? 'text-emerald-400' : 'text-red-400'} 
             />
         </section>
