@@ -14,6 +14,7 @@ import { useAnalysis } from './hooks/use-analysis';
 import { useEffect, useState } from 'react';
 import { useDateStore } from '@/store/date';
 import { NoDataModal } from '@/components/NoDataModal';
+import { TradeList } from './components/TradeList';
 
 interface OverviewPosition {
   risk: number;
@@ -91,7 +92,16 @@ export const Debrief = () => {
       </div>
 
       {/* Trade List */}
-      <SessionTrades positions={positions} />
+      
+      {/* Desktop-only Component */}
+      <div className="hidden lg:block">
+        <SessionTrades positions={positions} />
+      </div>
+
+      {/* Mobile-only Component */}
+      <div className="block lg:hidden">
+        <TradeList data={positions} />
+      </div>
 
       {/* Strategy Adjustments */}
       <StrategyAdjustments strategy_recommendations={analysis?.strategy_recommendations} />

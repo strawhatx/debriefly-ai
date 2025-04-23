@@ -13,16 +13,19 @@ interface Option {
 
 interface MultiSelectProps {
     options: Option[];
-    values: string[]; // Supports single value only (shadcn Select does not support multiple values out of the box)
+    values: string[] | undefined; // Allow undefined to handle optional values
     onValueChange: (value: string[]) => void;
 }
 
 export const MultiSelect: React.FC<MultiSelectProps> = ({ options, values, onValueChange }) =>  {
+  // Ensure values is always an array, even when undefined
+  const safeValues = values || [];
+  
   return (
       <ShadcnMultiSelect
         options={options}
         onValueChange={onValueChange}
-        defaultValue={values}
+        defaultValue={safeValues}
         placeholder="Select frameworks"
         variant="inverted"
         className="text-sm"

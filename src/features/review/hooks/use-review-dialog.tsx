@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface Trade {
   id: string;
+  user_id: string;
   date: string;
   symbol: string;
   type: 'LONG' | 'SHORT';
@@ -22,7 +23,17 @@ interface ValidationErrors {
 export const useReviewDialog = () => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [trade, setTrade] = useState<Trade | null>(null);
+  const [trade, setTrade] = useState<Trade>({
+    id: "",
+    user_id: "",
+    date: new Date().toLocaleDateString(),
+    symbol: "",
+    type: "LONG",
+    pnl: 0,
+    strategy: "",
+    reward: 0,
+    tags: []
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
 
@@ -75,9 +86,12 @@ export const useReviewDialog = () => {
       const { error } = await supabase
         .from('positions')
         .update({
+          id: trade.id,
+          user_id: trade.user_id,
           strategy: trade.strategy,
           reward: trade.reward,
-          tags: trade.tags
+          tags: trade.tags,
+          state: "PUBLISHED",
         })
         .eq('id', trade.id)
         .single();

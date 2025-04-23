@@ -11,7 +11,7 @@ interface EmotionalTagProps {
 }
 
 export const EmotionalTags = ({ id }: EmotionalTagProps) => {
-    const { emotionTags, allEmotionTags, handleTagChange } = useEmotionalTags(id)
+    const { emotionTags, allTags, handleTagChange } = useEmotionalTags(id)
 
     return (
         <div className="py-3 px-2">            
@@ -29,7 +29,7 @@ export const EmotionalTags = ({ id }: EmotionalTagProps) => {
                         </ListboxButton>
 
                         <ListboxOptions className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-gray-800 py-1 text-base ring-1 shadow-lg ring-black/5 focus:outline-none">
-                            {allEmotionTags.map((emotion) => (
+                            {allTags.map((emotion) => (
                                 <ListboxOption key={emotion} value={emotion} className="group relative cursor-default py-2 pr-9 pl-3 select-none text-white data-focus:bg-primary">
                                     <div className="flex items-center text-gray-400">
                                         <Tag className="w-4" />

@@ -4,6 +4,8 @@ import useTradingAccountStore from "@/store/trading-account";
 
 interface Trade {
   id: string;
+  user_id:string;
+  trading_account_id:string;
   symbol: string;
   position_type: "LONG" | "SHORT";
   fill_price: number;
@@ -42,7 +44,7 @@ export const useTrades = (isReview: boolean = false) => {
       let query = supabase
         .from("positions")
         .select(`
-            id, symbol, asset_type,  position_type, fill_price, stop_price, entry_date, 
+            id, user_id, trading_account_id, symbol, asset_type,  position_type, fill_price, stop_price, entry_date, 
             closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
           `)
         .eq("user_id", user.id)
@@ -76,8 +78,11 @@ export const useTrades = (isReview: boolean = false) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+
+
       const updates = updatedTrades.map((trade) => ({
         id: trade.id,
+        user_id: trade.user_id,
         strategy: trade.strategy,
         reward: trade.reward,
         tags: trade.tags,

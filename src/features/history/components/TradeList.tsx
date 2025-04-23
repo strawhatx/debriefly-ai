@@ -4,26 +4,26 @@ import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowDownRight, ArrowUpRight, ChevronsUpDown, Search } from "lucide-react"
-import { ReviewDialog } from "./ReviewDialog"
-import { Trade } from "../hooks/use-review-dialog"
+import { ArrowDownRight, ArrowUpRight, ChevronsUpDown, ClipboardCopy, Database, MoreHorizontal, Search } from "lucide-react"
 import { getAssetIcon } from "@/utils/asset-icons"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
-// Extend the Trade interface to include asset property
-interface ExtendedTrade extends Trade {
+export interface Trade {
+    id: string;
+    date: string;
     asset: string;
     market: string;
+    type: 'LONG' | 'SHORT';
+    pnl: number;
 }
 
 interface TradeListProps {
-    data: ExtendedTrade[];
-    refresh?: () => void;
+    data: Trade[];
+    onViewRawData: (tradeId: string) => void;
 }
 
-export const TradeList = ({ data, refresh }: TradeListProps) => {
+export const TradeList = ({ data, onViewRawData }: TradeListProps) => {
     const [searchTerm, setSearchTerm] = React.useState("");
-    const [selectedTrade, setSelectedTrade] = React.useState<ExtendedTrade | null>(null);
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
     const [assetIcons, setAssetIcons] = React.useState<Record<string, string>>({});
 
     // Memoize filtered trades
@@ -41,24 +41,6 @@ export const TradeList = ({ data, refresh }: TradeListProps) => {
     const handleSearch = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     }, []);
-
-    // Memoize open dialog handler
-    const handleOpenDialog = React.useCallback((trade: ExtendedTrade) => {
-        setSelectedTrade(trade);
-        setIsDialogOpen(true);
-    }, []);
-
-    // Memoize close dialog handler
-    const handleCloseDialog = React.useCallback(() => {
-        setIsDialogOpen(false);
-        setSelectedTrade(null);
-    }, []);
-
-    // Memoize save handler
-    const handleSave = React.useCallback(() => {
-        if (refresh) refresh();
-        handleCloseDialog();
-    }, [refresh, handleCloseDialog]);
 
     // Load asset icons
     React.useEffect(() => {
@@ -83,6 +65,15 @@ export const TradeList = ({ data, refresh }: TradeListProps) => {
 
         loadIcons();
     }, [data]);
+
+    if (!filteredTrades || filteredTrades.length === 0) {
+        return (
+            <Card className="w-full">
+                <p className="text-gray-400">No trades found for this account.</p>
+            </Card>
+        );
+    }
+
 
     return (
         <Card className="w-full">
@@ -147,28 +138,40 @@ export const TradeList = ({ data, refresh }: TradeListProps) => {
                                     </div>
                                 </div>
                             </div>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleOpenDialog(trade)}
-                                className="border-gray-600"
-                            >
-                                Edit
-                            </Button>
+
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="h-8 w-8 p-0">
+                                        <span className="sr-only">Open menu</span>
+                                        <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="bg-gray-900" align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuItem
+                                        onClick={() => navigator.clipboard.writeText(trade.id)}
+                                    >
+                                        <ClipboardCopy className="w-4 h-4 mr-2" />
+                                        Copy trade ID
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => navigator.clipboard.writeText(trade.asset)}
+                                    >
+                                        <ClipboardCopy className="w-4 h-4 mr-2" />
+                                        Copy asset
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => onViewRawData(trade.id)}
+                                    >
+                                        <Database className="w-4 h-4 mr-2" />
+                                        View raw data
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     ))
                 )}
             </CardContent>
-
-            {/* Single instance of ReviewDialog */}
-            {selectedTrade && (
-                <ReviewDialog
-                    data={{ ...selectedTrade, symbol: selectedTrade.asset }}
-                    onSave={handleSave}
-                    open={isDialogOpen}
-                    onOpenChange={setIsDialogOpen}
-                />
-            )}
         </Card>
     );
 };

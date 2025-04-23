@@ -1,5 +1,7 @@
+import { emotionAttributes } from '@/utils/constants';
 import { useSessionTrades } from '../hooks/use-session-trades';
-import { ArrowUpRight, ArrowDownRight, SortAsc } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, SortAsc} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface Position {
   id: string;
@@ -24,8 +26,6 @@ interface TradeTagProps {
   tag: string;
 }
 
-const POSITIVE_TAGS = ['Disciplined', 'Planned', 'Confident'] as const;
-
 const SortableColumn = ({ label, sortKey, onSort }: SortableColumnProps) => (
   <button
     onClick={() => onSort(sortKey)}
@@ -36,17 +36,21 @@ const SortableColumn = ({ label, sortKey, onSort }: SortableColumnProps) => (
   </button>
 );
 
-const TradeTag = ({ tag }: TradeTagProps) => (
-  <span
-    className={`px-2 py-1 rounded-full text-sm ${
-      POSITIVE_TAGS.includes(tag as typeof POSITIVE_TAGS[number])
-        ? 'bg-emerald-500/20 text-emerald-300'
-        : 'bg-amber-500/20 text-amber-300'
-    }`}
-  >
-    {tag}
-  </span>
-);
+const TradeTag = ({ tag }: TradeTagProps) => {
+  const { colorClass, icon } = emotionAttributes[tag] || {
+      colorClass: "text-gray-400 bg-gray-900/50",
+      icon: "❓",
+  };
+
+  return (
+      <Badge
+          key={tag}
+          className={`py-2 px-3 text-sm border border-gray-500/50 hover:bg-gray-900/70 ${colorClass}`}
+      >
+          {icon} {tag}
+      </Badge>
+  );
+}
 
 const TradeTypeIndicator = ({ type }: { type: Position['type'] }) => (
   <span className={`flex items-center gap-1 ${

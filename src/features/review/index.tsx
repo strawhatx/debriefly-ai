@@ -11,7 +11,7 @@ import { TradeList } from "./components/TradeList";
 export const Review = () => {
   const [showModal, setShowModal] = useState(false);
   const [mappedTrades, setMappedTrades] = useState([]);
-  const { trades, setTrades, saveTrades, isLoading: tradesLoading, error } = useTrades(true);
+  const { trades, setTrades, fetchTrades, saveTrades, isLoading: tradesLoading, error } = useTrades(true);
   const { event, setLoading } = useEventStore();
   const { toast } = useToast();
 
@@ -51,6 +51,7 @@ export const Review = () => {
   useEffect(() => {
     const result = trades.map((trade) => ({
       id: trade.id,
+      user_id: trade.user_id,
       date: trade.entry_date,
       asset: trade.symbol,
       type: trade.position_type,
@@ -107,7 +108,7 @@ export const Review = () => {
 
           {/* Mobile-only Component */}
           <div className="block lg:hidden">
-            <TradeList data={mappedTrades} />
+            <TradeList data={mappedTrades} refresh={fetchTrades} />
           </div>
           
         </>
