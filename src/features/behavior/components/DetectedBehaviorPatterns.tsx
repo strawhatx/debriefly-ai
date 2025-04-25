@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { emotionAttributes } from "@/utils/constants";
 import { Brain } from "lucide-react";
 import { useMemo } from "react";
+import { calculateEmotionalControlScore } from "@/utils/calculate-emotional-control-score";
 
 interface DetectedBehaviorPatternsProps {
   trades: { tags: string[] }[]; // Assuming each trade has a `tags` array
@@ -28,6 +29,11 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
 
     return { tagPercentages, totalTrades };
   }, [trades]);
+
+  // Calculate emotional control score
+  const emotionalControlScore = useMemo(() => {
+    return calculateEmotionalControlScore(tagPercentages);
+  }, [tagPercentages]);
 
   // Handle empty trades
   if (!totalTrades) {
@@ -71,13 +77,16 @@ export const DetectedBehaviorPatterns = ({ trades }: DetectedBehaviorPatternsPro
         <div className="p-4 bg-gray-900/70 rounded-lg">
           <div className="flex justify-between items-center mb-2">
             <span className="font-medium">Emotional Control Score</span>
-            <span className="text-lg font-bold text-emerald-400">7.2/10</span>
+            <span className="text-lg font-bold text-emerald-400">{emotionalControlScore}/10</span>
           </div>
           <div className="h-2 bg-gray-700 rounded-full">
-            <div className="h-full w-[72%] bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full"></div>
+            <div 
+              className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full"
+              style={{ width: `${emotionalControlScore * 10}%` }}
+            ></div>
           </div>
           <p className="text-sm text-gray-400 mt-2">
-            Score based on your last 50 trades. Showing improvement from last month's 6.4/10.
+            Score based on your last {totalTrades} trades. {emotionalControlScore >= 7 ? "Showing good emotional control." : "Consider focusing on emotional discipline."}
           </p>
         </div>
       </div>

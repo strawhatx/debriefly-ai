@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
 
+// Define proper types for all entities
 interface Trade {
   id: string;
-  user_id:string;
-  trading_account_id:string;
+  user_id: string;
+  trading_account_id: string;
   symbol: string;
   position_type: "LONG" | "SHORT";
   fill_price: number;
@@ -22,18 +23,82 @@ interface Trade {
   tags: string[] | null;
   score: number;
   leverage: number | null;
+  state?: "DRAFT" | "PUBLISHED";
 }
 
-export const useTrades = (isReview: boolean = false) => {
+interface TradeUpdate {
+  id: string;
+  strategy: string | null;
+  reward: number;
+  tags: string[] | null;
+  trading_account_id: string;
+  user_id: string;
+}
+
+interface UseTradesResult {
+  trades: Trade[];
+  setTrades: React.Dispatch<React.SetStateAction<Trade[]>>;
+  isLoading: boolean;
+  error: Error | null;
+  fetchTrades: () => Promise<void>;
+  saveTrades: (updatedTrades: TradeUpdate[]) => Promise<void>;
+}
+
+// Validation functions
+const validateTrade = (trade: TradeUpdate): boolean => {
+  if (!trade.id) {
+    console.warn("Trade missing ID, skipping:", trade);
+    return false;
+  }
+  
+  if (trade.strategy !== null && typeof trade.strategy !== 'string') {
+    console.warn(`Invalid strategy for trade ${trade.id}: ${trade.strategy}`);
+    return false;
+  }
+  
+  if (typeof trade.reward !== 'number' || isNaN(trade.reward)) {
+    console.warn(`Invalid reward for trade ${trade.id}: ${trade.reward}`);
+    return false;
+  }
+  
+  if (trade.tags !== null && (!Array.isArray(trade.tags) || !trade.tags.every(tag => typeof tag === 'string'))) {
+    console.warn(`Invalid tags for trade ${trade.id}: ${trade.tags}`);
+    return false;
+  }
+  
+  return true;
+};
+
+export const useTrades = (isReview: boolean = false): UseTradesResult => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const selectedAccount = useTradingAccountStore((state) => state.selected);
 
+  // Memoize the query builder to prevent unnecessary re-renders
+  const buildTradesQuery = useCallback(() => {
+    let query = supabase
+      .from("positions")
+      .select(`
+        id, user_id, trading_account_id, symbol, asset_type, position_type, fill_price, stop_price, entry_date, 
+        closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
+      `)
+      .order("entry_date", { ascending: false });
+
+    if (isReview) {
+      query = query.eq("state", "DRAFT");
+    }
+    
+    if (selectedAccount) {
+      query = query.eq("trading_account_id", selectedAccount);
+    }
+
+    return query;
+  }, [isReview, selectedAccount]);
+
   // Fetch trades from the database
-  // Fetch trades from the database
-  const fetchTrades = async () => {
+  const fetchTrades = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -41,36 +106,22 @@ export const useTrades = (isReview: boolean = false) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      let query = supabase
-        .from("positions")
-        .select(`
-            id, user_id, trading_account_id, symbol, asset_type,  position_type, fill_price, stop_price, entry_date, 
-            closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
-          `)
-        .eq("user_id", user.id)
-        .order("entry_date", { ascending: false });
-
-      if (isReview) {
-        query = query.eq("state", "DRAFT");
-      }
-      if (selectedAccount) {
-        query = query.eq("trading_account_id", selectedAccount);
-      }
-
-      const { data, error } = await query;
+      const query = buildTradesQuery();
+      const { data, error } = await query.eq("user_id", user.id);
+      
       if (error) throw error;
-
-      setTrades(data);
+      setTrades(data || []);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to fetch trades"));
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch trades";
+      setError(new Error(errorMessage));
       console.error("Error fetching trades:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [buildTradesQuery]);
 
   // Save trades to the database
-  const saveTrades = async (updatedTrades: any[]) => {
+  const saveTrades = useCallback(async (updatedTrades: TradeUpdate[]) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -78,38 +129,54 @@ export const useTrades = (isReview: boolean = false) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Validate trades before saving
+      const validatedTrades = updatedTrades.filter(validateTrade);
 
+      if (validatedTrades.length === 0) {
+        throw new Error("No valid trades to save after validation");
+      }
 
-      const updates = updatedTrades.map((trade) => ({
+      // Batch updates for better performance
+      const updates = validatedTrades.map((trade) => ({
         id: trade.id,
-        user_id: trade.user_id,
         strategy: trade.strategy,
         reward: trade.reward,
         tags: trade.tags,
-        state: "PUBLISHED",
+        state: "PUBLISHED" as const,
+        trading_account_id: trade.trading_account_id,
+        user_id: trade.user_id
       }));
 
-      const { error } = await supabase.from("positions").upsert(updates, { onConflict: "id" });
+      const { error } = await supabase
+        .from("positions")
+        .upsert(updates, { onConflict: 'id' });
 
       if (error) throw error;
 
       // Update local state after saving
-      setTrades((prevTrades) =>
-        prevTrades.map((trade) =>
-          updatedTrades.find((updated) => updated.id === trade.id) || trade
-        )
-      );
+      await fetchTrades();
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to save trades"));
-      console.error("Error saving trades:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to update trades";
+      setError(new Error(errorMessage));
+      console.error("Error updating trades:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [fetchTrades]);
+
+  // Memoize the result to prevent unnecessary re-renders
+  const result = useMemo(() => ({
+    trades,
+    setTrades,
+    isLoading,
+    error,
+    fetchTrades,
+    saveTrades
+  }), [trades, isLoading, error, fetchTrades, saveTrades]);
 
   useEffect(() => {
     fetchTrades();
-  }, [selectedAccount, isReview]);
+  }, [fetchTrades]);
 
-  return { trades, setTrades, isLoading, error, fetchTrades, saveTrades };
+  return result;
 };

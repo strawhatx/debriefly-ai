@@ -5,13 +5,14 @@ import { useEventStore } from "@/store/event";
 import { SummaryCards } from "./components/SummaryCards";
 import { TradeTable } from "./components/TradeTable";
 import { Columns } from "./components/Columns";
-import { NoDataModal } from "@/components/NoDataModal";
 import { TradeList } from "./components/TradeList";
+import { Button } from "@/components/ui/button";
+import { useAnalysis } from "./hooks/use-analysis";
 
 export const Review = () => {
-  const [showModal, setShowModal] = useState(false);
   const [mappedTrades, setMappedTrades] = useState([]);
-  const { trades, setTrades, fetchTrades, saveTrades, isLoading: tradesLoading, error } = useTrades(true);
+  const { trades, setTrades, fetchTrades, saveTrades, error } = useTrades(true);
+  const { hasUnanalyzedTrades, runTradeAnalysis, checkForUnanalyzedTrades } = useAnalysis();
   const { event, setLoading } = useEventStore();
   const { toast } = useToast();
 
@@ -68,15 +69,10 @@ export const Review = () => {
   }, [trades]);
 
   useEffect(() => {
-    if (tradesLoading) return; // Don't run until data is done loading
+    if (trades && trades.length > 0) return;
 
-    if (!trades || trades.length === 0) {
-      setShowModal(true);
-    } else {
-      setShowModal(false);
-    }
-  }, [trades, tradesLoading]);
-
+    checkForUnanalyzedTrades();
+  }, [trades]);
 
   if (error) {
     return (
@@ -90,12 +86,22 @@ export const Review = () => {
 
   return (
     <div className="space-y-4">
-      <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
-
       {/* Trade Statistics */}
       {(!mappedTrades || mappedTrades.length === 0) ? (
         <section className="text-gray-400 text-center p-4 bg-gray-800 rounded-xl border border-gray-700">
-          No trade data available.
+          {hasUnanalyzedTrades ? (
+            <div className="space-y-4">
+              <p>
+                No trades needed to review. Click
+                <Button variant="link" onClick={runTradeAnalysis}
+                  className="px-1 py-1 text-primary hover:text-emerald-700">
+                  here to start the analysis
+                </Button>
+              </p>
+            </div>
+          ) : (
+            <p>No trades needed to review.</p>
+          )}
         </section>
       ) : (
         <>
@@ -110,7 +116,6 @@ export const Review = () => {
           <div className="block lg:hidden">
             <TradeList data={mappedTrades} refresh={fetchTrades} />
           </div>
-          
         </>
       )}
     </div>

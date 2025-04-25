@@ -2,7 +2,7 @@ import React from "react";
 import { saveAs } from "file-saver";
 
 const generateTradesCSV = () => {
-    const symbols = ["FOREX:EURUSD", "FOREX:GBPUSD", "FOREX:USDJPY", "FOREX:AUDUSD", "FOREX:USDCAD"];
+    const symbols = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA", "NVDA", "JPM", "V", "WMT"];
     const numTrades = 10; // 10 trades (each with an entry + exit)
     const trades = [];
     let orderId = 1762849200;

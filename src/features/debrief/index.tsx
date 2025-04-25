@@ -105,22 +105,6 @@ export const Debrief = () => {
 
       {/* Strategy Adjustments */}
       <StrategyAdjustments strategy_recommendations={analysis?.strategy_recommendations} />
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <button className="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg font-medium">
-          <Save className="w-5 h-5" />
-          Save Debrief
-        </button>
-        <button className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium">
-          <History className="w-5 h-5" />
-          Compare Past Sessions
-        </button>
-        <button className="flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium group">
-          Set AI Coaching Goal
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-        </button>
-      </div>
     </div>
   );
 }

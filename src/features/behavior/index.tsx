@@ -1,7 +1,3 @@
-
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 import { DetectedBehaviorPatterns } from './components/DetectedBehaviorPatterns';
 import { useTrades } from './hooks/use-trades';
 import { AiSummary } from './components/AiSummary';
@@ -11,9 +7,9 @@ import { WinRate } from './components/WinRate';
 import { RiskReward } from './components/RiskReward';
 import { TradeReview } from './components/TradeReview';
 import { BehaviorChart } from './components/BehaviorChart';
-import { ChevronRight, Lock, ThumbsUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { NoDataModal } from '@/components/NoDataModal';
+import { TradeList } from './components/TradeList';
 
 export const Behavior = () => {
   const [showModal, setShowModal] = useState(false);
@@ -61,40 +57,16 @@ export const Behavior = () => {
 
       {/* Section 4: Detailed Trade Review */}
       <section>
-        <TradeReview trades={trades} />
-      </section>
+        
+          {/* Desktop-only Component */}
+      <div className="hidden lg:block">
+       <TradeReview trades={trades} />
+      </div>
 
-      {/* Section 5: Call to Action */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-gray-800 border border-gray-700 p-6 flex flex-col items-start">
-          <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-            <ThumbsUp className="text-emerald-400" />
-            View Your Full Trading Session Analysis
-          </h3>
-          <p className="text-gray-300 mb-4">
-            Get a comprehensive debrief of your recent trading sessions with deeper insights and personalized tips.
-          </p>
-          <Link to="/app/debrief">
-            <Button className="hover-scale">
-              Go to Debrief
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </Link>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 p-6 flex flex-col items-start">
-          <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-            <Lock className="text-purple-400" />
-            Unlock Advanced Behavioral Analytics
-          </h3>
-          <p className="text-gray-300 mb-4">
-            Upgrade to Pro for AI-powered pattern recognition, automated behavior alerts, and personalized coaching.
-          </p>
-          <Button variant="glow" className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover-scale">
-            Upgrade to Pro
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </Card>
+      {/* Mobile-only Component */}
+      <div className="block lg:hidden">
+        <TradeList data={trades} />
+      </div>
       </section>
     </div>
   );

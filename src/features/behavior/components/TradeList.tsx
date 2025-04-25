@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 
 export interface Trade {
     id: string;
-    time: string;
     date: string;
     symbol: string;
     entry: number;
@@ -82,7 +81,7 @@ const TradeCard = React.memo(({ trade }: TradeCardProps) => {
                         {trade.symbol}
                     </span>
                 </div>
-                <span className="text-sm text-gray-400">{trade.time}</span>
+                <span className="text-sm text-gray-400">{trade.date}</span>
             </div>
             <div className="flex justify-between items-center">
                 <span className="text-gray-300">

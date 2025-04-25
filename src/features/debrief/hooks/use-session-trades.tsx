@@ -12,7 +12,6 @@ interface Position {
   reward: number;
   pnl: number;
   tags: string[];
-
 }
 
 export const useSessionTrades = (positions: Position[]) => {
@@ -23,13 +22,23 @@ export const useSessionTrades = (positions: Position[]) => {
 
   const sortedTrades = [...positions].sort((a, b) => {
     if (sortOrder === 'asc') {
-      return sortField === 'time'
-        ? a.time.localeCompare(b.time)
-        : a.pnl - b.pnl;
+      if (sortField === 'time') {
+        // Parse the time strings to Date objects for proper comparison
+        const dateA = new Date(a.time);
+        const dateB = new Date(b.time);
+        return dateA.getTime() - dateB.getTime();
+      } else {
+        return a.pnl - b.pnl;
+      }
     } else {
-      return sortField === 'time'
-        ? b.time.localeCompare(a.time)
-        : b.pnl - a.pnl;
+      if (sortField === 'time') {
+        // Parse the time strings to Date objects for proper comparison
+        const dateA = new Date(a.time);
+        const dateB = new Date(b.time);
+        return dateB.getTime() - dateA.getTime();
+      } else {
+        return b.pnl - a.pnl;
+      }
     }
   });
 
