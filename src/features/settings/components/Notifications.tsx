@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 
-export const NotificationSection = () => {
+export const Notifications = () => {
   const [notifications, setNotifications] = useState({
     dailySession: true, weeklyPerformance: true, betaUpdates: false, psychologyTips: true
   });

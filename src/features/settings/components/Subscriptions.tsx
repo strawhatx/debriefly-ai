@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { usePayment } from "@/hooks/use-payment";
 import { useEffect, useState } from "react";
 
-interface SubscriptionSectionProps {
+interface SubscriptionsProps {
   userId: string;
   email: string;
 }
@@ -43,7 +43,7 @@ const tiers = [
   },
 ];
 
-export const SubscriptionSection = ({ userId, email }: SubscriptionSectionProps) => {
+export const Subscriptions = ({ userId, email }: SubscriptionsProps) => {
   const { fetchSubscription, createPaymentLink, openBillingPortal, loading } = usePayment();
   const [activePlan, setActivePlan] = useState<string | null>(null);
 

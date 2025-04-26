@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { usePasswordDialog } from "../hooks/use-password-dialog";
 
-export const ProfilePasswordDialog = () => {
+export const PasswordDialog = () => {
   const { isOpen, setIsOpen, passwords, updatePassword, handlePasswordUpdate } = usePasswordDialog();
 
   return (

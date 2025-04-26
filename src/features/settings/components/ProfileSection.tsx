@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { AvatarUpload } from "./AvatarUpload";
-import { ProfilePasswordDialog } from "./ProfilePasswordDialog";
+import { PasswordDialog } from "./PasswordDialog";
 import { useProfileSection } from "../hooks/use-profile-section";
 
 export const ProfileSection = () => {
@@ -67,7 +67,7 @@ export const ProfileSection = () => {
               <Label className="block text-sm mb-2">
                 Password
               </Label>
-              <ProfilePasswordDialog />
+              <PasswordDialog />
             </div>
 
             <Button

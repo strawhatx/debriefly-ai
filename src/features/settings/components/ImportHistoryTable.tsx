@@ -16,7 +16,7 @@ interface Import {
   file_type?: string;
 }
 
-export const ImportHistorySection = () => {
+export const ImportHistoryTable = () => {
   const { imports, loading } = useImportHistorySection();
 
   const columns: ColumnDef<Import>[] = [
