@@ -96,7 +96,7 @@ export const useReviewDialog = () => {
         .eq('id', trade.id)
         .single();
 
-      if (error) throw error;
+      if (error) throw new Error(error.message);
 
       toast({
         title: "Success",
@@ -105,14 +105,16 @@ export const useReviewDialog = () => {
       });
 
       setOpen(false);
-    } catch (error: any) {
+    } 
+    catch (error: any) {
       console.error('Error saving position:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to save trade",
         variant: "destructive"
       });
-    } finally {
+    } 
+    finally {
       setIsSaving(false);
     }
   };

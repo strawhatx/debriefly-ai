@@ -147,19 +147,32 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
         user_id: trade.user_id
       }));
 
-      const { error } = await supabase
-        .from("positions")
-        .upsert(updates, { onConflict: 'id' });
-
-      if (error) throw error;
+      // Update each trade individually
+      for (const update of updates) {
+        const { error } = await supabase
+          .from("positions")
+          .update({
+            strategy: update.strategy,
+            reward: update.reward,
+            tags: update.tags,
+            state: update.state,
+            trading_account_id: update.trading_account_id,
+            user_id: update.user_id
+          })
+          .eq('id', update.id);
+          
+        if (error) throw error;
+      }
 
       // Update local state after saving
       await fetchTrades();
-    } catch (err) {
+    } 
+    catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update trades";
       setError(new Error(errorMessage));
       console.error("Error updating trades:", err);
-    } finally {
+    } 
+    finally {
       setIsLoading(false);
     }
   }, [fetchTrades]);
