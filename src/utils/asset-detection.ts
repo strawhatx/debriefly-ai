@@ -110,26 +110,24 @@ export const extractMarket = (symbol: string): string | undefined => {
   return parts.length === 2 ? parts[0] : undefined;
 };
 
-export const getAssetType = (symbol: string): string => {
+export const getAssetType = async (symbol: string): Promise<string> => {
   const capsSymbol = symbol.toUpperCase().trim();
   const cleanSymbol = normalizeSymbol(capsSymbol);
 
   console.log(`Detecting asset type for: ${cleanSymbol}`);
 
-  // Futures Detection
+  // Check synchronous conditions first
   if (isFutures(cleanSymbol)) return 'FUTURES';
-
-  // Options Detection
   if (isOptions(cleanSymbol)) return 'OPTIONS';
 
-  // Forex Detection
-  if (isForex(cleanSymbol)) return 'FOREX';
+  const isForexResult = await isForex(cleanSymbol);
+  if (isForexResult) return 'FOREX';
 
-  // Crypto Detection
-  if (isCrypto(cleanSymbol)) return 'CRYPTO';
+  const isCryptoResult = await isCrypto(cleanSymbol);
+  if (isCryptoResult) return 'CRYPTO';
 
   // Default to STOCK if no other patterns match
-  return 'STOCK'
+  return 'STOCK';
 };
 
 export const getFuturesInfo = async (symbol: string): Promise<FuturesAssetConfig> => {

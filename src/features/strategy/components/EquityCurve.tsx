@@ -9,6 +9,7 @@ import {
   } from "recharts";
   import { TrendingUp } from "lucide-react";
   import { useMemo } from "react";
+import { abbreviateNumber } from "@/utils/utils";
   
   interface Trade {
     pnl: number;
@@ -36,14 +37,6 @@ import {
     }, [trades]);
   
     const hasData = equityCurveData.length > 0;
-
-      // Function to abbreviate large numbers
-  const abbreviateNumber = (value: number) => {
-    const absValue = Math.abs(value); // Get the absolute value for formatting
-    if (absValue >= 1_000_000) return `${(value / 1_000_000)}M`;
-    if (absValue >= 1_000) return `${(value / 1_000)}K`;
-    return value.toString();
-  };
   
     return (
       <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">

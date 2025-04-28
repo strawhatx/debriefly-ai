@@ -28,12 +28,15 @@ export const StrategyMetrics = ({ positions }: StrategyMetricsProps) => {
         value: string | number;
         subtitle?: string;
       }) => (
-        <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
-          <span className="text-gray-400">{title}</span>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">
-            {value ?? "-"}
+        <div className="flex flex-col justify-between bg-gray-800 rounded-xl p-4 border border-gray-700">
+          <div>
+            <span className="text-gray-400">{title}</span>
+            <div className="text-xl font-bold text-emerald-400 mt-1">
+              {value ?? "-"}
+            </div>
           </div>
-          {subtitle && <div className="text-sm text-gray-400">{subtitle}</div>}
+
+          {subtitle && <div className="text-sm text-gray-400 mt-2">{subtitle}</div>}
         </div>
       ),
     []

@@ -28,9 +28,9 @@ export const ContactPage = () => {
       const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
 
       await resend.emails.send({
-        from: 'contact@trademindai.com', // Verified domain email
+        from: 'contact@psyq.com', // Verified domain email
         to: 'nathanieltjames24@gmail.com', // Where you want to receive messages
-        subject: `Trademind AI: Contact Form Inquiry from ${data.name}`,
+        subject: `PsyQ: Contact Form Inquiry from ${data.name}`,
         text: `
           Name: ${data.name}
           Email: ${data.email}
@@ -60,7 +60,7 @@ export const ContactPage = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-4xl font-bold mb-4">Get in Touch</h1>
           <p className="text-gray-400">
-            Have questions about TradeMind AI? Our team is here to help you optimize your trading journey.
+            Have questions about PsyQ? Our team is here to help you optimize your trading journey.
           </p>
         </div>
 
@@ -69,8 +69,8 @@ export const ContactPage = () => {
             <Mail className="w-8 h-8 text-primary mb-4" />
             <h3 className="text-lg font-semibold mb-2">Email Us</h3>
             <p className="text-gray-400 mb-2">We'll respond within 24 hours</p>
-            <a href="mailto:support@trademind.ai" className="text-primary hover:text-emerald-300">
-              support@trademind.ai
+            <a href="mailto:support@psyq.ai" className="text-primary hover:text-emerald-300">
+              support@psyq.ai
             </a>
           </Card>
 
@@ -150,7 +150,7 @@ export const ContactPage = () => {
               {[
                 {
                   q: "What's included in the free trial?",
-                  a: "The Free Beata is a free trial includes basic trade tracking, performance metrics, and AI insights to help you experience the power of TradeMind AI for a limited of time, we do this in the hopes that our users will give us feedback about the app."
+                  a: "The Free Beata is a free trial includes basic trade tracking, performance metrics, and AI insights to help you experience the power of PsyQ for a limited of time, we do this in the hopes that our users will give us feedback about the app."
                 },
                 {
                   q: "Can I import my existing trade history?",

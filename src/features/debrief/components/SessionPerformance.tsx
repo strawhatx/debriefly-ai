@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { ResponsiveContainer, LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, TooltipProps } from "recharts";
 import { LineChart as LineChartIcon } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { abbreviateNumber } from '@/utils/utils';
 
 interface Position {
   time: string;
@@ -65,78 +67,82 @@ export const SessionPerformance = ({
 }: SessionPerformanceProps) => {
   const chartData = useMemo(() => positions || [], [positions]);
 
-  // Function to abbreviate large numbers
-  const abbreviateNumber = (value: number) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000)}M`;
-    if (value >= 1_000) return `${(value / 1_000)}K`;
-    return value.toString();
-  };
-
   if (isLoading) {
     return (
-      <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <LineChartIcon className="text-blue-400" />
-          Session Performance
-        </h2>
-        <LoadingSkeleton />
-      </div>
+      <Card className={`${className}`}>
+        <CardHeader>
+          <CardTitle className="flex gap-2 text-lg">
+            <LineChartIcon className="text-blue-400" />
+            Session Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LoadingSkeleton />
+        </CardContent>
+      </Card>
     );
   }
 
   if (!positions?.length) {
     return (
-      <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <LineChartIcon className="text-blue-400" />
-          Session Performance
-        </h2>
-        <EmptyState />
-      </div>
+      <Card className={`${className}`}>
+        <CardHeader>
+          <CardTitle className="flex gap-2 text-lg">
+            <LineChartIcon className="text-blue-400" />
+            Session Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EmptyState />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className={`bg-gray-800 rounded-xl p-6 border border-gray-700 ${className}`}>
-      <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <LineChartIcon className="text-blue-400" />
-        Session Performance
-      </h2>
-      <div className="h-44">
-        <ResponsiveContainer width="100%" height="100%">
-          <RechartsLineChart data={chartData}>
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke={CHART_CONFIG.colors.grid} 
-            />
-            <XAxis
-              dataKey="time"
-              stroke={CHART_CONFIG.colors.text}
-              tick={{ fill: CHART_CONFIG.colors.text }}
-            />
-            <YAxis
-              stroke={CHART_CONFIG.colors.text}
-              tick={{ fill: CHART_CONFIG.colors.text }}
-              tickFormatter={abbreviateNumber} // Use custom formatter
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Line
-              type="monotone"
-              dataKey="pnl"
-              stroke={CHART_CONFIG.colors.line}
-              strokeWidth={2}
-              dot={{ 
-                fill: CHART_CONFIG.colors.line, 
-                strokeWidth: 2 
-              }}
-              activeDot={{ 
-                r: 6, 
-                fill: CHART_CONFIG.colors.line 
-              }}
-            />
-          </RechartsLineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+    <Card className={`${className}`}>
+      <CardHeader>
+        <CardTitle className='flex text-lg'>
+          <LineChartIcon className="text-blue-400" />
+          Session Performance</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <RechartsLineChart data={chartData}>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={CHART_CONFIG.colors.grid}
+              />
+              <XAxis
+                dataKey="time"
+                stroke={CHART_CONFIG.colors.text}
+                tick={{ fill: CHART_CONFIG.colors.text }}
+              />
+              <YAxis
+                stroke={CHART_CONFIG.colors.text}
+                tick={{ fill: CHART_CONFIG.colors.text }}
+                tickFormatter={abbreviateNumber} // Use custom formatter
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Line
+                type="monotone"
+                dataKey="pnl"
+                stroke={CHART_CONFIG.colors.line}
+                strokeWidth={2}
+                dot={{
+                  fill: CHART_CONFIG.colors.line,
+                  strokeWidth: 2
+                }}
+                activeDot={{
+                  r: 6,
+                  fill: CHART_CONFIG.colors.line
+                }}
+              />
+            </RechartsLineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

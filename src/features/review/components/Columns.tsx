@@ -2,6 +2,7 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { Select } from "./Select";
 import { allStrategies, allTagObjects as allTags } from "../../../utils/constants";
 import { MultiSelect } from "./MultiSelect";
+import { displayTotal } from "@/utils/utils";
 
 export const Columns = (handleUpdate: (id: string, key: string, value: any) => void) => [
   {
@@ -48,8 +49,7 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
           row.getValue("pnl") >= 0 ? "text-emerald-400" : "text-red-400"
         }`}
       >
-        {row.getValue("pnl") >= 0 ? "+" : ""}
-        {row.getValue("pnl")?.toFixed(2)}
+        {displayTotal(row.getValue("pnl") >= 0, row.getValue("pnl"))}
       </div>
     ),
   },

@@ -1,3 +1,4 @@
+import { abbreviateNumber } from "@/utils/utils";
 import { LineChart as IconLineChart } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
@@ -41,13 +42,6 @@ export const PerformanceChart = ({ trades }: PerformanceChartProps) => {
     acc.push({ date: trade.date, cumulativePnl });
     return acc;
   }, [] as { date: string; cumulativePnl: number }[]);
-
-  // Function to abbreviate large numbers
-  const abbreviateNumber = (value: number) => {
-    if (value >= 1_000_000) return `${(value / 1_000_000)}M`;
-    if (value >= 1_000) return `${(value / 1_000)}K`;
-    return value.toString();
-  };
 
   return (
     <Link

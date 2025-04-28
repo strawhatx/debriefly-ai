@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowDownRight, ArrowUpRight } from "lucide-react"
 import { emotionAttributes } from "@/utils/constants"
 import { Badge } from "@/components/ui/badge"
+import { displayTotal } from "@/utils/utils"
 
 export interface Trade {
     id: string;
@@ -54,7 +55,7 @@ const PnLDisplay = React.memo(({ pnl }: { pnl: number }) => {
     
     return (
         <span className={`font-medium ${pnlColor}`}>
-            {isWin ? "+" : "-"}${Math.abs(pnl).toFixed(2)}
+            {displayTotal(isWin, pnl)}
         </span>
     );
 });

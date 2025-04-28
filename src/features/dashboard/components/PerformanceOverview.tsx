@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePerformanceMetrics } from "../hooks/use-performance-metrics";
+import { displayTotal } from "@/utils/utils";
 
 interface Trade {
     pnl: number;
@@ -33,12 +34,12 @@ export const PerformanceOverview = ({ trades }: PerformanceOverviewProps) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Daily PnL */}
             <Link to="/history" className={cardClass}>
-                <span className="text-gray-400">Daily P&L</span>
+                <span className="text-gray-400 text-md">Daily P&L</span>
                 <div
-                    className={`text-2xl font-bold mt-1 ${dailyPnl >= 0 ? "text-emerald-400" : "text-red-400"
+                    className={`text-xl font-bold mt-1 ${dailyPnl >= 0 ? "text-emerald-400" : "text-red-400"
                         }`}
                 >
-                    {dailyPnl >= 0 ? "+" : "-"}${Math.abs(dailyPnl).toFixed(2)}
+                    {displayTotal(dailyPnl >= 0, dailyPnl)}
                 </div>
                 <div className="flex items-center gap-1 text-sm text-emerald-400">
                     <ArrowUpRight className="w-4 h-4" />
@@ -51,7 +52,7 @@ export const PerformanceOverview = ({ trades }: PerformanceOverviewProps) => {
             {/* Win Rate */}
             <Link to="/strategy" className={cardClass}>
                 <span className="text-gray-400">Win Rate</span>
-                <div className="text-2xl font-bold text-emerald-400 mt-1">
+                <div className="text-xl font-bold text-emerald-400 mt-1">
                     {hasTrades ? `${winRate.toFixed(1)}%` : "—"}
                 </div>
                 <div className="text-sm text-gray-400">
@@ -62,7 +63,7 @@ export const PerformanceOverview = ({ trades }: PerformanceOverviewProps) => {
             {/* Avg Risk/Reward */}
             <Link to="/strategy" className={cardClass}>
                 <span className="text-gray-400">Avg R:R Ratio</span>
-                <div className="text-2xl font-bold text-emerald-400 mt-1">
+                <div className="text-xl font-bold text-emerald-400 mt-1">
                     {hasTrades ? `1:${avgRiskReward.toFixed(1)}` : "—"}
                 </div>
                 <div className="text-sm text-gray-400">
@@ -73,7 +74,7 @@ export const PerformanceOverview = ({ trades }: PerformanceOverviewProps) => {
             {/* Emotional Score */}
             <Link to="/behavior" className={cardClass}>
                 <span className="text-gray-400">Emotional Score</span>
-                <div className="text-2xl font-bold text-emerald-400 mt-1">
+                <div className="text-xl font-bold text-emerald-400 mt-1">
                     {hasTrades ? `${emotionalScore.toFixed(1)}/10` : "—"}
                 </div>
                 <div className="text-sm text-emerald-400">

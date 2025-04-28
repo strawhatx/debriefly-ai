@@ -73,3 +73,16 @@ export const cn = (...inputs: ClassValue[]) => {
 const isNullOrEmpty = (str?: string): boolean => {
   return !str || str.trim().length === 0;
 };
+
+export const displayTotal = (isWin: boolean, value: number) => {
+  return isWin ? `+ $${Math.abs(value).toFixed(2)}` : `- $${Math.abs(value).toFixed(2)}`
+}
+
+// Function to abbreviate large numbers
+// Function to abbreviate large numbers
+export const abbreviateNumber = (value: number) => {
+  const absValue = Math.abs(value); // Get the absolute value for formatting
+  if (absValue >= 1_000_000) return `${(value / 1_000_000)}M`;
+  if (absValue >= 1_000) return `${(value / 1_000)}K`;
+  return value.toString();
+};

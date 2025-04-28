@@ -60,10 +60,10 @@ const AppSidebar = () => {
       <SidebarContent>
         {/* Branding */}
         <div className="p-4">
-          <Link to="/" className="flex items-center gap-2 text-xl font-bold">
-            <BarChart2 className="w-6 h-6 text-primary" />
-            <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Debriefly
+          <Link to="/" className="flex items-center gap-2 text-md font-bold">
+            <Brain className="w-6 h-6 text-primary" />
+            <span className="text-md text-primary">
+              PsyQ
             </span>
           </Link>
         </div>

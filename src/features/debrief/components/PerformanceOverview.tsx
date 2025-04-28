@@ -13,21 +13,21 @@ interface Position {
 }
 
 const StatCardComponent = ({ title, value, icon: Icon, trend, trendUp, className }: StatCardProps) => (
-  <Card className={`p-6 ${className}`}>
+  <Card className={`p-4 ${className}`}>
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-sm text-muted-foreground">{title}</p>
-        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-muted-foreground">{title}</p>
+        <p className="text-xl font-bold">{value}</p>
       </div>
       <div className={`rounded-full p-2 ${trendUp ? 'bg-green-100/10' : 'bg-red-100/10'}`}>
         <Icon className={`size-4 ${trendUp ? 'text-green-600' : 'text-red-600'}`} />
       </div>
     </div>
-    <div className="mt-2">
-      <span className={`text-sm ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+    <div className="mt-1">
+      <span className={` ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
         {trend}
       </span>
-      <span className="text-sm text-muted-foreground"> vs last month</span>
+      <span className=" text-muted-foreground"> vs last month</span>
     </div>
   </Card>
 );

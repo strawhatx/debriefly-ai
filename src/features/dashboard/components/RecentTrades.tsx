@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useMemo } from "react";
+import { displayTotal } from "@/utils/utils";
 
 interface Trade {
   id: string;
@@ -76,7 +77,7 @@ const TradeCard = ({ trade }: { trade: Trade }) => {
           {trade.entry} → {trade.exit}
         </span>
         <span className={`font-medium ${pnlColor}`}>
-          {isWin ? "+" : "-"}${Math.abs(trade.pnl).toFixed(2)}
+          {displayTotal(isWin, trade.pnl)}
         </span>
       </div>
     </div>
