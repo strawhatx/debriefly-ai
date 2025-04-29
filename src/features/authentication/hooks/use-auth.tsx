@@ -19,7 +19,11 @@ export const useAuth = () => {
       const { error, data } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
-      toast({ title: "Welcome back", description: "You have been logged in successfully" });
+      toast({ 
+        variant: "success",
+        title: "Welcome back", 
+        description: "You have been logged in successfully" 
+      });
       navigate("/app/dashboard");
     } catch (err: any) {
       setError(err.message || "Authentication failed");
@@ -49,7 +53,7 @@ export const useAuth = () => {
 
       await createStripeCustomer(data.user.id, data.user.email);
 
-      toast({ title: "Success", description: "Account created successfully" });
+      toast({variant:"success", title: "Success", description: "Account created successfully" });
     } catch (err: any) {
       setError(err.message || "Authentication failed");
       toast({ title: "Error", description: err.message, variant: "destructive" });

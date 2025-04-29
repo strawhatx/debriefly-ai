@@ -92,6 +92,7 @@ export const useAvatarUpload = (
             setProfile({ ...profile, avatar_url: publicUrl });
 
             toast({
+                variant:"success",
                 title: "Success",
                 description: "Avatar updated successfully",
             });

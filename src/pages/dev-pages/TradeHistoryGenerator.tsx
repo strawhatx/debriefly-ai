@@ -15,27 +15,54 @@ const generateTradesCSV = () => {
 
     const randomPrice = (base = 100, variation = 5) => (base + Math.random() * variation * 2 - variation).toFixed(2);
 
-    for (let i = 0; i < numTrades; i++) {
+    // Generate 50 random trades
+    for (let i = 0; i < 50; i++) {
         const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-        const qty = Math.floor(Math.random() * 5) + 1;
-        const stopPrice = Math.random() > 0.5 ? randomPrice(100, 1) : "";
-        const entryPrice = randomPrice(100, 2);
-        const exitPrice = (parseFloat(entryPrice) + (Math.random() * 2 - 1)).toFixed(2); // Random exit within ±1 range
-        const commission = (Math.random() * (1.0 - 0.2) + 0.2).toFixed(4);
-
-        const tradeDate = i < 5 ? today : recentDates[Math.floor(Math.random() * recentDates.length)];
-        const placingTime = new Date(tradeDate.getTime() - Math.random() * 7200000);
-        const closingTime = new Date(placingTime.getTime() + Math.random() * 3600000);
-
-        // Entry Trade (Buy)
+        const side = Math.random() > 0.5 ? "Buy" : "Sell";
+        const qty = Math.floor(Math.random() * 10) + 1;
+        const entryPrice = parseFloat((Math.random() * 100 + 50).toFixed(2));
+        const stopPrice = parseFloat((entryPrice * (side === "Buy" ? 0.95 : 1.05)).toFixed(2));
+        const commission = parseFloat((Math.random() * 5).toFixed(2));
+        const placingTime = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
+        const closingTime = new Date(placingTime.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000);
+        
+        // Entry Trade (Buy/Sell)
         trades.push([
-            symbol, "Buy", "Market", qty, stopPrice, entryPrice, "Filled", commission, placingTime.toISOString(), closingTime.toISOString(), orderId
+            symbol, side, "Market", qty, stopPrice, entryPrice, "Filled", commission, placingTime.toISOString(), "", orderId
         ]);
         orderId++;
 
+        // Determine if this will be a winning trade (70% chance of winning)
+        const isWinningTrade = Math.random() < 0.7;
+        
+        // Calculate exit price with bias toward profitable outcomes
+        let exitPrice;
+        if (isWinningTrade) {
+            // For winning trades, ensure a profitable exit
+            const minProfitPercent = 0.02; // 2% minimum profit
+            const maxProfitPercent = 0.15; // 15% maximum profit
+            const profitPercent = minProfitPercent + Math.random() * (maxProfitPercent - minProfitPercent);
+            
+            if (side === "Buy") {
+                exitPrice = parseFloat((entryPrice * (1 + profitPercent)).toFixed(2));
+            } else {
+                exitPrice = parseFloat((entryPrice * (1 - profitPercent)).toFixed(2));
+            }
+        } else {
+            // For losing trades, ensure a loss but not too big
+            const maxLossPercent = 0.08; // 8% maximum loss
+            const lossPercent = Math.random() * maxLossPercent;
+            
+            if (side === "Buy") {
+                exitPrice = parseFloat((entryPrice * (1 - lossPercent)).toFixed(2));
+            } else {
+                exitPrice = parseFloat((entryPrice * (1 + lossPercent)).toFixed(2));
+            }
+        }
+
         // Exit Trade (Sell) - Same qty, different price
         trades.push([
-            symbol, "Sell", "Market", qty, "", exitPrice, "Filled", commission, closingTime.toISOString(), "", orderId
+            symbol, side === "Buy" ? "Sell" : "Buy", "Market", qty, "", exitPrice, "Filled", commission, closingTime.toISOString(), "", orderId
         ]);
         orderId++;
     }

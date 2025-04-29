@@ -50,7 +50,7 @@ export const useBrokerConnection = ({ selectedAccount, brokerFields, formValues,
 
             if (error) throw error;
 
-            toast({ title: "Success", description: "Broker connection successful" });
+            toast({variant:"success", title: "Success", description: "Broker connection successful" });
 
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("Not authenticated");

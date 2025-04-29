@@ -57,6 +57,7 @@ export const usePasswordDialog = () => {
             if (error) throw error;
 
             toast({
+                variant:"success",
                 title: "Success",
                 description: "Password updated successfully",
             });

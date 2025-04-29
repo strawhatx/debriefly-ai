@@ -39,6 +39,7 @@ export const ContactPage = () => {
       });
 
       toast({
+        variant:"success",
         title: "Success",
         description: "Message sent successfully!",
       });

@@ -100,6 +100,7 @@ export const useProfileSection = () => {
             if (error) throw error;
 
             toast({
+                variant:"success",
                 title: "Success",
                 description: "Profile updated successfully",
             });

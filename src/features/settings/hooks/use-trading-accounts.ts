@@ -83,6 +83,7 @@ export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
         type === "add" ? [account, ...prev] : prev.map((a) => (a.id === account.id ? account : a))
       );
       toast({
+        variant:"success",
         title: "Success",
         description: `Trading account ${type === "add" ? "added" : "updated"} successfully.`,
       });
@@ -106,6 +107,7 @@ export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
     onSuccess: (_, id) => {
       setTradingAccounts((prev) => prev.filter((account) => account.id !== id));
       toast({
+        variant:"success",
         title: "Success",
         description: "Trading account deleted successfully.",
       });

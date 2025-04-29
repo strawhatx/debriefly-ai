@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 
 export type MARKET = 'STOCKS'| 'OPTIONS'| 'CRYPTO'| 'FOREX'|'FUTURES';
 
@@ -68,7 +67,7 @@ export const useAccountDialog = () => {
       }
 
       setAccount(null);
-      toast({ title: "Success", description: `Trading account added successfully` });
+      toast({variant:"success", title: "Success", description: `Trading account added successfully` });
     } catch (error: any) {
       console.error('Error saving trading account:', error);
       toast({ title: "Error", description: error.message || `Failed to add trading account`, variant: "destructive" });

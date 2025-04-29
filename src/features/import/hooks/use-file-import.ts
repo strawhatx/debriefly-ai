@@ -40,6 +40,7 @@ export const useFileImport = (selectedAccount: string) => {
       
       await updateImportStatus(importRecord.id, 'COMPLETED');
 
+      toast({variant:"success", title: "Success", description: `File imported successfully` });
       return true;
     } catch (error: any) {
       showError("Error", error.message || "Failed to start import");

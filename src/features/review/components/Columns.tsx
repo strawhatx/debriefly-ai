@@ -79,7 +79,7 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
       <input
         type="number"
         className="bg-gray-800 text-right text-white border border-gray-600 rounded px-4 py-2"
-        value={row.getValue("reward")}
+        value={row.getValue("reward") || 0}
         min={0.5}
         max={10}
         step={0.5}

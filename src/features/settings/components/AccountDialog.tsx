@@ -187,6 +187,7 @@ export const AccountDialog = React.memo(({
             }
 
             toast({
+                variant:"success",
                 title: "Success",
                 description: `Trading account ${isCreating ? 'created' : 'updated'} successfully.`,
             });

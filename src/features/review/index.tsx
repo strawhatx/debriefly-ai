@@ -13,7 +13,7 @@ export const Review = () => {
   const [mappedTrades, setMappedTrades] = useState([]);
   const { trades, setTrades, fetchTrades, saveTrades, error } = useTrades(true);
   const { hasUnanalyzedTrades, runTradeAnalysis, checkForUnanalyzedTrades } = useAnalysis();
-  const { event, setLoading } = useEventStore();
+  const { event, setLoading, setEvent } = useEventStore();
   const { toast } = useToast();
 
   const handleUpdate = (id, key, value) => {
@@ -27,18 +27,24 @@ export const Review = () => {
   const handleSave = async () => {
     try {
       await saveTrades(mappedTrades);
+      
       toast({
         title: "Success",
         description: "Changes saved successfully!",
         variant: "default",
       });
+      
+      setLoading(false);
     } catch (err) {
       console.error("Error saving trades:", err);
+
       toast({
         title: "Error",
         description: "Failed to save changes. Please try again.",
         variant: "destructive",
       });
+
+      setLoading(false);
     }
   };
 
@@ -47,6 +53,7 @@ export const Review = () => {
 
     handleSave();
     setLoading(false);
+    setEvent("");
   }, [event]);
 
   useEffect(() => {
