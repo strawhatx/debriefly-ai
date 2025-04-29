@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Resend } from 'resend';
 import { useToast } from "@/components/ui/use-toast";
 import { Mail, MessageSquare, Send, Clock } from 'lucide-react';

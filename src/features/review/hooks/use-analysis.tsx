@@ -5,10 +5,18 @@ import { useState } from "react";
 
 export const useAnalysis = () => {
     const [hasUnanalyzedTrades, setHasUnanalyzedTrades] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // State to track loading
     const selectedAccount = useTradingAccountStore((state) => state.selected);
 
     const runTradeAnalysis = async () => {
         try {
+          setIsLoading(true); // Start the loader
+          toast({
+            title: "Running Analysis",
+            description: "Please wait while the analysis is running...",
+            variant: "default",
+          });
+
           const { data: { user } } = await supabase.auth.getUser();
           if (!user) {
             toast({
@@ -16,6 +24,7 @@ export const useAnalysis = () => {
               description: "You must be logged in to run analysis",
               variant: "destructive",
             });
+            setIsLoading(false); // Stop the loader
             return;
           }
     
@@ -23,17 +32,17 @@ export const useAnalysis = () => {
           const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: user.id, trading_account_id: selectedAccount}),
+            body: JSON.stringify({ user_id: user.id, trading_account_id: selectedAccount }),
           });
     
           if (!response.ok) {
             throw new Error("Failed to run analysis");
           }
-          
+    
           toast({
             title: "Success",
             description: "Analysis completed successfully!",
-            variant: "default",
+            variant: "success",
           });
 
           await checkForUnanalyzedTrades();
@@ -45,6 +54,8 @@ export const useAnalysis = () => {
             description: "Failed to run analysis. Please try again.",
             variant: "destructive",
           });
+        } finally {
+          setIsLoading(false); // Stop the loader
         }
       };
     
@@ -67,6 +78,7 @@ export const useAnalysis = () => {
 
   return {
     hasUnanalyzedTrades,
+    isLoading, // Expose the loading state
     runTradeAnalysis,
     checkForUnanalyzedTrades
   }

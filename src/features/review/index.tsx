@@ -12,7 +12,7 @@ import { useAnalysis } from "./hooks/use-analysis";
 export const Review = () => {
   const [mappedTrades, setMappedTrades] = useState([]);
   const { trades, setTrades, fetchTrades, saveTrades, error } = useTrades(true);
-  const { hasUnanalyzedTrades, runTradeAnalysis, checkForUnanalyzedTrades } = useAnalysis();
+  const { hasUnanalyzedTrades, isLoading, runTradeAnalysis, checkForUnanalyzedTrades } = useAnalysis();
   const { event, setLoading, setEvent } = useEventStore();
   const { toast } = useToast();
 
@@ -27,14 +27,15 @@ export const Review = () => {
   const handleSave = async () => {
     try {
       await saveTrades(mappedTrades);
-      
+
       toast({
         title: "Success",
         description: "Changes saved successfully!",
         variant: "default",
       });
-      
+
       setLoading(false);
+      setEvent("review_trades_refresh"); //send refresh event
     } catch (err) {
       console.error("Error saving trades:", err);
 
@@ -99,10 +100,11 @@ export const Review = () => {
           {hasUnanalyzedTrades ? (
             <div className="space-y-4">
               <p>
-                No trades needed to review. Click
-                <Button variant="link" onClick={runTradeAnalysis}
-                  className="px-1 py-1 text-primary hover:text-emerald-700">
-                  here to start the analysis
+                {isLoading ? "" : "No trades needed to review."}
+
+                <Button variant="link" onClick={runTradeAnalysis} disabled={isLoading}
+                  className="px-1 py-1 text-gray-400 font-normal text-md hover:text-emerald-400">
+                  {isLoading ? " Running Analysis..." : " Click here to start the analysis"}
                 </Button>
               </p>
             </div>

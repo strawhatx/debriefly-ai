@@ -8,7 +8,7 @@ const steps = [
     name: 'Import',
     description: 'Upload your trades.',
     icon: FileUp,
-    source: 'https://www.tradervue.com/',
+    source: 'https://www.loom.com/embed/37c661cd751e4f4996160b103174cb6d?sid=7fac9c7d-c7f0-4446-a11b-70c674ed5d9c',
   },
   {
     id: 2,
@@ -16,15 +16,15 @@ const steps = [
     name: 'Review',
     description: 'Review imported trades.',
     icon: Eye,
-    source: 'https://www.tradervue.com/',
+    source: 'https://www.loom.com/embed/8ac8c23c1bb34894ab998e4909966fec?sid=00920bf7-c30d-40fc-ab12-37e5df9c3f79',
   },
   {
     id: 3,
     number: '03',
-    name: 'Results',
-    description: 'View your results.',
+    name: 'Analyze',
+    description: 'Run the analysis.',
     icon: Brain,
-    source: 'https://www.tradervue.com/',
+    source: 'https://www.loom.com/embed/1133aa54bf924562b0ebada83668b7fd?sid=6c92b8b8-a53f-4dcc-ba9f-7a2e054557c0',
   },
 ]
 
@@ -66,13 +66,14 @@ export const HowItWorks = () => {
               <TabPanels className="mt-6">
                 {steps.map(({ name, source }) => (
                   <TabPanel key={name} className="rounded-xl bg-white/5 p-3">
-                    <div className="flex items-center justify-center">
-                      <img
-                        src={source}
-                        alt={name}
-                        className="h-48 w-48 rounded-lg object-cover"
-                      />
-                    </div>
+                    <div style={{ position: 'relative', paddingBottom: '45.3125%', height: 0 }}>
+                        <iframe
+                          src={source}
+                          frameBorder="0"
+                          allowFullScreen
+                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                        />
+                      </div>
                   </TabPanel>
                 ))}
               </TabPanels>

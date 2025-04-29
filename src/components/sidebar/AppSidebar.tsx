@@ -11,31 +11,49 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SelectAccount } from "../SelectAccount";
 import { useProfile } from "@/hooks/use-profile";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useTrades } from "@/hooks/use-trades";
+import { Badge } from "@/components/ui/badge";
+import { useEventStore } from "@/store/event";
 
 const AppSidebar = () => {
   const { profile } = useProfile();
+  const { trades: reviewTrades, fetchTrades} = useTrades(true);
+  const { event, setEvent } = useEventStore();
 
   const navigationItems = useMemo(
     () => [
       { title: "Dashboard", icon: Home, url: "/app/dashboard" },
       { title: "Debrief", icon: ClipboardList, url: "/app/debrief" },
       { title: "Trade History", icon: History, url: "/app/trade-history" },
-      { title: "Trade Review", icon: Eye, url: "/app/trade-import/review" },
+      { 
+        title: "Trade Review", 
+        icon: Eye, 
+        url: "/app/trade-import/review",
+        badge: reviewTrades?.length > 0 ? reviewTrades.length : undefined
+      },
       { title: "Behavior", icon: Brain, url: "/app/behavioral-patterns" },
       { title: "Strategy", icon: LineChart, url: "/app/strategy-optimization" },
     ],
-    []
+    [reviewTrades]
   );
+
+  useEffect(() => {
+    if (event !== "review_trades_refresh") return;
+
+    setEvent("");
+  }, [event]);
 
   const NavItem = ({
     title,
     icon: Icon,
     url,
+    badge,
   }: {
     title: string;
     icon: React.ElementType;
     url: string;
+    badge?: number;
   }) => (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>
@@ -45,6 +63,11 @@ const AppSidebar = () => {
         >
           <Icon className="w-5 h-5" />
           <span>{title}</span>
+          {badge !== undefined && (
+            <Badge variant="secondary" className="ml-auto bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30">
+              {badge}
+            </Badge>
+          )}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>
