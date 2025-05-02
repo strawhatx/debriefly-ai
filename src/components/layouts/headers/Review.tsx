@@ -1,17 +1,18 @@
 
 import { Button } from "@/components/ui/button";
 import { useTrades } from "@/hooks/use-trades";
-import { useEventStore } from "@/store/event";
+import { useEventBus } from "@/store/event";
 import { useEffect, useState } from "react";
 
 export const ReviewHeader = () => {
   const [visible, setVisible] = useState(true);
-  const { loading, setLoading, setEvent } = useEventStore();
+  const [saving, setSaving] = useState(true);
   const { trades, isLoading } = useTrades(true);
+  const publish = useEventBus((state) => state.publish);
 
   const handleSave = () => {
-    setEvent("review_trade_save");
-    setLoading(true);
+    setSaving(true);
+    publish("review_trade_save", { setSaving });
   }
 
   useEffect(() => {
@@ -22,14 +23,14 @@ export const ReviewHeader = () => {
 
   return (
     <div className="hidden lg:block">
-      { visible && (
+      {visible && (
         <Button
           onClick={handleSave}
           size="sm"
           className="gap-2 text-sm"
-          disabled={loading}
+          disabled={saving}
         >
-          {loading ? "Saving..." : "Save & Publish"}
+          {saving ? "Saving..." : "Save & Publish"}
         </Button>
       )}
     </div>

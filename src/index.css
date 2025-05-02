@@ -1,9 +1,12 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ✅ Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700&display=swap');
+
 @layer base {
+  /* 🎨 Custom Color Variables */
   :root {
     --background: theme(colors.gray.900);
     --foreground: theme(colors.gray.100);
@@ -33,15 +36,60 @@
     --input: theme(colors.gray.200);
     --ring: theme(colors.emerald.400);
     --radius: 0.75rem;
+
+    --brand: 27 96% 61%;
+    --brand-foreground: 31 97% 72%;
+  }
+
+  .dark {
+    --brand: 31 97% 72%;
+  }
+
+  /* ✅ Semantic Element Defaults */
+  h1 {
+    @apply text-4xl font-heading font-bold text-white leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl font-heading font-semibold text-white leading-snug;
+  }
+
+  h3 {
+    @apply text-2xl font-heading font-semibold text-white leading-snug;
+  }
+
+  h4 {
+    @apply text-xl font-heading font-semibold text-white;
+  }
+
+  h5 {
+    @apply text-lg font-heading font-medium text-white;
+  }
+
+  h6 {
+    @apply text-base font-heading font-medium text-white;
+  }
+
+  p {
+    @apply text-base font-sans text-gray-300 leading-relaxed;
+  }
+
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
   }
 }
- 
-/* Smooth scrolling */
+
+/* ✅ Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* ✅ Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -58,26 +106,7 @@ html {
   @apply bg-gray-600;
 }
 
-@layer base {
-  :root {
-    --brand: 27 96% 61%;
-    --brand-foreground: 31 97% 72%;
-  }
-  .dark {
-    --brand: 31 97% 72%;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-/* Rich text editor styles */
+/* ✅ Rich Text Editor Styles (ProseMirror) */
 .ProseMirror:focus {
   outline: none;
 }
@@ -137,7 +166,7 @@ html {
   border-radius: 0.25em;
 }
 
-/* Text alignment styles */
+/* ✅ Text Alignment for Editor */
 .ProseMirror .is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -172,5 +201,3 @@ html {
 .ProseMirror h2[style*="text-align: justify"] {
   text-align: justify;
 }
-
-   

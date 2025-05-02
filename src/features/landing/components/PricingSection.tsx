@@ -20,22 +20,22 @@ const tiers = [
     isActive: true,
     featured: true,
   },
-  {
-    name: 'Pro (Coming soon)',
-    id: 'tier-pro',
-    href: '#',
-    priceMonthly: '$20',
-    description: '🔥 Pro Plan (Coming Soon).',
-    features: [
-      'Everything in Free',
-      'Advanced AI Insights & Custom Reports',
-      'Weekly Performance Review (Coming Soon)',
-      'Priority Support',
-      'Broker Integration (Future Idea)',
-    ],
-    isActive: false,
-    featured: false,
-  },
+  //{
+  //  name: 'Pro (Coming soon)',
+  //  id: 'tier-pro',
+  //  href: '#',
+  //  priceMonthly: '$20',
+  //  description: '🔥 Pro Plan (Coming Soon).',
+  //  features: [
+  //    'Everything in Free',
+  //    'Advanced AI Insights & Custom Reports',
+  //    'Weekly Performance Review (Coming Soon)',
+  //    'Priority Support',
+  //    'Broker Integration (Future Idea)',
+  //  ],
+  //  isActive: false,
+  //  featured: false,
+  //},
 ]
 
 function classNames(...classes) {
@@ -64,7 +64,7 @@ export const PricingSection = () => {
       Join our Beta Program and get full access to AI-powered debriefs, behavior insights, and strategy optimization—for FREE.
      <br/> <em>(No credit card required)</em>
       </p>
-      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-4xl lg:grid-cols-2">
+      <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 items-center gap-y-6 sm:mt-20 sm:gap-y-0 lg:max-w-xl">
         {tiers.map((tier, tierIdx) => (
           <div
             key={tier.id}

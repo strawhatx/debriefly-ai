@@ -1,7 +1,7 @@
 import { useTrades } from "@/hooks/use-trades";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useEventStore } from "@/store/event";
+import { useEventBus } from "@/store/event";
 import { SummaryCards } from "./components/SummaryCards";
 import { TradeTable } from "./components/TradeTable";
 import { Columns } from "./components/Columns";
@@ -13,7 +13,7 @@ export const Review = () => {
   const [mappedTrades, setMappedTrades] = useState([]);
   const { trades, setTrades, fetchTrades, saveTrades, error } = useTrades(true);
   const { hasUnanalyzedTrades, isLoading, runTradeAnalysis, checkForUnanalyzedTrades } = useAnalysis();
-  const { event, setLoading, setEvent } = useEventStore();
+  const { publish, subscribe } = useEventBus();
   const { toast } = useToast();
 
   const handleUpdate = (id, key, value) => {
@@ -31,11 +31,10 @@ export const Review = () => {
       toast({
         title: "Success",
         description: "Changes saved successfully!",
-        variant: "default",
+        variant: "success",
       });
 
-      setLoading(false);
-      setEvent("review_trades_refresh"); //send refresh event
+      publish("review_trades_refresh", { tradeCount: trades.length, refresh: fetchTrades }); // send the refresh event
     } catch (err) {
       console.error("Error saving trades:", err);
 
@@ -44,18 +43,21 @@ export const Review = () => {
         description: "Failed to save changes. Please try again.",
         variant: "destructive",
       });
-
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (event !== "review_trade_save") return;
+    // Subscribe to the event when the component mounts
+    const unsubscribe = subscribe('review_trade_save', (data: { setSaving: (value: boolean) => void }) => {
+      handleSave();
+      data.setSaving(false);
+    });
 
-    handleSave();
-    setLoading(false);
-    setEvent("");
-  }, [event]);
+    // Cleanup function: Unsubscribe when the component unmounts
+    return () => {
+      unsubscribe();
+    };
+  }, [subscribe]);
 
   useEffect(() => {
     const result = trades.map((trade) => ({

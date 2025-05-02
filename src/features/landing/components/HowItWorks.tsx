@@ -8,7 +8,7 @@ const steps = [
     name: 'Import',
     description: 'Upload your trades.',
     icon: FileUp,
-    source: 'https://www.loom.com/embed/37c661cd751e4f4996160b103174cb6d?sid=7fac9c7d-c7f0-4446-a11b-70c674ed5d9c',
+    source: 'https://www.loom.com/embed/4b9ca8affc4b42f0940044253534f780?sid=b53fd4e3-9172-48f2-ac5d-2493ae807927',
   },
   {
     id: 2,
@@ -16,7 +16,8 @@ const steps = [
     name: 'Review',
     description: 'Review imported trades.',
     icon: Eye,
-    source: 'https://www.loom.com/embed/8ac8c23c1bb34894ab998e4909966fec?sid=00920bf7-c30d-40fc-ab12-37e5df9c3f79',
+    source: 'https://www.loom.com/embed/d1fd1a89329e4be2981f997bd112d40b?sid=0677ca18-6272-4f23-b674-c18d321432f4',
+  
   },
   {
     id: 3,
@@ -24,7 +25,7 @@ const steps = [
     name: 'Analyze',
     description: 'Run the analysis.',
     icon: Brain,
-    source: 'https://www.loom.com/embed/1133aa54bf924562b0ebada83668b7fd?sid=6c92b8b8-a53f-4dcc-ba9f-7a2e054557c0',
+    source: 'https://www.loom.com/embed/caa315693236439a9623bf493222ba4b?sid=c0b4853e-3586-4e23-926b-f88c561e39d0',
   },
 ]
 

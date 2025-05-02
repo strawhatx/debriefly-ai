@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { useFileImport } from "../hooks/use-file-import";
 import useBrokerStore from "@/store/broker";
 import { Upload } from "lucide-react";
-import { useEventStore } from "@/store/event";
+import { useEventBus } from "@/store/event";
 
 export const FileImport = () => {
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { selected: broker, update: setBroker } = useBrokerStore();
-  const { setEvent } = useEventStore();
   const { isUploading, handleImport } = useFileImport(selectedAccount);
+  const publish = useEventBus((state) => state.publish);
 
   const handleStartImport = useCallback(async () => {
     if (!selectedFile) return;
@@ -23,8 +23,9 @@ export const FileImport = () => {
       if (success) {
         setSelectedFile(null);
         setSelectedAccount("");
+        setBroker(null); // Reset broker after import
         
-        setEvent("review_trades_refresh"); // send the refresh event
+        publish("review_trades_refresh", {}); // send the refresh event
       }
     } catch (error) {
       console.error("Import failed:", error);

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Sidebar as ShadcnSidebar,
@@ -11,38 +12,43 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SelectAccount } from "../SelectAccount";
 import { useProfile } from "@/hooks/use-profile";
-import { useEffect, useMemo } from "react";
-import { useTrades } from "@/hooks/use-trades";
 import { Badge } from "@/components/ui/badge";
-import { useEventStore } from "@/store/event";
+import { useEventBus } from "@/store/event";
 
 const AppSidebar = () => {
+  const subscribe = useEventBus((state) => state.subscribe);
+  const [count, setCount] = useState(0);
   const { profile } = useProfile();
-  const { trades: reviewTrades, fetchTrades} = useTrades(true);
-  const { event, setEvent } = useEventStore();
 
   const navigationItems = useMemo(
     () => [
       { title: "Dashboard", icon: Home, url: "/app/dashboard" },
       { title: "Debrief", icon: ClipboardList, url: "/app/debrief" },
       { title: "Trade History", icon: History, url: "/app/trade-history" },
-      { 
-        title: "Trade Review", 
-        icon: Eye, 
+      {
+        title: "Trade Review",
+        icon: Eye,
         url: "/app/trade-import/review",
-        badge: reviewTrades?.length > 0 ? reviewTrades.length : undefined
+        badge: count > 0 ? count : undefined
       },
       { title: "Behavior", icon: Brain, url: "/app/behavioral-patterns" },
       { title: "Strategy", icon: LineChart, url: "/app/strategy-optimization" },
     ],
-    [reviewTrades]
+    [count]
   );
 
   useEffect(() => {
-    if (event !== "review_trades_refresh") return;
+    // Subscribe to the event when the component mounts
+    const unsubscribe = subscribe('review_trades_refresh', (data: { tradeCount: number, refresh: ()=> void }) => {
+      data.refresh();
+      setCount(data.tradeCount);
+    });
 
-    setEvent("");
-  }, [event]);
+    // Cleanup function: Unsubscribe when the component unmounts
+    return () => {
+      unsubscribe();
+    };
+  }, [subscribe]);
 
   const NavItem = ({
     title,
@@ -84,9 +90,10 @@ const AppSidebar = () => {
         {/* Branding */}
         <div className="p-4">
           <Link to="/" className="flex items-center gap-2 text-md font-bold">
-            <Brain className="w-6 h-6 text-primary" />
-            <span className="text-md text-primary">
-              PsyQ
+            <span className="sr-only">Debriefly</span>
+            <BarChart2 className="w-6 h-6 text-primary" />
+            <span className="text-grey-400">
+              Debriefly
             </span>
           </Link>
         </div>
@@ -100,7 +107,7 @@ const AppSidebar = () => {
                   to="/app/trade-import"
                   className="flex items-center gap-3 px-4 py-2 rounded-md bg-emerald-400 text-gray-800 hover:bg-emerald-500 transition-colors"
                 >
-                  <Import className="w-3.5 h-3.5" /> 
+                  <Import className="w-3.5 h-3.5" />
                   <span>Import Trades</span>
                 </Link>
               </SidebarMenuItem>

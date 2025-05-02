@@ -11,7 +11,7 @@ import { allStrategies, allTagObjects as allTags } from "../../../utils/constant
 import { MultiSelect } from "./MultiSelect";
 import { Select } from "./Select";
 import { Trade, useReviewDialog } from "../hooks/use-review-dialog";
-import { useEventStore } from "@/store/event";
+import { useEventBus } from "@/store/event";
 
 interface ReviewDialogProps {
     data: Trade;
@@ -37,8 +37,7 @@ export const ReviewDialog = ({
         isSaving = false,
         errors = {}
     } = useReviewDialog();
-    
-    const { setEvent } = useEventStore();
+    const publish = useEventBus((state) => state.publish);
 
     // Use controlled or uncontrolled state
     const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -79,7 +78,7 @@ export const ReviewDialog = ({
         console.log(`trade ${trade}`)
         await save();
         onSave();
-        setEvent("review_trades_refresh"); //send refresh event
+        publish("review_trades_refresh", { }); // send the refresh 
     }, [save, onSave, trade]);
 
     // Reset form when dialog opens/closes
