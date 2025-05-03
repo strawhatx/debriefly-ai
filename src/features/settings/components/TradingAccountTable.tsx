@@ -188,7 +188,7 @@ export const TradingAccountTable = ({ tradingAccounts }: TradingAccountTableProp
             <section className="bg-gray-800 mt-4 rounded-xl border border-gray-700">
                 <div className="overflow-x-auto">
                     <div className="p-6 flex justify-between items-center">
-                        <h3 className="text-lg font-bold">Trading Accounts</h3>
+                        <h5 className="text-lg font-bold">Trading Accounts</h5>
                         <Button 
                             onClick={handleStartCreate} 
                             className="flex items-center gap-2"

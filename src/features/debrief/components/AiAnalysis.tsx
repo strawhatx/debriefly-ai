@@ -45,10 +45,10 @@ const AnalysisSection = ({
     const [first, second] = items
     return (
         <div className="p-4 bg-gray-900/50 rounded-lg">
-            <h3 className="text-md font-medium mb-2 flex items-center gap-2">
+            <h6 className="text-md font-medium mb-2 flex items-center gap-2">
                 <Icon className={`w-4 h-4 ${iconColor}`} />
                 {title}
-            </h3>
+            </h6>
             {!items?.length ? (
                 <EmptyState message={`No ${title.toLowerCase()} data available`} />
             ) : (

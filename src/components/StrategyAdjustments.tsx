@@ -20,7 +20,7 @@ const EmptyState = () => (
 // Reusable recommendation card component
 const RecommendationCard = ({ recommendation }: { recommendation: StrategyRecommendation }) => (
     <div className="p-4 bg-gray-900/50 rounded-lg transition-all hover:bg-gray-900/70">
-        <h3 className="font-medium mb-2 text-gray-100">{recommendation.title}</h3>
+        <h6 className="font-medium mb-2 text-gray-100">{recommendation.title}</h6>
         <p className="text-gray-300 mb-2 text-sm leading-relaxed">
             {recommendation.description}
         </p>

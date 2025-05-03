@@ -53,7 +53,7 @@ const Import = () => {
               <BrokerSync />
             </Card>
             <Card className="p-6 order-1 lg:order-2">
-              <h3 className="text-lg font-semibold mb-4">How to Sync with Your Broker</h3>
+              <h5 className="text-lg font-semibold mb-4">How to Sync with Your Broker</h5>
               <div className="space-y-4 text-sm text-muted-foreground">
                 <p>Currently, direct broker sync is supported for:</p>
                 <ul className="list-disc list-inside space-y-1">

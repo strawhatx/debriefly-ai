@@ -66,7 +66,7 @@ export const Subscriptions = ({ userId, email }: SubscriptionsProps) => {
 
         return (
           <Card key={tier.id} className="p-6 h-full">
-            <h3 id={tier.id} className="text-primary text-lg font-semibold">{tier.name}</h3>
+            <h5 id={tier.id} className="text-primary text-lg font-semibold">{tier.name}</h5>
             <p className="mt-4 flex items-baseline gap-x-2">
               <span className="text-white text-5xl font-semibold tracking-tight">{tier.priceMonthly}</span>
               <span className="text-gray-500 text-base">/month</span>

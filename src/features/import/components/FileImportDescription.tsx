@@ -7,7 +7,7 @@ export const FileImportDescription = () => {
     <>
       {broker && (
         <div className="p-4 mb-4 border rounded-md bg-gray-700/70">
-          <h3 className="font-medium mb-1">Selected Broker</h3>
+          <h5 className="font-medium mb-1">Selected Broker</h5>
           <p className="text-sm text-muted-foreground">
             {broker.name}
             {broker.description && (
@@ -26,7 +26,7 @@ export const FileImportDescription = () => {
         </div>
       )}
 
-      <h3 className="text-lg font-semibold mb-4">How to Import Trades</h3>
+      <h5 className="text-lg font-semibold mb-4">How to Import Trades</h5>
       <div className="space-y-4 text-sm text-muted-foreground">
         <p>Follow these steps to import your trades:</p>
         <ol className="list-decimal list-inside space-y-2">

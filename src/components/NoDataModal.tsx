@@ -33,7 +33,7 @@ export const NoDataModal = ({
             <DialogContent className="max-w-lg w-full flex flex-col justify-center items-center gap-6">
 
                 <DialogHeader className="text-center space-y-2">
-                    <DialogTitle className="flex text-md gap-2">
+                    <DialogTitle className="flex gap-2">
                         <FileWarning />{title}
                     </DialogTitle>
                     <DialogDescription className="text-sm text-gray-400">{description}</DialogDescription>

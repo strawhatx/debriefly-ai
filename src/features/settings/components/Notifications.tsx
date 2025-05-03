@@ -36,7 +36,7 @@ export const Notifications = () => {
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium mb-1">{item.title}</h3>
+                <h5 className="font-medium mb-1">{item.title}</h5>
                 <p className="text-sm text-gray-400">{item.description}</p>
               </div>
               <button

@@ -46,7 +46,7 @@ const InsightCard = ({
   description: string;
 }) => (
   <div className="p-4 bg-gray-900/50 rounded-lg">
-    <h3 className="font-medium text-white mb-1">{title}</h3>
+    <h6 className="font-medium text-white mb-1">{title}</h6>
     <p className="text-gray-300 text-sm">{description}</p>
   </div>
 );

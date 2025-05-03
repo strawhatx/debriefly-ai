@@ -99,7 +99,7 @@ export const ReviewDialog = ({
             )}
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Review Position</DialogTitle>
+                    <h5>Review Position</h5>
                     <DialogDescription>
                         Review and update trades in prep for position analysis
                     </DialogDescription>

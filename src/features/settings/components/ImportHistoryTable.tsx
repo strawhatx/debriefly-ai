@@ -76,7 +76,7 @@ export const ImportHistoryTable = () => {
   return (
     <section className="bg-gray-800 mt-4 rounded-xl border border-gray-700">
         <div className="space-y-4 p-4">
-          <h3 className="text-lg font-bold">Trading Accounts</h3>
+          <h5 className="text-lg font-bold">Trading Accounts</h5>
           {loading ? (
             <p className="text-center py-4">Loading...</p>
           ) : imports.length === 0 ? (

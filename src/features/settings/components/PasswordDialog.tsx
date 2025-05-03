@@ -20,7 +20,7 @@ export const PasswordDialog = () => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
+          <h5>Change Password</h5>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
