@@ -34,3 +34,4 @@ supabase functions serve --env-file supabase/.env
 
 ## Migrations
  - supabase db diff --use-migra -f [migration name]
+ - TODO: we need to script out the tables and base data from the db
