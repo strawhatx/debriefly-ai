@@ -1,5 +1,7 @@
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MARKETS, TradingAccount, EditingAccount } from "@/types/trading";
 import { toast } from "sonner";
@@ -7,23 +9,45 @@ import { toast } from "sonner";
 export const useAccountForm = () => {
   const [editingAccount, setEditingAccount] = useState<EditingAccount | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<EditingAccount>({
+    defaultValues: {
+      account_name: "",
+      broker_id: "",
+      market: null,
+      account_balance: 0,
+    },
+  });
+
+  const { data: brokers = [] } = useQuery({
+    queryKey: ["brokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("brokers").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const openDialog = (account?: TradingAccount) => {
     if (account) {
-      setEditingAccount({
+      const editingData = {
         ...account,
-        // Ensure market is one of the allowed types or null
         market: MARKETS.includes(account.market as any) ? account.market as typeof MARKETS[number] : null,
         isNew: false,
-      });
+      };
+      setEditingAccount(editingData);
+      form.reset(editingData);
     } else {
-      setEditingAccount({
+      const newAccount = {
         account_name: "",
         broker_id: "",
         market: null,
         account_balance: 0,
         isNew: true,
-      });
+      };
+      setEditingAccount(newAccount);
+      form.reset(newAccount);
     }
     setIsDialogOpen(true);
   };
@@ -31,6 +55,16 @@ export const useAccountForm = () => {
   const closeDialog = () => {
     setEditingAccount(null);
     setIsDialogOpen(false);
+    form.reset();
+  };
+
+  const onSubmit = async (data: EditingAccount) => {
+    setIsLoading(true);
+    const success = await saveAccount(data);
+    setIsLoading(false);
+    if (success) {
+      closeDialog();
+    }
   };
 
   const saveAccount = async (accountData: EditingAccount) => {
@@ -38,7 +72,6 @@ export const useAccountForm = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Ensure market is properly typed
       const market = accountData.market && MARKETS.includes(accountData.market as any) 
         ? accountData.market as typeof MARKETS[number]
         : null;
@@ -73,7 +106,6 @@ export const useAccountForm = () => {
         toast.success("Trading account updated successfully");
       }
 
-      closeDialog();
       return true;
     } catch (error) {
       console.error("Error saving account:", error);
@@ -102,9 +134,14 @@ export const useAccountForm = () => {
   return {
     editingAccount,
     isDialogOpen,
+    isLoading,
+    form,
+    brokers,
     openDialog,
     closeDialog,
     saveAccount,
     deleteAccount,
+    onSubmit,
+    setEditingAccount,
   };
 };

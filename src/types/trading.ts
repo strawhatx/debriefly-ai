@@ -1,3 +1,4 @@
+
 export const MARKETS = ['STOCKS', 'OPTIONS', 'CRYPTO', 'FOREX', 'FUTURES'] as const;
 
 export type TradingAccount = {
@@ -6,7 +7,9 @@ export type TradingAccount = {
   broker_id: string;
   market: string | null;
   account_balance: number;
+  broker_connected?: boolean;
   created_at: string;
+  user_id?: string;
 };
 
 export interface Trade {
