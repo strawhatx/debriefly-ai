@@ -13,6 +13,7 @@ This project is built with .
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase/Posgres SQL
 
 ## How can I deploy this project?
 
@@ -34,3 +35,4 @@ supabase functions serve --env-file supabase/.env
 
 ## Migrations
  - supabase db diff --use-migra -f [migration name]
+ - TODO: we need to script out the tables and base data from the db
