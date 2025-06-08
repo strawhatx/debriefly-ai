@@ -17,7 +17,6 @@ import { TradeHistoryPage } from "./pages/TradeHistory";
 import { BehaviorPage } from "./pages/Behavior";
 import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
-import { NotebookPage } from "./pages/Notebook";
 import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
 import { DoubleLayout, PlainLayout, SidebarLayout } from "./components/layouts/Index";
 import { NavbarLayout } from "./components/layouts/Index";
@@ -26,8 +25,6 @@ import { DateRangeHeader } from "./components/layouts/headers/DateRange";
 import { TradeHistoryHeader } from "./components/layouts/headers/TradeHistory";
 import { DebriefHeader } from "./components/layouts/headers/Debrief";
 import { DashboardHeader } from "./components/layouts/headers/Dashboard";
-import { NotebookHeader } from "./components/layouts/headers/Notebook";
-import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
 import { TradeHistoryGenerator } from "./pages/dev-pages/TradeHistoryGenerator";
 import { ReviewPage } from "./pages/Review";
 import { ReviewHeader } from "./components/layouts/headers/Review";
@@ -35,22 +32,6 @@ import { PositionReviewGenerator } from "./pages/dev-pages/PositionReviewGenerat
 const queryClient = new QueryClient();
 
 const App = () => {
-  const NotebookWithSidebar = () => {
-    const { id } = useParams(); // Extracts the dynamic `id` from the route
-
-    return (
-      <DoubleLayout
-        breadcrumbs={[
-          { name: "Trades", href: "/app/trade-history" },
-          { name: `Notebook ${id}`, href: `/app/notebook/${id}` }
-        ]}
-        rightContent={<NotebookHeader />}
-        rightSidebar={<NotebookSidebar id={id} />}
-      >
-        <NotebookPage />
-      </DoubleLayout>
-    );
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
