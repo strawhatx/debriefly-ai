@@ -83,7 +83,7 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
       .from("positions")
       .select(`
         id, user_id, trading_account_id, symbol, asset_type, position_type, fill_price, stop_price, entry_date, 
-        closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score
+        closing_date, leverage, fees, quantity, pnl, strategy, risk, reward, tags, score, state
       `)
       .order("entry_date", { ascending: false });
 
@@ -115,8 +115,9 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
       // Transform data to match our Trade interface
       const transformedTrades: Trade[] = (data || []).map(trade => ({
         ...trade,
-        position_type: trade.position_type as "LONG" | "SHORT", // Type assertion for proper typing
-        state: trade.state as "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED" | undefined
+        position_type: trade.position_type as "LONG" | "SHORT",
+        state: trade.state as "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED" | undefined,
+        tags: Array.isArray(trade.tags) ? trade.tags as string[] : trade.tags ? [trade.tags as string] : null
       }));
       
       setTrades(transformedTrades);

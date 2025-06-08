@@ -1,125 +1,147 @@
 
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "@/components/ui/use-toast"
-import { supabase } from "@/integrations/supabase/client"
-import { useDashboard } from "@/hooks/use-dashboard"
-import { useUser } from "@/hooks/use-user"
-import { formSchema, type FormData } from "../components/AccountForm"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { MARKETS, TradingAccount, EditingAccount } from "@/types/trading";
+import { toast } from "sonner";
 
 export const useAccountForm = () => {
-  const { user } = useUser()
-  const { refetchAccounts } = useDashboard()
-  const [isLoading, setIsLoading] = useState(false)
-  const [brokers, setBrokers] = useState<{ id: string; name: string }[]>([])
+  const [editingAccount, setEditingAccount] = useState<EditingAccount | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const editingAccount = useDashboard((state) => state.editingAccount)
-  const setEditingAccount = useDashboard((state) => state.setEditingAccount)
-
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<EditingAccount>({
     defaultValues: {
-      account_name: editingAccount?.account_name || "",
-      broker_id: editingAccount?.broker_id || "",
-      account_balance: editingAccount?.account_balance,
-      market: editingAccount?.market,
+      account_name: "",
+      broker_id: "",
+      market: null,
+      account_balance: 0,
     },
-  })
+  });
 
-  useEffect(() => {
-    const fetchBrokers = async () => {
-      const { data, error } = await supabase.from("brokers").select("id, name")
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch brokers",
-          variant: "destructive",
-        })
-        return
-      }
-      setBrokers(data)
+  const { data: brokers = [] } = useQuery({
+    queryKey: ["brokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("brokers").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const openDialog = (account?: TradingAccount) => {
+    if (account) {
+      const editingData = {
+        ...account,
+        market: MARKETS.includes(account.market as any) ? account.market as typeof MARKETS[number] : null,
+        isNew: false,
+      };
+      setEditingAccount(editingData);
+      form.reset(editingData);
+    } else {
+      const newAccount = {
+        account_name: "",
+        broker_id: "",
+        market: null,
+        account_balance: 0,
+        isNew: true,
+      };
+      setEditingAccount(newAccount);
+      form.reset(newAccount);
     }
+    setIsDialogOpen(true);
+  };
 
-    fetchBrokers()
-  }, [])
+  const closeDialog = () => {
+    setEditingAccount(null);
+    setIsDialogOpen(false);
+    form.reset();
+  };
 
-  useEffect(() => {
-    if (editingAccount) {
-      form.reset({
-        account_name: editingAccount.account_name || "",
-        broker_id: editingAccount.broker_id || "",
-        account_balance: editingAccount.account_balance,
-        market: editingAccount.market,
-      })
+  const onSubmit = async (data: EditingAccount) => {
+    setIsLoading(true);
+    const success = await saveAccount(data);
+    setIsLoading(false);
+    if (success) {
+      closeDialog();
     }
-  }, [editingAccount, form])
+  };
 
-  const onSubmit = async (values: FormData) => {
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "User not authenticated",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const saveAccount = async (accountData: EditingAccount) => {
     try {
-      setIsLoading(true);
-      
-      if (editingAccount?.isNew) {
-        // Create new account
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const market = accountData.market && MARKETS.includes(accountData.market as any) 
+        ? accountData.market as typeof MARKETS[number]
+        : null;
+
+      if (accountData.isNew) {
         const { error } = await supabase
           .from("trading_accounts")
-          .insert({
-            user_id: user.id,
-            broker_id: values.broker_id,
-            account_balance: values.account_balance || 0,
-            account_name: values.account_name,
-            market: values.market || null
-          });
-          
+          .insert([
+            {
+              account_name: accountData.account_name!,
+              broker_id: accountData.broker_id!,
+              market,
+              account_balance: accountData.account_balance || 0,
+              user_id: user.id,
+            },
+          ]);
+
         if (error) throw error;
+        toast.success("Trading account created successfully");
       } else {
-        // Update existing account
         const { error } = await supabase
           .from("trading_accounts")
           .update({
-            account_name: values.account_name,
-            broker_id: values.broker_id,
-            account_balance: values.account_balance || 0,
-            market: values.market || null
+            account_name: accountData.account_name,
+            broker_id: accountData.broker_id,
+            market,
+            account_balance: accountData.account_balance,
           })
-          .eq("id", editingAccount?.id!);
-          
+          .eq("id", accountData.id!);
+
         if (error) throw error;
+        toast.success("Trading account updated successfully");
       }
 
-      toast({
-        title: "Success",
-        description: "Account saved successfully",
-      })
-      refetchAccounts()
-      setEditingAccount(undefined)
-    } catch (error: any) {
+      return true;
+    } catch (error) {
       console.error("Error saving account:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to save account",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
+      toast.error("Failed to save account");
+      return false;
     }
-  }
+  };
+
+  const deleteAccount = async (accountId: string) => {
+    try {
+      const { error } = await supabase
+        .from("trading_accounts")
+        .delete()
+        .eq("id", accountId);
+
+      if (error) throw error;
+      toast.success("Trading account deleted successfully");
+      return true;
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error("Failed to delete account");
+      return false;
+    }
+  };
 
   return {
+    editingAccount,
+    isDialogOpen,
+    isLoading,
     form,
     brokers,
-    isLoading,
-    editingAccount,
+    openDialog,
+    closeDialog,
+    saveAccount,
+    deleteAccount,
+    onSubmit,
     setEditingAccount,
-    onSubmit
-  }
-}
+  };
+};

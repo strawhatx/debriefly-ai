@@ -1,252 +1,187 @@
-import { Button } from "@/components/ui/button";
-import { Check, Pencil, Plus, X } from "lucide-react";
-import { EmptyTradingAccounts } from "./EmptyTradingAccounts";
-import { TradingAccount } from "@/types/trading";
-import { useTradingAccounts } from "../hooks/use-trading-accounts";
-import { MARKETS, EditingAccount } from "@/types/trading";
-import { useQuery } from "@tanstack/react-query";
+
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { memo, useCallback } from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import { TradingAccount } from "@/types/trading";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Edit, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
-interface TradingAccountTableProps {
-    tradingAccounts: TradingAccount[];
+interface Props {
+  onEdit: (account: TradingAccount) => void;
 }
 
-interface TradingAccountRowProps {
-    account: TradingAccount;
-    onEdit: (account: TradingAccount) => void;
-    onDelete: (id: string) => void;
-}
+export const TradingAccountTable = ({ onEdit }: Props) => {
+  const [deleteAccountId, setDeleteAccountId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-interface TradingAccountFormProps {
-    editingAccount: EditingAccount;
-    onUpdate: (account: EditingAccount) => void;
-    onSave: () => void;
-    onCancel: () => void;
-}
+  const { data: brokers } = useQuery({
+    queryKey: ["brokers"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("brokers").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
 
-// Memoized form component to prevent unnecessary re-renders
-const TradingAccountForm = memo(({ editingAccount, onUpdate, onSave, onCancel }: TradingAccountFormProps) => {
-    const { data: brokers = [], isLoading: isLoadingBrokers } = useQuery({
-        queryKey: ["availableBrokers"],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from("brokers")
-                .select("*");
-            if (error) throw error;
-            return data;
-        },
-    });
+  const { data: accounts, isLoading, error } = useQuery<TradingAccount[]>({
+    queryKey: ["tradingAccounts"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
-    const handleInputChange = useCallback((field: keyof EditingAccount, value: string | number) => {
-        onUpdate({ ...editingAccount, [field]: value });
-    }, [editingAccount, onUpdate]);
+      const { data, error } = await supabase
+        .from("trading_accounts")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
-    if (isLoadingBrokers) {
-        return <tr><td colSpan={5} className="text-center py-4">Loading brokers...</td></tr>;
+      if (error) throw error;
+      return data as TradingAccount[];
+    },
+  });
+
+  const deleteAccount = async (accountId: string) => {
+    try {
+      const { error } = await supabase
+        .from("trading_accounts")
+        .delete()
+        .eq("id", accountId);
+
+      if (error) throw error;
+
+      toast.success("Trading account deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["tradingAccounts"] });
+      setDeleteAccountId(null);
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      toast.error("Failed to delete account");
     }
+  };
 
+  const getBrokerName = (brokerId: string) => {
+    const broker = brokers?.find(b => b.id === brokerId);
+    return broker?.name || "Unknown Broker";
+  };
+
+  if (isLoading) {
+    return <div>Loading accounts...</div>;
+  }
+
+  if (error) {
     return (
-        <tr className="border-b border-gray-700 hover:bg-gray-700/50">
-            <td className="px-6 py-4">
-                <Input
-                    value={editingAccount.account_name || ''}
-                    onChange={(e) => handleInputChange('account_name', e.target.value)}
-                    placeholder="Enter account name"
-                    aria-label="Account name"
-                />
-            </td>
-            <td className="px-6 py-4">
-                <Select
-                    value={editingAccount.broker_id}
-                    onValueChange={(value) => handleInputChange('broker_id', value)}
-                >
-                    <SelectTrigger aria-label="Select broker">
-                        <SelectValue placeholder="Select broker" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {brokers?.map((broker) => (
-                            <SelectItem key={broker.id} value={broker.id}>{broker.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </td>
-            <td className="px-6 py-4">
-                <Select
-                    value={editingAccount.market}
-                    onValueChange={(value) => handleInputChange('market', value as typeof MARKETS[number])}
-                >
-                    <SelectTrigger aria-label="Select market">
-                        <SelectValue placeholder="Select method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {MARKETS.map((market) => (
-                            <SelectItem key={market} value={market}>
-                                {market}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </td>
-            <td className="px-6 py-4">
-                <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={editingAccount.account_balance || ''}
-                    onChange={(e) => handleInputChange('account_balance', parseFloat(e.target.value))}
-                    placeholder="Enter balance"
-                    aria-label="Account balance"
-                />
-            </td>
-            <td className="text-right space-x-2 px-6 py-4">
-                <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    onClick={onSave}
-                    aria-label="Save account"
-                >
-                    <Check className="h-4 w-4" />
-                </Button>
-                <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    onClick={onCancel}
-                    aria-label="Cancel editing"
-                >
-                    <X className="h-4 w-4" />
-                </Button>
-            </td>
-        </tr>
+      <div className="text-red-500">
+        Failed to load accounts. Please try again later.
+      </div>
     );
-});
+  }
 
-TradingAccountForm.displayName = 'TradingAccountForm';
-
-// Memoized row component to prevent unnecessary re-renders
-const TradingAccountRow = memo(({ account, onEdit, onDelete }: TradingAccountRowProps) => {
-    const handleEdit = useCallback(() => onEdit(account), [account, onEdit]);
-    const handleDelete = useCallback(() => onDelete(account.id), [account.id, onDelete]);
-
+  if (!accounts || accounts.length === 0) {
     return (
-        <tr className="border-b border-gray-700 hover:bg-gray-700/50">
-            <td className="px-6 py-4">{account.account_name}</td>
-            <td className="px-6 py-4">{account.broker?.name || 'N/A'}</td>
-            <td className="px-6 py-4">{account.market}</td>
-            <td className="px-6 py-4">
-                ${account.account_balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </td>
-            <td className="text-right space-x-2 px-6 py-4">
-                <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    onClick={handleEdit}
-                    aria-label="Edit account"
-                >
-                    <Pencil className="h-4 w-4" />
-                </Button>
-                <Button 
-                    size="icon" 
-                    variant="ghost" 
-                    onClick={handleDelete}
-                    aria-label="Delete account"
-                >
-                    <X className="h-4 w-4" />
-                </Button>
-            </td>
-        </tr>
+      <div className="text-center py-8 text-muted-foreground">
+        No trading accounts found. Create your first account to get started.
+      </div>
     );
-});
+  }
 
-TradingAccountRow.displayName = 'TradingAccountRow';
+  return (
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Account Name</TableHead>
+              <TableHead>Broker</TableHead>
+              <TableHead>Market</TableHead>
+              <TableHead>Balance</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {accounts.map((account) => (
+              <TableRow key={account.id}>
+                <TableCell className="font-medium">
+                  {account.account_name}
+                </TableCell>
+                <TableCell>{getBrokerName(account.broker_id)}</TableCell>
+                <TableCell>{account.market || "Not specified"}</TableCell>
+                <TableCell>${account.account_balance.toLocaleString()}</TableCell>
+                <TableCell>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${
+                      account.broker_connected
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-800"
+                    }`}
+                  >
+                    {account.broker_connected ? "Connected" : "Not Connected"}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onEdit(account)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteAccountId(account.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-// Error fallback component
-const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
-    <div className="p-4 text-center">
-        <h2 className="text-lg font-semibold text-red-500">Something went wrong:</h2>
-        <p className="text-sm text-gray-400">{error.message}</p>
-        <Button onClick={resetErrorBoundary} className="mt-4">Try again</Button>
-    </div>
-);
-
-export const TradingAccountTable = ({ tradingAccounts }: TradingAccountTableProps) => {
-    const {
-        editingAccount,
-        setEditingAccount,
-        handleStartEdit,
-        handleStartCreate,
-        handleCancelEdit,
-        handleSave,
-        handleDelete,
-    } = useTradingAccounts(tradingAccounts);
-
-    return (
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <section className="bg-gray-800 mt-4 rounded-xl border border-gray-700">
-                <div className="overflow-x-auto">
-                    <div className="p-6 flex justify-between items-center">
-                        <h5 className="text-lg font-bold">Trading Accounts</h5>
-                        <Button 
-                            onClick={handleStartCreate} 
-                            className="flex items-center gap-2"
-                            aria-label="Add new trading account"
-                        >
-                            <Plus className="w-4 h-4" />
-                            Add Account
-                        </Button>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                        <table className="w-full" role="grid">
-                            <thead>
-                                <tr className="border-b border-gray-700">
-                                    <th scope="col" className="px-6 py-3 text-left">Name</th>
-                                    <th scope="col" className="px-6 py-3 text-left">Broker</th>
-                                    <th scope="col" className="px-6 py-3 text-left">Market</th>
-                                    <th scope="col" className="px-6 py-3 text-left">Balance</th>
-                                    <th scope="col" className="px-6 py-3 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {editingAccount?.isNew && (
-                                    <TradingAccountForm
-                                        editingAccount={editingAccount}
-                                        onUpdate={setEditingAccount}
-                                        onSave={handleSave}
-                                        onCancel={handleCancelEdit}
-                                    />
-                                )}
-
-                                {tradingAccounts.map((account) => (
-                                    <ErrorBoundary key={account.id} FallbackComponent={ErrorFallback}>
-                                        {editingAccount?.id === account.id ? (
-                                            <TradingAccountForm
-                                                editingAccount={editingAccount}
-                                                onUpdate={setEditingAccount}
-                                                onSave={handleSave}
-                                                onCancel={handleCancelEdit}
-                                            />
-                                        ) : (
-                                            <TradingAccountRow
-                                                account={account}
-                                                onEdit={handleStartEdit}
-                                                onDelete={handleDelete}
-                                            />
-                                        )}
-                                    </ErrorBoundary>
-                                ))}
-                                
-                                {tradingAccounts.length === 0 && !editingAccount?.isNew && (
-                                    <EmptyTradingAccounts />
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </ErrorBoundary>
-    );
+      <AlertDialog
+        open={deleteAccountId !== null}
+        onOpenChange={() => setDeleteAccountId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              trading account and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteAccountId && deleteAccount(deleteAccountId)}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 };
