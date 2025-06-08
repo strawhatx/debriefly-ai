@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { handleCORS, handleReturnCORS } from "../../utils/cors.ts";
+import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 
 serve(async (req) => {
   try {

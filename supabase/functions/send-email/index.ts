@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { Resend } from "resend";
-import { handleCORS, handleReturnCORS } from "../../utils/cors.ts";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
