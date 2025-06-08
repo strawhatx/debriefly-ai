@@ -17,7 +17,7 @@ This project is built with .
 
 ## How can I deploy this project?
 
-Simply open [Netlify](https://app.netlify.com) and click on Share -> Publish.
+TBD
 
 ## Dev Info
 
