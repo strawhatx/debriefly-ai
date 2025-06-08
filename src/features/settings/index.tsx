@@ -8,12 +8,10 @@ import { ImportHistoryTable } from "./components/ImportHistoryTable";
 import { AccountDialog } from "./components/AccountDialog";
 import { useAccountForm } from "./hooks/use-account-form";
 import { useUserData } from "./hooks/use-user-data";
-import { useImportHistorySection } from "./hooks/use-import-history-section";
 
 export default function Settings() {
   const { tradingAccounts, loading: userDataLoading } = useUserData();
   const { openDialog } = useAccountForm();
-  const { imports, loading: importLoading } = useImportHistorySection();
 
   if (userDataLoading) {
     return <div>Loading...</div>;
@@ -41,11 +39,7 @@ export default function Settings() {
           <CardTitle>Import History</CardTitle>
         </CardHeader>
         <CardContent>
-          {importLoading ? (
-            <div>Loading import history...</div>
-          ) : (
-            <ImportHistoryTable importHistory={imports} />
-          )}
+          <ImportHistoryTable />
         </CardContent>
       </Card>
 
