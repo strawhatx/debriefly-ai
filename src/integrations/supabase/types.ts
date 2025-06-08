@@ -461,10 +461,45 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_position_history: {
+        Args: { pos_id: string }
+        Returns: {
+          account_name: string
+          symbol: string
+          order_type: string
+          side: string
+          fill_price: number
+          stop_price: number
+          quantity: number
+          entry_date: string
+          closing_date: string
+          fees: number
+          status: string
+          order_id: string
+          leverage: number
+        }[]
+      }
+      get_unanalyzed_positions: {
+        Args: { user_id_param: string; trading_account_id_param: string }
+        Returns: {
+          trade_day: string
+          trades: Json
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      asset_type: "STOCK" | "OPTION" | "FUTURES" | "FOREX" | "CRYPTO"
+      broker_field_type: "TEXT" | "PASSWORD" | "APIKEY"
+      import_status:
+        | "PENDING"
+        | "UPLOADED"
+        | "PROCESSING"
+        | "COMPLETED"
+        | "FAILED"
+      insight_type: "debrief" | "pattern" | "suggestion"
+      profit_calc_method: "FIFO" | "LIFO"
+      subscription_tier: "FREE" | "PREMIUM"
+      trade_status: "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED"
     }
   }
 }

@@ -1,3 +1,4 @@
+
 // ✅ Advanced P&L Calculator (Futures, Forex, Stocks, Crypto, Options) with Real-Time Currency Conversion
 import { supabase } from "@/integrations/supabase/client";
 import { getAssetType, getFuturesInfo } from "./asset-detection";
@@ -29,7 +30,7 @@ const getForexConversionRate = async (
             .maybeSingle();
 
         if (cachedRate?.rate) {
-            return parseFloat(cachedRate.rate);
+            return parseFloat(cachedRate.rate.toString());
         }
 
         // 2. Fetch from CurrencyFreaks if not cached

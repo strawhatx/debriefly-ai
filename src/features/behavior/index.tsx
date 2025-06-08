@@ -26,6 +26,14 @@ export const Behavior = () => {
     }
   }, [trades, tradesLoading]);
 
+  // Transform trades to match the expected interface for BehaviorChart (keeping entry_date as string)
+  const transformedTrades = trades.map(trade => ({
+    ...trade,
+    entry_date: trade.entry_date, // Keep as string since that's what the hook returns
+    closing_date: trade.closing_date || trade.entry_date, // Keep as string
+    tags: trade.tags || []
+  }));
+
   return (
     <div className="space-y-4 animate-fade-up">
       <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
@@ -47,7 +55,7 @@ export const Behavior = () => {
 
       {/* Behavioral Trend Graph */}
       <section>
-        <BehaviorChart trades={trades} />
+        <BehaviorChart trades={transformedTrades} />
       </section>
 
       {/* Section 3: AI-Powered Insights */}

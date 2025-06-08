@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
 import { useEffect, useState } from "react";
@@ -15,7 +16,7 @@ interface Analysis {
 }
 
 export const useAnalysis = () => {
-  const [analysis, setAnalysis] = useState<Analysis>();
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [day, setDay] = useState<Date>(new Date());
 
   const selectedAccount = useTradingAccountStore((state) => state.selected);
@@ -39,7 +40,8 @@ export const useAnalysis = () => {
       return;
     }
 
-    setAnalysis(data[0].analysis);
+    // Proper type assertion for JSON data
+    setAnalysis(data[0].analysis as unknown as Analysis);
   }
 
   useEffect(() => {

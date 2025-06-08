@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDateStore } from "@/store/date";
@@ -50,7 +51,10 @@ export const useAnalysis = () => {
     const insightMap: Record<string, BehaviorInsight & { count: number }> = {};
 
     for (const entry of data) {
-      const insightsArray = entry.analysis?.behavior_insights || [];
+      // Type assertion for JSON data
+      const analysis = entry.analysis as any;
+      const insightsArray = analysis?.behavior_insights || [];
+      
       for (const insight of insightsArray) {
         const key = insight.title;
         if (!insightMap[key]) {

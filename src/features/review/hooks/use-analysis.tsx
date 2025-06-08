@@ -1,3 +1,4 @@
+
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
@@ -5,12 +6,12 @@ import { useState } from "react";
 
 export const useAnalysis = () => {
     const [hasUnanalyzedTrades, setHasUnanalyzedTrades] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // State to track loading
+    const [isLoading, setIsLoading] = useState(false);
     const selectedAccount = useTradingAccountStore((state) => state.selected);
 
     const runTradeAnalysis = async () => {
         try {
-          setIsLoading(true); // Start the loader
+          setIsLoading(true);
           toast({
             title: "Running Analysis",
             description: "Please wait while the analysis is running...",
@@ -24,7 +25,7 @@ export const useAnalysis = () => {
               description: "You must be logged in to run analysis",
               variant: "destructive",
             });
-            setIsLoading(false); // Stop the loader
+            setIsLoading(false);
             return;
           }
     
@@ -55,7 +56,7 @@ export const useAnalysis = () => {
             variant: "destructive",
           });
         } finally {
-          setIsLoading(false); // Stop the loader
+          setIsLoading(false);
         }
       };
     
@@ -66,7 +67,8 @@ export const useAnalysis = () => {
     
           const { data, error } = await supabase
             .rpc('get_unanalyzed_positions', { 
-                user_id_param: user.id, trading_acccount_id_param: selectedAccount 
+                user_id_param: user.id, 
+                trading_account_id_param: selectedAccount // Fixed typo
             });
     
           if (error) throw error;
@@ -78,7 +80,7 @@ export const useAnalysis = () => {
 
   return {
     hasUnanalyzedTrades,
-    isLoading, // Expose the loading state
+    isLoading,
     runTradeAnalysis,
     checkForUnanalyzedTrades
   }

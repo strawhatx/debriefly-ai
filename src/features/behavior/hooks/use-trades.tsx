@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
@@ -17,8 +18,8 @@ interface Trade {
   fill_price: number;
   stop_price: number;
   pnl: number;
-  entry_date: Date;
-  closing_date: Date;
+  entry_date: string; // Changed to string for consistency
+  closing_date: string; // Changed to string for consistency
   strategy: string;
   risk: number;
   reward: number;
@@ -33,8 +34,6 @@ export const useTrades = () => {
   const selectedAccount = useTradingAccountStore((state) => state.selected);
   const days = useDateStore((state) => state.days);
 
-  // Fetch trades from the database
-  // Fetch trades from the database
   const fetchTrades = async () => {
     try {
       setIsLoading(true);
@@ -47,7 +46,6 @@ export const useTrades = () => {
       const end_date = new Date(today);
       end_date.setDate(today.getDate() - days);
 
-      // Adjust the date range for the query
       const startDate = today.toISOString();
       const endDate = end_date.toISOString();
 
@@ -70,7 +68,6 @@ export const useTrades = () => {
             score
           `)
         .eq("user_id", user.id)
-        //range filter for the date
         .gte("entry_date", endDate)
         .lte("entry_date", startDate);
 
@@ -85,9 +82,12 @@ export const useTrades = () => {
         ...trade,
         date: format(new Date(trade.entry_date), 'MMM d, yyyy'),
         market: trade.asset_type,
-        type: trade.position_type,
+        type: trade.position_type as 'LONG' | 'SHORT',
         entry: trade.fill_price,
-        exit: trade.stop_price
+        exit: trade.stop_price,
+        entry_date: trade.entry_date,
+        closing_date: trade.closing_date || '',
+        tags: Array.isArray(trade.tags) ? trade.tags as string[] : trade.tags ? [trade.tags as string] : []
       })));
 
     } catch (err) {
@@ -97,6 +97,7 @@ export const useTrades = () => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchTrades();
   }, [selectedAccount, days]);

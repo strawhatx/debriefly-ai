@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateBehaviorScore } from "../../utils/calculate-behavioral-score";
@@ -22,8 +23,8 @@ export const PositionReviewGenerator = () => {
                     strategy,
                     reward,
                     tags,
-                    score: score.toFixed(2),
-                    state: "PUBLISHED",
+                    score: parseFloat(score.toFixed(2)), // Convert to number
+                    state: "CLOSED", // Use CLOSED instead of PUBLISHED
                 })
                 .eq("id", trade.id);
 
@@ -44,7 +45,6 @@ export const PositionReviewGenerator = () => {
 
         await runTradeAnalysis();
     };
-
 
     const runTradeAnalysis = async () => {
         const { data: { user } } = await supabase.auth.getUser();

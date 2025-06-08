@@ -6,6 +6,8 @@ import { mapTradeData } from "@/utils/utils";
 import { getAssetType } from "@/utils/asset-detection";
 import { calculatePnL } from "@/utils/calculate";
 
+type ImportStatus = "PENDING" | "UPLOADED" | "PROCESSING" | "COMPLETED" | "FAILED";
+
 export const useFileImport = (selectedAccount: string) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
@@ -28,7 +30,7 @@ export const useFileImport = (selectedAccount: string) => {
 
       const importRecord = await createImportRecord(user.id, selectedAccount, sanitizedFileName, filePath, selectedFile);
 
-      await updateImportStatus(importRecord.id, 'PROCESSING');
+      await updateImportStatus(importRecord.id, 'PROCESSING' as ImportStatus);
 
       const result = await parseCSV(selectedFile);
 
@@ -38,7 +40,7 @@ export const useFileImport = (selectedAccount: string) => {
 
       await insertTradesToSupabase(trades, rawHeaders, user.id, selectedAccount, importRecord.id);
       
-      await updateImportStatus(importRecord.id, 'COMPLETED');
+      await updateImportStatus(importRecord.id, 'COMPLETED' as ImportStatus);
 
       toast({variant:"success", title: "Success", description: `File imported successfully` });
       return true;
@@ -71,7 +73,7 @@ export const useFileImport = (selectedAccount: string) => {
         user_id: userId,
         trading_account_id: accountId,
         import_type: fileExtension === 'csv' ? 'csv' : 'excel',
-        status: 'PENDING',
+        status: 'PENDING' as ImportStatus,
         original_filename: fileName,
         file_path: path,
         file_size: file.size,
@@ -84,7 +86,7 @@ export const useFileImport = (selectedAccount: string) => {
     return data;
   };
 
-  const updateImportStatus = async (importId: string, status: string, errorMessage: string = '') => {
+  const updateImportStatus = async (importId: string, status: ImportStatus, errorMessage: string = '') => {
     await supabase.from('imports').update({ status, error_message: errorMessage }).match({ id: importId });
   };
 
@@ -106,7 +108,7 @@ export const useFileImport = (selectedAccount: string) => {
     const { data, error } = await supabase.from('trade_history').insert(transformedTrades).select();
     if (error) throw new Error(`Error inserting trades: ${error.message}`);
 
-    await updateImportStatus(importId, 'UPLOADED');
+    await updateImportStatus(importId, 'UPLOADED' as ImportStatus);
 
     await processTradesIntoPositions(data);
   };

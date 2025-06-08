@@ -75,6 +75,7 @@
     "file-saver": "^2.0.5",
     "filesize": "^8.0.7",
     "input-otp": "^1.2.4",
+    "lovable-tagger": "^1.1.8",
     "lucide-react": "^0.475.0",
     "next-themes": "^0.3.0",
     "papaparse": "^5.5.2",

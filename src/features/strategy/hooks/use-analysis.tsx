@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDateStore } from "@/store/date";
@@ -50,7 +51,10 @@ export const useAnalysis = () => {
     const recommendationMap: Record<string, StrategyRecommendation & { count: number }> = {};
 
     for (const entry of data) {
-      const recommendations = entry.analysis?.strategy_recommendations || [];
+      // Type assertion for JSON data
+      const analysis = entry.analysis as any;
+      const recommendations = analysis?.strategy_recommendations || [];
+      
       for (const recommendation of recommendations) {
         const key = recommendation.title;
         if (!recommendationMap[key]) {
