@@ -13,7 +13,7 @@ export const SelectAccount = () => {
         queryFn: async () => {
             const { data, error } = await supabase
                 .from("trading_accounts")
-                .select("id,account_name");
+                .select("id, account_name, broker_id, market, account_balance, created_at");
             if (error) {
                 console.error("Error fetching trading accounts:", error);
                 return [];

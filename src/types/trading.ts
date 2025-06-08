@@ -1,20 +1,13 @@
-
 export const MARKETS = ['STOCKS', 'OPTIONS', 'CRYPTO', 'FOREX', 'FUTURES'] as const;
 
-export interface TradingAccount {
+export type TradingAccount = {
   id: string;
   account_name: string;
   broker_id: string;
-  market: typeof MARKETS[number];
+  market: string | null;
   account_balance: number;
   created_at: string;
-  broker?: {
-    id: string;
-    name: string;
-    description?: string;
-    asset_types?: string[];
-  };
-}
+};
 
 export interface Trade {
   id: string;
