@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -80,7 +81,7 @@ export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
     },
     onSuccess: ({ type, account }) => {
       setTradingAccounts((prev) => 
-        type === "add" ? [account, ...prev] : prev.map((a) => (a.id === account.id ? account : a))
+        type === "add" ? [account as TradingAccount, ...prev] : prev.map((a) => (a.id === account.id ? account as TradingAccount : a))
       );
       toast({
         variant:"success",
@@ -88,7 +89,7 @@ export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
         description: `Trading account ${type === "add" ? "added" : "updated"} successfully.`,
       });
       setEditingAccount(null);
-      queryClient.invalidateQueries(["tradingAccounts"]);
+      queryClient.invalidateQueries({ queryKey: ["tradingAccounts"] });
     },
     onError: (error: any) => {
       toast({
@@ -111,7 +112,7 @@ export const useTradingAccounts = (initialAccounts: TradingAccount[]) => {
         title: "Success",
         description: "Trading account deleted successfully.",
       });
-      queryClient.invalidateQueries(["tradingAccounts"]);
+      queryClient.invalidateQueries({ queryKey: ["tradingAccounts"] });
     },
     onError: (error) => {
       toast({

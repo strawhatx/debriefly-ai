@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { LineChartIcon } from "lucide-react";
 import {
@@ -24,8 +25,8 @@ interface Trade {
   entry: number;
   exit: number;
   pnl: number;
-  entry_date: Date;
-  closing_date: Date;
+  entry_date: string; // Changed from Date to string
+  closing_date: string; // Changed from Date to string
   risk: number;
   reward: number;
   strategy: string | null;

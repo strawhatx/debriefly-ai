@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +21,8 @@ interface ValidationErrors {
   tags?: string;
 }
 
+type TradeState = "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED";
+
 export const useReviewDialog = () => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -37,7 +40,6 @@ export const useReviewDialog = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<ValidationErrors>({});
 
-  // Reset state when dialog closes
   const handleOpenChange = (newOpen: boolean) => {
     setOpen(newOpen);
     if (!newOpen) {
@@ -46,7 +48,6 @@ export const useReviewDialog = () => {
     }
   };
 
-  // Validate trade data
   const validateTrade = (trade: Trade): ValidationErrors => {
     const errors: ValidationErrors = {};
 
@@ -65,11 +66,9 @@ export const useReviewDialog = () => {
     return errors;
   };
 
-  // Save trade data
   const handleSave = async () => {
     if (!trade) return;
 
-    // Validate trade data
     const validationErrors = validateTrade(trade);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -91,7 +90,7 @@ export const useReviewDialog = () => {
           strategy: trade.strategy,
           reward: trade.reward,
           tags: trade.tags,
-          state: "PUBLISHED",
+          state: "DRAFT" as TradeState, // Fixed to use valid enum value
         })
         .eq('id', trade.id)
         .single();

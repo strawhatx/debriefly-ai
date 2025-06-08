@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -32,6 +33,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+
+// Extend the ColumnMeta type to include className
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData, TValue> {
+    className?: string;
+  }
+}
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[]
