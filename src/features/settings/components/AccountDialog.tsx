@@ -1,3 +1,4 @@
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,21 +20,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { useDashboard } from "@/hooks/use-dashboard"
 import { supabase } from "@/integrations/supabase/client"
-import { EditingAccount, MARKETS, TradingAccount } from "@/types/trading"
+import { MARKETS } from "@/types/trading"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -53,18 +44,12 @@ const formSchema = z.object({
   market: z.enum(MARKETS).optional(),
 })
 
-interface AccountFormProps {
-  editingAccount?: EditingAccount
-  onClose: () => void
-}
-
 export const AccountDialog = () => {
   const { user } = useUser();
   const { refetchAccounts } = useDashboard()
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [brokers, setBrokers] = useState<{ id: string; name: string }[]>([])
-  const [accountsToCreate, setAccountsToCreate] = useState<any[]>([{ user_id: user?.id }]);
 
   const editingAccount = useDashboard((state) => state.editingAccount)
   const setEditingAccount = useDashboard((state) => state.setEditingAccount)
@@ -98,17 +83,22 @@ export const AccountDialog = () => {
 
   useEffect(() => {
     setOpen(!!editingAccount)
-    form.reset(editingAccount)
-  }, [editingAccount])
+    if (editingAccount) {
+      form.reset({
+        account_name: editingAccount.account_name || "",
+        broker_id: editingAccount.broker_id || "",
+        account_balance: editingAccount.account_balance,
+        market: editingAccount.market,
+      })
+    }
+  }, [editingAccount, form])
 
   const handleClose = () => {
     setOpen(false)
     setEditingAccount(undefined)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user) {
       toast({
         title: "Error",
@@ -122,31 +112,29 @@ export const AccountDialog = () => {
       setIsLoading(true);
       
       if (editingAccount?.isNew) {
-        // For bulk insert, we need to pass individual objects, not an array
-        for (const account of accountsToCreate) {
-          const { error } = await supabase
-            .from("trading_accounts")
-            .insert({
-              user_id: account.user_id,
-              broker_id: account.broker_id!,
-              account_balance: account.account_balance || 0,
-              account_name: account.account_name!,
-              market: account.market || null
-            });
-            
-          if (error) throw error;
-        }
+        // Create new account
+        const { error } = await supabase
+          .from("trading_accounts")
+          .insert({
+            user_id: user.id,
+            broker_id: values.broker_id,
+            account_balance: values.account_balance || 0,
+            account_name: values.account_name,
+            market: values.market || null
+          });
+          
+        if (error) throw error;
       } else {
         // Update existing account
         const { error } = await supabase
           .from("trading_accounts")
           .update({
-            account_name: editingAccount.account_name!,
-            broker_id: editingAccount.broker_id!,
-            account_balance: editingAccount.account_balance || 0,
-            market: editingAccount.market || null
+            account_name: values.account_name,
+            broker_id: values.broker_id,
+            account_balance: values.account_balance || 0,
+            market: values.market || null
           })
-          .eq("id", editingAccount.id!);
+          .eq("id", editingAccount?.id!);
           
         if (error) throw error;
       }
@@ -183,7 +171,7 @@ export const AccountDialog = () => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <Form {...form}>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="account_name"
