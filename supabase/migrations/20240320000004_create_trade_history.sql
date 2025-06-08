@@ -22,17 +22,17 @@ CREATE TABLE public.trade_history (
     constraint unique_trade_external_id unique (external_id, trading_account_id),
     constraint trades_leverage_check check (
         (
-        leverage = any (
-            array[
-            (0)::numeric,
-            (50)::numeric,
-            (100)::numeric,
-            (200)::numeric,
-            (300)::numeric,
-            (400)::numeric,
-            (500)::numeric
-            ]
-        )
+            leverage = any (
+                array[
+                (0)::numeric,
+                (50)::numeric,
+                (100)::numeric,
+                (200)::numeric,
+                (300)::numeric,
+                (400)::numeric,
+                (500)::numeric
+                ]
+            )
         )
     ),
     constraint trades_side_check check (

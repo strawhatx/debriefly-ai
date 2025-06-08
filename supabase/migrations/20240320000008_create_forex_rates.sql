@@ -5,7 +5,7 @@ create table public.forex_rates (
   rate_date date null,
   rate numeric null,
   constraint forex_rates_base_currency_quote_currency_rate_date_key unique (base_currency, quote_currency, rate_date)
-)
+);
 
 -- Enable Row Level Security
 ALTER TABLE public.forex_rates ENABLE ROW LEVEL SECURITY;

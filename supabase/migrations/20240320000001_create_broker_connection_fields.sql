@@ -9,8 +9,7 @@ CREATE TABLE public.broker_connection_fields (
     required BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
-
-  constraint broker_connection_fields_broker_id_field_name_key unique (broker_id, field_name),
+  constraint broker_connection_fields_broker_id_field_name_key unique (broker_id, field_name)
 );
 
 create index IF not exists idx_broker_connection_fields_broker_id on public.broker_connection_fields using btree (broker_id) TABLESPACE pg_default;

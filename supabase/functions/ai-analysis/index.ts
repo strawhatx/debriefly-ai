@@ -157,12 +157,15 @@ serve(async (req) => {
     }
 
     console.log(`✅ AI analysis stored successfully for ${dailyAnalysisResults.length} sessions.`);
+    
     return new Response(
       JSON.stringify({ insights: dailyAnalysisResults }),
       { headers: handleReturnCORS(req), status: 200 }
     );
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("❌ Unexpected Error:", error instanceof Error ? error.message : String(error));
+    
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { headers: handleReturnCORS(req), status: 500 }
