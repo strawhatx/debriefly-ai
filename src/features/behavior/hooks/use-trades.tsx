@@ -18,8 +18,8 @@ interface Trade {
   fill_price: number;
   stop_price: number;
   pnl: number;
-  entry_date: Date;
-  closing_date: Date;
+  entry_date: string; // Changed to string for consistency
+  closing_date: string; // Changed to string for consistency
   strategy: string;
   risk: number;
   reward: number;
@@ -82,9 +82,12 @@ export const useTrades = () => {
         ...trade,
         date: format(new Date(trade.entry_date), 'MMM d, yyyy'),
         market: trade.asset_type,
-        type: trade.position_type as 'LONG' | 'SHORT', // Type assertion
+        type: trade.position_type as 'LONG' | 'SHORT',
         entry: trade.fill_price,
-        exit: trade.stop_price
+        exit: trade.stop_price,
+        entry_date: trade.entry_date,
+        closing_date: trade.closing_date || '',
+        tags: Array.isArray(trade.tags) ? trade.tags as string[] : trade.tags ? [trade.tags as string] : []
       })));
 
     } catch (err) {

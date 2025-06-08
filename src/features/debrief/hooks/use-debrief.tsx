@@ -73,10 +73,10 @@ export const useDebrief = () => {
                         hour: 'numeric',minute: 'numeric', hour12: true
                     }),
                     entry_date: position.entry_date,
-                    closing_date: position.closing_date,
+                    closing_date: position.closing_date || '',
                     symbol: position.symbol,
                     market: position.asset_type,
-                    type: position.position_type as 'LONG' | 'SHORT', // Type assertion
+                    type: position.position_type as 'LONG' | 'SHORT',
                     entry: position.fill_price,
                     exit: position.stop_price,
                     strategy: position.strategy,
@@ -84,7 +84,7 @@ export const useDebrief = () => {
                     reward: position.reward,
                     outcome: position.pnl > 0 ? 'WIN' : 'LOSS',
                     pnl: position.pnl,
-                    tags: position.tags,
+                    tags: Array.isArray(position.tags) ? position.tags as string[] : position.tags ? [position.tags as string] : [],
                     score: position.score,
                 })));
 

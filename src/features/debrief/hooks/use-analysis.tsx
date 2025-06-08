@@ -16,7 +16,7 @@ interface Analysis {
 }
 
 export const useAnalysis = () => {
-  const [analysis, setAnalysis] = useState<Analysis>();
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [day, setDay] = useState<Date>(new Date());
 
   const selectedAccount = useTradingAccountStore((state) => state.selected);
@@ -40,8 +40,8 @@ export const useAnalysis = () => {
       return;
     }
 
-    // Type assertion for JSON data
-    setAnalysis(data[0].analysis as Analysis);
+    // Proper type assertion for JSON data
+    setAnalysis(data[0].analysis as unknown as Analysis);
   }
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+
 import { DetectedBehaviorPatterns } from './components/DetectedBehaviorPatterns';
 import { useTrades } from './hooks/use-trades';
 import { AiSummary } from './components/AiSummary';
@@ -26,6 +27,14 @@ export const Behavior = () => {
     }
   }, [trades, tradesLoading]);
 
+  // Transform trades to match the expected interface for components
+  const transformedTrades = trades.map(trade => ({
+    ...trade,
+    entry_date: new Date(trade.entry_date), // Convert back to Date for BehaviorChart
+    closing_date: new Date(trade.closing_date || trade.entry_date), // Convert back to Date
+    tags: trade.tags || []
+  }));
+
   return (
     <div className="space-y-4 animate-fade-up">
       <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
@@ -47,7 +56,7 @@ export const Behavior = () => {
 
       {/* Behavioral Trend Graph */}
       <section>
-        <BehaviorChart trades={trades} />
+        <BehaviorChart trades={transformedTrades} />
       </section>
 
       {/* Section 3: AI-Powered Insights */}
