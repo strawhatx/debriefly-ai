@@ -3,8 +3,17 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL!;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_KEY!;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_KEY;
+
+// Validate that both URL and key are provided
+if (!supabaseUrl) {
+  throw new Error('VITE_SUPABASE_URL is required but not provided');
+}
+
+if (!supabaseAnonKey) {
+  throw new Error('VITE_SUPABASE_KEY is required but not provided');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

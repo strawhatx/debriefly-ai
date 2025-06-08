@@ -1,8 +1,9 @@
-VITE_SUPABASE_URL=http://127.0.0.1:54321
 
-VITE_SUPABASE_KEY=
+VITE_SUPABASE_URL=https://epqavmriilapnczbrxmz.supabase.co
 
-VITE_SUPABASE_API=http://127.0.0.1:54321/functions/v1
+VITE_SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwcWF2bXJpaWxhcG5jemJyeG16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMzYxMDUsImV4cCI6MjA2NDkxMjEwNX0.iaDOyFAgTP_tqPWrCGgn-gRQpnYU_1gYhRyadJeNV2Y
+
+VITE_SUPABASE_API=https://epqavmriilapnczbrxmz.supabase.co/functions/v1
 
 VITE_STRIPE_PUBLIC_KEY=
 
