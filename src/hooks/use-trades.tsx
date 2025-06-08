@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
@@ -23,7 +24,7 @@ interface Trade {
   tags: string[] | null;
   score: number;
   leverage: number | null;
-  state?: "DRAFT" | "PUBLISHED";
+  state?: "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED";
 }
 
 interface TradeUpdate {
@@ -110,7 +111,15 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
       const { data, error } = await query.eq("user_id", user.id);
       
       if (error) throw error;
-      setTrades(data || []);
+      
+      // Transform data to match our Trade interface
+      const transformedTrades: Trade[] = (data || []).map(trade => ({
+        ...trade,
+        position_type: trade.position_type as "LONG" | "SHORT", // Type assertion for proper typing
+        state: trade.state as "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED" | undefined
+      }));
+      
+      setTrades(transformedTrades);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch trades";
       setError(new Error(errorMessage));
@@ -142,7 +151,7 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
         strategy: trade.strategy,
         reward: trade.reward,
         tags: trade.tags,
-        state: "PUBLISHED" as const,
+        state: "CLOSED" as const, // Use CLOSED instead of PUBLISHED
         trading_account_id: trade.trading_account_id,
         user_id: trade.user_id
       }));

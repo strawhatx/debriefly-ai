@@ -1,127 +1,93 @@
-export type Broker = {
-    id: string;
-    name: string;
-    description?: string;
-    asset_types: string[];
-    created_at?: string;
-    updated_at?: string;
-    file_upload_enabled: boolean;
-    broker_sync_enabled: boolean;
+
+export interface User {
+  id: string
+  roles: Role[]
 }
 
-export type BrokerConnectionField = {
-    id: string;
-    broker_id: string;
-    field_name: string;
-    field_type: BrokerFieldType;
-    required: boolean;
-    display_name: string;
-    description: string;
-    created_at: string;
-    updated_at: string;
+export type Role = "admin" | "professional" | "trader" | "viewer"
+
+export interface Broker {
+  id: string
+  name: string
+  description?: string
+  asset_types?: string[]
 }
 
-export type TradingAccount = {
-    id: string;
-    user_id: string;
-    account_name: string;
-    broker_id: string;
-    broker_credentials: string;
-    broker_connected: boolean;
-    market: Market;
-    account_balance: number;
-    created_at: string;
-    updated_at: string;
+export interface BrokerConnectionField {
+  id: string
+  broker_id: string
+  field_name: string
+  field_type: string
+  required: boolean
+  display_name: string
+  description?: string
 }
 
-export type Position = {
-    id: string;
-    user_id: string;
-    trading_account_id: string;
-    symbol: string;
-    asset_type: string;
-    entry_date: string;
-    closing_date: string | null;
-    fill_price: number;
-    stop_price: number;
-    quantity: number;
-    position_type: string;
-    pnl: number | null;
-    fees: number;
-    leverage: number;
-    status: string;
-    entry_trade_id: string;
-    close_trade_id: string;
-    created_at: string;
-    updated_at: string;
+export interface TradingAccount {
+  id: string
+  user_id: string
+  account_name: string
+  broker_id: string
+  market?: string
+  account_balance: number
 }
 
-export type EmotionalTag = {
-    id: string;
-    position_id: string;
-    tags: Tag[];
+export interface Position {
+  id: string
+  user_id: string
+  trading_account_id: string
+  symbol: string
+  position_type: string
+  quantity: number
+  fill_price: number
+  stop_price?: number
+  entry_date: string
+  closing_date?: string
+  pnl?: number
+  fees: number
 }
 
-export type FuturesMultiplier = {
-    symbol: string;
-    tick_size: number;
-    tick_value: number;
-    point_value: number;
+export interface EmotionalTag {
+  id: string
+  tag_name: string
+  category: string
+  description?: string
 }
 
-export type Import = {
-    user_id: string;
-    trading_account_id: string;
-    import_type: ImportType
+export interface FuturesMultiplier {
+  id: string
+  symbol: string
+  name?: string
+  point_value: number
+  tick_size?: number
+  tick_value?: number
 }
 
-export type Insight = {
-    user_id: string;
-    position_id: string;
-    import_type: ImportType
-    type: string;
-    content: string;
-    created_at: string;
-    updated_at: string;
-    session_date: string;
+export interface Import {
+  id: string
+  user_id: string
+  trading_account_id: string
+  import_type: string
+  status: string
+  original_filename?: string
+  file_path?: string
+  error_message?: string
 }
 
-export type JournalEntry = {
-    user_id: string;
-    position_id: string;
-    entry_text: string;
-    strategy: Strategy;
-    created_at: string;
-    updated_at: string;
-    session_date: string;
+export interface Insight {
+  id: string
+  user_id: string
+  trading_account_id?: string
+  title: string
+  description: string
+  recommendation?: string
 }
 
-export type Subscription = {
-    user_id: string;
-    stripe_subscription_id: string;
-    stripe_price_id: string;
-    status: SubscriptionStatus;
-    current_period_end: string;
-    created_at: string;
+export interface JournalEntry {
+  id: string
+  user_id: string
+  trading_account_id?: string
+  entry_date: string
+  content: string
+  mood?: string
 }
-
-export type User = { id: string, roles: Role[] }
-
-
-//HELPER TYPES
-
-export type Market = 'STOCKS' | 'OPTIONS' | 'CRYPTO' | 'FOREX' | 'FUTURES';
-
-export type BrokerFieldType = 'TEXT' | 'PASSWORD' | 'APIKEY';
-
-export type Strategy = 'BREAKOUT' | 'PULLBACK' | 'REVERSALS' | 'TREND FOLLOWING' |
-    'RANGE TRADING' | 'SCALPING' | 'MOMENTUM' | 'SWING TRADING' | 'ORDER BLOCK' | 'FVG'
-
-export type Tag = 'CALM' | 'CONFIDENT' | 'DISCIPLINED' | 'PATIENT' | 'HESITANT' | 'ANXIOUS' | 'FEARFUL' | 'DOUBTFUL' |
-    'FOMO' | 'GREEDY' | 'EXCITED' | 'OVERCONFIDENT' | 'REVENGE' | 'ANGRY' | 'FRUSTRATED' | 'IMPULSIVE';
-
-export type SubscriptionStatus = 'ACTIVE' | 'CANCELLED' | 'PAST DUE';
-
-export type Role = 'admin' | 'professional' | 'trader' | 'viewer'
-
-export type ImportType = 'csv';

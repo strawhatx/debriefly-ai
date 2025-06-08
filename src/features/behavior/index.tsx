@@ -1,4 +1,3 @@
-
 import { DetectedBehaviorPatterns } from './components/DetectedBehaviorPatterns';
 import { useTrades } from './hooks/use-trades';
 import { AiSummary } from './components/AiSummary';
@@ -27,11 +26,11 @@ export const Behavior = () => {
     }
   }, [trades, tradesLoading]);
 
-  // Transform trades to match the expected interface for components
+  // Transform trades to match the expected interface for BehaviorChart (keeping entry_date as string)
   const transformedTrades = trades.map(trade => ({
     ...trade,
-    entry_date: new Date(trade.entry_date), // Convert back to Date for BehaviorChart
-    closing_date: new Date(trade.closing_date || trade.entry_date), // Convert back to Date
+    entry_date: trade.entry_date, // Keep as string since that's what the hook returns
+    closing_date: trade.closing_date || trade.entry_date, // Keep as string
     tags: trade.tags || []
   }));
 

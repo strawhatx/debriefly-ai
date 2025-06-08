@@ -1,72 +1,53 @@
-import { Broker, BrokerConnectionField, EmotionalTag, FuturesMultiplier, Import, Insight, JournalEntry, Position, Role, TradingAccount, User } from "./data-types"
 
-type PermissionCheck<Key extends keyof Permissions> =
-  | boolean
-  | ((user: User, data: Permissions[Key]["dataType"]) => boolean)
+import type { 
+  User, 
+  Broker, 
+  BrokerConnectionField, 
+  TradingAccount, 
+  Position, 
+  EmotionalTag, 
+  FuturesMultiplier, 
+  Import, 
+  Insight, 
+  JournalEntry 
+} from "./data-types"
 
-export type RolesWithPermissions = {
-  [R in Role]: Partial<{
-    [Key in keyof Permissions]: Partial<{
-      [Action in Permissions[Key]["action"]]: PermissionCheck<Key>;
-    }>;
-  }> & {
-    limits?: {
-      [Key in keyof Permissions]?: number;
-    };
-  };
-};
+type PermissionAction = "view" | "create" | "update" | "delete"
 
+type Permission<T> = {
+  [K in PermissionAction]?: boolean | ((user: User, data: T) => boolean)
+}
 
-export type Permissions = {
-  broker: {
-    dataType: Broker
-    action: "view" | "create" | "update" | "delete" 
-  }
-  broker_connection_field: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: BrokerConnectionField
-    action: "view" | "create" | "update" | "delete"
-  }
+export interface Permissions {
+  broker: { action: PermissionAction; dataType: Broker }
+  broker_connection_field: { action: PermissionAction; dataType: BrokerConnectionField }
+  trading_account: { action: PermissionAction; dataType: TradingAccount }
+  position: { action: PermissionAction; dataType: Position }
+  emotional_tag: { action: PermissionAction; dataType: EmotionalTag }
+  futures_multiplier: { action: PermissionAction; dataType: FuturesMultiplier }
+  import: { action: PermissionAction; dataType: Import }
+  insight: { action: PermissionAction; dataType: Insight }
+  journal_entry: { action: PermissionAction; dataType: JournalEntry }
+}
 
-  trading_account: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: TradingAccount
-    action: "view" | "create" | "update" | "delete"
-  }
+export interface Limits {
+  trading_account?: number
+  storage?: number
+}
 
-  position: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: Position
-    action: "view" | "create" | "update" | "delete"
-  }
+export interface ResourcePermissions {
+  broker?: Permission<Broker>
+  broker_connection_field?: Permission<BrokerConnectionField>
+  trading_account?: Permission<TradingAccount>
+  position?: Permission<Position>
+  emotional_tag?: Permission<EmotionalTag>
+  futures_multiplier?: Permission<FuturesMultiplier>
+  import?: Permission<Import>
+  insight?: Permission<Insight>
+  journal_entry?: Permission<JournalEntry>
+  limits?: Limits
+}
 
-  emotional_tag: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: EmotionalTag
-    action: "view" | "create" | "update" | "delete"
-  }
-
-  futures_multiplier: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: FuturesMultiplier
-    action: "view" | "create" | "update" | "delete"
-  }
-
-  import: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: Import
-    action: "view" | "create" | "update" | "delete"
-  }
-
-  insight: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: Insight
-    action: "view" | "create" | "update" | "delete"
-  }
-
-  journal_entry: {
-    // Can do something like Pick<Todo, "userId"> to get just the rows you use
-    dataType: JournalEntry
-    action: "view" | "create" | "update" | "delete"
-  }
+export interface RolesWithPermissions {
+  [roleName: string]: ResourcePermissions
 }

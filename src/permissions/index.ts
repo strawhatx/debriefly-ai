@@ -1,3 +1,4 @@
+
 import { Role, User } from "./data-types"
 import { Permissions, RolesWithPermissions } from "./permissions"
 
@@ -15,24 +16,22 @@ const ROLES = {
         limits: {
             trading_account: Infinity, // Admins have no limit
             storage: Infinity, // Admins have no storage limits
-          },
+        },
     },
     professional: {
-        comments: {
-            view: true,
-            create: true,
-            update: true,
-        },
-        todos: {
-            view: true,
-            create: true,
-            update: true,
-            delete: (user, todo) => todo.completed,
-        },
+        broker: { view: true },
+        broker_connection_field: { view: true },
+        trading_account: { view: true, create: true, update: true },
+        position: { view: true, create: true, update: true },
+        emotional_tag: { view: true },
+        futures_multiplier: { view: true },
+        import: { view: true, create: true },
+        insight: { view: true, create: true, update: true },
+        journal_entry: { view: true, create: true, update: true },
         limits: {
-            trading_account: 5, // Admins have no limit
+            trading_account: 5,
             storage: 5 * 1024 ** 3, // 5GB in bytes
-          },
+        },
     },
     trader: {
         broker: { view: true },
@@ -45,9 +44,9 @@ const ROLES = {
         insight: { view: true },
         journal_entry: { view: true },
         limits: {
-            trading_account: 1, // Admins have no limit
+            trading_account: 1,
             storage: 5 * 1024 ** 3, // 5GB in bytes
-          },
+        },
     },
     viewer: {
         broker: { view: true },
@@ -60,9 +59,9 @@ const ROLES = {
         insight: { view: true },
         journal_entry: { view: true },
         limits: {
-            trading_account: 1, // Admins have no limit
+            trading_account: 1,
             storage: 1 * 1024 ** 3, // 1GB in bytes
-          },
+        },
     },
 } as const satisfies RolesWithPermissions
 
@@ -80,16 +79,3 @@ export function hasPermission<Resource extends keyof Permissions>(
         return data != null && permission(user, data)
     })
 }
-
-// USAGE:
-//const user: User = { id: "1", roles: ["user"] }
-//const todo: Todo = {completed: false, id: "3", invitedUsers: [], title: "Test Todo", userId: "1" }
-
-// Can create a comment
-//hasPermission(user, "comments", "create")
-
-// Can view the `todo` Todo
-//(user, "todos", "view", todo)
-
-// Can view all todos
-//hasPermission(user, "todos", "view")

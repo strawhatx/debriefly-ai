@@ -1,3 +1,4 @@
+
 "use client"
 
 import React from "react"
@@ -6,6 +7,7 @@ import { TradingAccount } from "@/types/trading";
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { AccountDialog } from "./AccountDialog"
+import { useDashboard } from "@/hooks/use-dashboard";
 
 interface TradingAccountListProps {
     accounts: TradingAccount[];
@@ -61,36 +63,17 @@ const EmptyState = React.memo(() => (
 EmptyState.displayName = "EmptyState";
 
 export const TradingAccountList = React.memo(({ accounts, refresh }: TradingAccountListProps) => {
-    const [selectedAccount, setSelectedAccount] = React.useState<TradingAccount | null>(null);
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-    const [isCreating, setIsCreating] = React.useState(false);
+    const { setEditingAccount } = useDashboard();
 
     // Memoize open dialog handler
-    const handleOpenDialog = React.useCallback((account: TradingAccount) => {
-        setSelectedAccount(account);
-        setIsCreating(false);
-        setIsDialogOpen(true);
-    }, []);
+    const handleEditAccount = React.useCallback((account: TradingAccount) => {
+        setEditingAccount(account);
+    }, [setEditingAccount]);
 
     // Memoize create dialog handler
-    const handleCreateDialog = React.useCallback(() => {
-        setSelectedAccount(null);
-        setIsCreating(true);
-        setIsDialogOpen(true);
-    }, []);
-
-    // Memoize close dialog handler
-    const handleCloseDialog = React.useCallback(() => {
-        setIsDialogOpen(false);
-        setSelectedAccount(null);
-        setIsCreating(false);
-    }, []);
-
-    // Memoize save handler
-    const handleSave = React.useCallback(() => {
-        if (refresh) refresh();
-        handleCloseDialog();
-    }, [refresh, handleCloseDialog]);
+    const handleCreateAccount = React.useCallback(() => {
+        setEditingAccount({ isNew: true });
+    }, [setEditingAccount]);
 
     return (
         <Card className="w-full">
@@ -98,7 +81,7 @@ export const TradingAccountList = React.memo(({ accounts, refresh }: TradingAcco
                 <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Accounts</CardTitle>
                     <Button
-                        onClick={handleCreateDialog}
+                        onClick={handleCreateAccount}
                         className="flex text-sm items-center gap-2"
                     >
                         <Plus className="w-4 h-4" />
@@ -114,22 +97,15 @@ export const TradingAccountList = React.memo(({ accounts, refresh }: TradingAcco
                         <AccountItem
                             key={account.id}
                             account={account}
-                            onEdit={handleOpenDialog}
+                            onEdit={handleEditAccount}
                         />
                     ))
                 )}
             </CardContent>
 
-            <AccountDialog
-                data={selectedAccount}
-                onSave={handleSave}
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-                isCreating={isCreating}
-            />
+            <AccountDialog />
         </Card>
     );
 });
 
-TradingAccountList.displayName = "TradeList";
-
+TradingAccountList.displayName = "TradingAccountList";
