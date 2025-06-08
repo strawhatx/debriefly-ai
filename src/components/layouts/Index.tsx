@@ -5,8 +5,6 @@ import { SidebarProvider, SidebarInset, SidebarTrigger } from "../ui/sidebar";
 import { Header } from "../Header";
 import { Separator } from "../ui/separator";
 import { AppSidebar } from "../sidebar/AppSidebar";
-import { NotebookSidebar } from "../sidebar/NotebookSidebar";
-
 
 // Plain Layout
 export const PlainLayout = ({ children }: { children: React.ReactNode }) => {
@@ -72,7 +70,6 @@ export const SidebarLayout = ({ children, breadcrumbs = [], rightContent }: Side
             )}
           </div>
 
-
           {/* Right Side Custom Content */}
           {rightContent && <div className="flex items-center gap-2">{rightContent}</div>}
         </header>
@@ -83,7 +80,6 @@ export const SidebarLayout = ({ children, breadcrumbs = [], rightContent }: Side
     </SidebarProvider>
   );
 };
-
 
 export const DoubleLayout = ({ children, breadcrumbs = [], rightContent, rightSidebar }: SidebarLayoutProps) => {
   return (
@@ -113,7 +109,6 @@ export const DoubleLayout = ({ children, breadcrumbs = [], rightContent, rightSi
             )}
           </div>
 
-
           {/* Right Side Custom Content */}
           {rightContent && <div className="flex items-center gap-2">{rightContent}</div>}
         </header>
@@ -122,14 +117,11 @@ export const DoubleLayout = ({ children, breadcrumbs = [], rightContent, rightSi
         <div className="flex flex-row">
            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {children}
-          
           </div>  
         {rightSidebar}
         </div>
        
       </SidebarInset> 
-    
     </SidebarProvider>
   );
 };
-

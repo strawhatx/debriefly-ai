@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthGuard from "@/components/AuthGuard";
 import { LandingPage } from "./pages/Landing";
 import { BlogPage } from "./pages/Blog";
@@ -18,8 +18,7 @@ import { BehaviorPage } from "./pages/Behavior";
 import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
 import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
-import { DoubleLayout, PlainLayout, SidebarLayout } from "./components/layouts/Index";
-import { NavbarLayout } from "./components/layouts/Index";
+import { SidebarLayout, NavbarLayout } from "./components/layouts/Index";
 import { SignOutButton } from "./features/settings/components/SignOutButton";
 import { DateRangeHeader } from "./components/layouts/headers/DateRange";
 import { TradeHistoryHeader } from "./components/layouts/headers/TradeHistory";
@@ -29,10 +28,10 @@ import { TradeHistoryGenerator } from "./pages/dev-pages/TradeHistoryGenerator";
 import { ReviewPage } from "./pages/Review";
 import { ReviewHeader } from "./components/layouts/headers/Review";
 import { PositionReviewGenerator } from "./pages/dev-pages/PositionReviewGenerator";
+
 const queryClient = new QueryClient();
 
 const App = () => {
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -121,7 +120,6 @@ const App = () => {
                   <ReviewPage />
                 </SidebarLayout>
               } />
-              {/* <Route path="/app/notebook/:id" element={<NotebookWithSidebar />} />*/}
               <Route path="/dev/edge-functions" element={<EdgeFunctions />} />
               <Route path="/dev/trade-history-generator" element={<TradeHistoryGenerator />} />
               <Route path="/dev/position-review-generator" element={<PositionReviewGenerator />} />
