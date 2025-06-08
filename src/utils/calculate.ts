@@ -1,4 +1,3 @@
-
 // ✅ Advanced P&L Calculator (Futures, Forex, Stocks, Crypto, Options) with Real-Time Currency Conversion
 import { supabase } from "@/integrations/supabase/client";
 import { getAssetType, getFuturesInfo } from "./asset-detection";
@@ -18,40 +17,19 @@ const getForexConversionRate = async (
     try {
         if (quoteCurrency === baseCurrency) return 1;
 
-        const today = new Date().toISOString().split("T")[0]; // format: YYYY-MM-DD
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_API}/forex-rates`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ baseCurrency, quoteCurrency })
+        });
 
-        // 1. Check Supabase for cached rate
-        const { data: cachedRate, error } = await supabase
-            .from("forex_rates")
-            .select("rate")
-            .eq("base_currency", baseCurrency)
-            .eq("quote_currency", quoteCurrency)
-            .eq("rate_date", today)
-            .maybeSingle();
-
-        if (cachedRate?.rate) {
-            return parseFloat(cachedRate.rate.toString());
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to fetch forex rate');
         }
-
-        // 2. Fetch from CurrencyFreaks if not cached
-        const response = await fetch(
-            `https://api.forexrateapi.com/v1/latest?api_key=${import.meta.env.VITE_FOREX_RATE_API_KEY}&currencies=${quoteCurrency}&base=${baseCurrency}`
-        );
 
         const data = await response.json();
-        const rate = parseFloat(data.rates[quoteCurrency]);
-
-        if (!isNaN(rate)) {
-            // 3. Save to Supabase for future use
-            await supabase.from("forex_rates").insert({
-                base_currency: baseCurrency, quote_currency: quoteCurrency, rate, rate_date: today,
-            });
-
-            return rate;
-        }
-
-        console.warn("Invalid rate from CurrencyFreaks. Defaulting to 1.");
-        return 1;
+        return data.rate;
     } catch (err) {
         console.error("Error getting forex rate:", err);
         return 1;

@@ -29,19 +29,25 @@ const getCryptoInfo = async (symbol: string): Promise<number> => {
 
 const getForexInfo = async (symbol: string): Promise<{}> => {
   try {
-    // Use an API to confirm the symbol exists
     const response = await fetch(
-      `https://api.twelvedata.com/symbol_search?symbol=${symbol}&apikey=${import.meta.env.VITE_TWELVE_DATA_API_KEY}`,
+      `${import.meta.env.VITE_SUPABASE_API}/validate-forex`,
       {
-        method: "GET",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-      });
+        body: JSON.stringify({ symbol })
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to validate forex symbol');
+    }
 
     const data = await response.json();
-    return data; // Assuming the API returns a field `exists` to confirm the symbol 
+    return data.exists;
   } catch (error) {
-    console.error(`Crypto API error for ${symbol}:`, error);
-    return 1;
+    console.error(`Forex validation error for ${symbol}:`, error);
+    return false;
   }
 };
 

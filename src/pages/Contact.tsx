@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Resend } from 'resend';
 import { useToast } from "@/components/ui/use-toast";
 import { Mail, MessageSquare, Send, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button';
 export const ContactPage = () => {
   const {toast} = useToast();
   const [data, setData] = useState({ name: '', email: '', message: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,39 +19,39 @@ export const ContactPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     toast({
       title: "Status",
       description: "Sending...",
     });
 
     try {
-      const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
-
-      await resend.emails.send({
-        from: 'contact@debriefly.com', // Verified domain email
-        to: 'nathanieltjames24@gmail.com', // Where you want to receive messages
-        subject: `Debriefly: Contact Form Inquiry from ${data.name}`,
-        text: `
-          Name: ${data.name}
-          Email: ${data.email}
-          Message: ${data.message}
-        `,
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_API}/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
 
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to send message');
+      }
+
       toast({
-        variant:"success",
+        variant: "success",
         title: "Success",
         description: "Message sent successfully!",
       });
       setData({ name: '', email: '', message: '' });
     } catch (error) {
       console.error(error);
-
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -101,11 +101,13 @@ export const ContactPage = () => {
                   Name
                 </Label>
                 <Input
+                  name="name"
                   type="text"
                   className="border-gray-600"
                   value={data.name}
                   onChange={handleChange}
                   placeholder="Enter your name" 
+                  required
                 />
               </div>
 
@@ -114,11 +116,13 @@ export const ContactPage = () => {
                   Email
                 </Label>
                 <Input
+                  name="email"
                   type="email"
                   className="border-gray-600"
                   value={data.email}
                   onChange={handleChange}
-                  placeholder="Enter your name" 
+                  placeholder="Enter your email" 
+                  required
                 />
               </div>
 
@@ -127,20 +131,23 @@ export const ContactPage = () => {
                   Message
                 </Label>
                 <Textarea
+                  name="message"
                   rows={4}
                   className="border-gray-600"
                   value={data.message}
                   onChange={handleChange}
                   placeholder="Enter your message" 
+                  required
                 />
               </div>
 
               <Button
                 type="submit"
                 className="w-full px-8 py-3 bg-primary hover:bg-emerald-300"
+                disabled={isLoading}
               >
-                Send Message
-                <Send className="w-4 h-4" />
+                {isLoading ? "Sending..." : "Send Message"}
+                <Send className="w-4 h-4 ml-2" />
               </Button>
             </form>
           </Card>

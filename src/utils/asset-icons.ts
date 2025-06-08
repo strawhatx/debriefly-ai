@@ -78,18 +78,24 @@ const mapStockToDomain = async (symbol: string): Promise<string> => {
 
     try {
         const response = await fetch(
-            `https://finnhub.io/api/v1/stock/profile2?symbol=${upperSymbol}&token=${import.meta.env.VITE_FINNHUB_API_KEY}`
+            `${import.meta.env.VITE_SUPABASE_API}/stock-domain`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ symbol: upperSymbol })
+            }
         );
 
-        const data = await response.json();
-        const hostname = data.weburl
-            ? new URL(data.weburl).hostname.replace("www.", "")
-            : "example.com";
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to fetch stock domain');
+        }
 
-        dynamicStockDomainCache[upperSymbol] = hostname;
-        return hostname;
+        const data = await response.json();
+        dynamicStockDomainCache[upperSymbol] = data.domain;
+        return data.domain;
     } catch (error) {
-        console.error(`❌ Finnhub error for ${symbol}:`, error);
+        console.error(`❌ Stock domain lookup error for ${symbol}:`, error);
         return "example.com";
     }
 };
