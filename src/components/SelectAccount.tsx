@@ -2,11 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
 import React from "react";
-
-type TradingAccount = {
-    id: string;
-    account_name: string;
-};
+import { TradingAccount } from "@/types/trading";
 
 export const SelectAccount = () => {
     const account = useTradingAccountStore((state) => state.selected);
