@@ -13,7 +13,7 @@ import { useImportHistorySection } from "./hooks/use-import-history-section";
 export default function Settings() {
   const { tradingAccounts, loading: userDataLoading } = useUserData();
   const { openDialog } = useAccountForm();
-  const { importHistory, loading: importLoading } = useImportHistorySection();
+  const { imports, loading: importLoading } = useImportHistorySection();
 
   if (userDataLoading) {
     return <div>Loading...</div>;
@@ -44,7 +44,7 @@ export default function Settings() {
           {importLoading ? (
             <div>Loading import history...</div>
           ) : (
-            <ImportHistoryTable importHistory={importHistory} />
+            <ImportHistoryTable importHistory={imports} />
           )}
         </CardContent>
       </Card>

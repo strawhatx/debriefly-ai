@@ -9,28 +9,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { MARKETS } from "@/types/trading"
+import { MARKETS, EditingAccount } from "@/types/trading"
 import { BrokerSelect } from "./BrokerSelect"
 import { UseFormReturn } from "react-hook-form"
-import * as z from "zod"
-
-const formSchema = z.object({
-  account_name: z.string().min(2, {
-    message: "Account name must be at least 2 characters.",
-  }),
-  broker_id: z.string().min(1, {
-    message: "Please select a broker.",
-  }),
-  account_balance: z.number().optional(),
-  market: z.enum(MARKETS).optional(),
-})
-
-type FormData = z.infer<typeof formSchema>
 
 interface AccountFormProps {
-  form: UseFormReturn<FormData>
+  form: UseFormReturn<EditingAccount>
   brokers: { id: string; name: string }[]
-  onSubmit: (values: FormData) => void
+  onSubmit: (values: EditingAccount) => void
 }
 
 export const AccountForm = ({ form, brokers, onSubmit }: AccountFormProps) => {
@@ -94,7 +80,7 @@ export const AccountForm = ({ form, brokers, onSubmit }: AccountFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Market</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a market" />
@@ -116,5 +102,3 @@ export const AccountForm = ({ form, brokers, onSubmit }: AccountFormProps) => {
     </Form>
   )
 }
-
-export { formSchema, type FormData }

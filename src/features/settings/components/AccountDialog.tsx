@@ -32,7 +32,7 @@ export const AccountDialog = () => {
 
   const handleClose = () => {
     setOpen(false)
-    setEditingAccount(undefined)
+    setEditingAccount(null)
   }
 
   return (
