@@ -8,6 +8,9 @@ interface Trade {
   score?: number; // Optional emotional score for the trade
 }
 
+const scaleScore = (raw: number, from: number, to: number): number => 
+  Math.max(0, Math.min(to, (raw / from) * to));
+
 export const usePerformanceMetrics = (trades: Trade[]) => {
   return useMemo(() => {
     if (!trades || trades.length === 0) {
@@ -31,8 +34,11 @@ export const usePerformanceMetrics = (trades: Trade[]) => {
       totalTrades;
 
     const emotionalScore =
-      trades.reduce((sum, trade) => sum + (trade.score || 0), 0) /
-      totalTrades;
+      scaleScore(
+        trades.reduce((sum, trade) => sum + (trade.score || 0), 0)/totalTrades,
+        100,
+        10
+      )
 
     return {
       dailyPnl: totalPnl,

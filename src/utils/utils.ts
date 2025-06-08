@@ -75,8 +75,13 @@ const isNullOrEmpty = (str?: string): boolean => {
 };
 
 export const displayTotal = (isWin: boolean, value: number) => {
-  return isWin ? `+ $${Math.abs(value).toFixed(2)}` : `- $${Math.abs(value).toFixed(2)}`
-}
+  const formatted = Math.abs(value).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  
+  return isWin ? `+ $${formatted}` : `- $${formatted}`;
+};
 
 // Function to abbreviate large numbers
 // Function to abbreviate large numbers

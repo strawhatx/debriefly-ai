@@ -91,15 +91,19 @@ const isForex = async (symbol: string): Promise<boolean> => {
 
 const isCrypto = async (symbol: string): Promise<boolean> => {
   try {
-    const cryptoRegex = /^[A-Z]{3,5}\/[A-Z]{3,5}$/;
-    if (cryptoRegex.test(symbol)) {
-      const found = await getCryptoInfo(symbol.split('/')[0]);
-      if (found) return true;
-    }
+    // Normalize the symbol by removing slashes and converting to uppercase
+    const normalizedSymbol = symbol.replace('/', '').toUpperCase();
 
-    return false
-  }
-  catch (error) {
+    // Extract the base symbol (e.g., BTC from BTC/USD or BTCUSD)
+    const baseSymbol = symbol.includes('/') ? symbol.split('/')[0] : normalizedSymbol;
+
+    // Check if the base symbol exists in the crypto API
+    const found = await getCryptoInfo(baseSymbol);
+    if (found) return true;
+
+
+    return false;
+  } catch (error) {
     console.error(`Crypto API error for ${symbol}:`, error);
     return false;
   }

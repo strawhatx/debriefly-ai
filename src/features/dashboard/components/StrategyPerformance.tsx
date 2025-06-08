@@ -45,15 +45,18 @@ export const StrategyPerformance = ({ trades }: StrategyPerformanceProps) => {
         <BarChart4 className="text-purple-400" />
         Strategy Performance
       </h2>
-      <div className="h-56 text-sm">
+      <div className="h-64 text-sm">
         {strategyData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={strategyData}>
+            <BarChart data={strategyData} margin={{ top: 20, right: 20, bottom: 60, left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis
                 dataKey="name"
                 stroke="#9CA3AF"
-                tick={{ fill: "#9CA3AF" }}
+                tick={{ fill: "#9CA3AF", fontSize: 12 }}
+
+                angle={-45}
+                textAnchor="end"
                 
               />
               <YAxis
