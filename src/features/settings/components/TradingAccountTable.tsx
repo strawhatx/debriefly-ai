@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,27 +21,55 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { AccountDialog } from "./AccountDialog";
+import { useAccountForm } from "../hooks/use-account-form";
 
-interface Props {
-  onEdit: (account: TradingAccount) => void;
-}
-
-export const TradingAccountTable = ({ onEdit }: Props) => {
+export const TradingAccountTable = () => {
   const [deleteAccountId, setDeleteAccountId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const {
+    form,
+    brokers,
+    isLoading,
+    editingAccount,
+    isDialogOpen,
+    setEditingAccount,
+    onSubmit,
+    openDialog,
+  } = useAccountForm();
 
-  const { data: brokers } = useQuery({
-    queryKey: ["brokers"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("brokers").select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleOpenDialog = (account?: TradingAccount) => {
+    if (account) {
+      // For editing an existing account
+      setEditingAccount({
+        ...account,
+        isNew: false,
+      });
+    } else {
+      // For creating a new account
+      setEditingAccount({
+        account_name: "",
+        broker_id: "",
+        market: null,
+        account_balance: 0,
+        isNew: true,
+      });
+    }
+    openDialog(account);
+  };
 
-  const { data: accounts, isLoading, error } = useQuery<TradingAccount[]>({
+  const handleCloseDialog = () => {
+    setEditingAccount(null);
+  };
+
+  const handleSubmit = async (data: any) => {
+    await onSubmit(data);
+    handleCloseDialog();
+  };
+
+  const { data: accounts, isLoading: isLoadingAccounts, error } = useQuery<TradingAccount[]>({
     queryKey: ["tradingAccounts"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -82,7 +109,7 @@ export const TradingAccountTable = ({ onEdit }: Props) => {
     return broker?.name || "Unknown Broker";
   };
 
-  if (isLoading) {
+  if (isLoadingAccounts) {
     return <div>Loading accounts...</div>;
   }
 
@@ -94,71 +121,77 @@ export const TradingAccountTable = ({ onEdit }: Props) => {
     );
   }
 
-  if (!accounts || accounts.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        No trading accounts found. Create your first account to get started.
-      </div>
-    );
-  }
-
   return (
     <>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Account Name</TableHead>
-              <TableHead>Broker</TableHead>
-              <TableHead>Market</TableHead>
-              <TableHead>Balance</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {accounts.map((account) => (
-              <TableRow key={account.id}>
-                <TableCell className="font-medium">
-                  {account.account_name}
-                </TableCell>
-                <TableCell>{getBrokerName(account.broker_id)}</TableCell>
-                <TableCell>{account.market || "Not specified"}</TableCell>
-                <TableCell>${account.account_balance.toLocaleString()}</TableCell>
-                <TableCell>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      account.broker_connected
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {account.broker_connected ? "Connected" : "Not Connected"}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex gap-2 justify-end">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onEdit(account)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeleteAccountId(account.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Trading Accounts</h2>
+        <Button onClick={() => handleOpenDialog()} className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          Add Account
+        </Button>
       </div>
+
+      {(!accounts || accounts.length === 0) ? (
+        <div className="text-center py-8 text-muted-foreground">
+          No trading accounts found. Create your first account to get started.
+        </div>
+      ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Account Name</TableHead>
+                <TableHead>Broker</TableHead>
+                <TableHead>Market</TableHead>
+                <TableHead>Balance</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {accounts.map((account) => (
+                <TableRow key={account.id}>
+                  <TableCell className="font-medium">
+                    {account.account_name}
+                  </TableCell>
+                  <TableCell>{getBrokerName(account.broker_id)}</TableCell>
+                  <TableCell>{account.market || "Not specified"}</TableCell>
+                  <TableCell>${account.account_balance.toLocaleString()}</TableCell>
+                  <TableCell>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs ${
+                        account.broker_connected
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {account.broker_connected ? "Connected" : "Not Connected"}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenDialog(account)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeleteAccountId(account.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       <AlertDialog
         open={deleteAccountId !== null}
@@ -182,6 +215,16 @@ export const TradingAccountTable = ({ onEdit }: Props) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AccountDialog
+        isOpen={isDialogOpen}
+        onOpenChange={handleCloseDialog}
+        editingAccount={editingAccount}
+        form={form}
+        brokers={brokers}
+        isLoading={isLoading}
+        onSubmit={handleSubmit}
+      />
     </>
   );
 };

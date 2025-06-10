@@ -6,21 +6,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Loader2, Plus } from "lucide-react"
-import { memo, useCallback } from "react"
+import { Loader2 } from "lucide-react"
+import { memo } from "react"
 import { AccountForm } from "./AccountForm"
-import { useAccountForm } from "../hooks/use-account-form"
 import type { EditingAccount } from "@/types/trading"
 
 interface DialogContentProps {
   editingAccount: EditingAccount | null
-  form: ReturnType<typeof useAccountForm>['form']
-  brokers: ReturnType<typeof useAccountForm>['brokers']
+  form: any
+  brokers: any[]
   isLoading: boolean
   onSubmit: (data: EditingAccount) => Promise<void>
+  onClose: () => void
 }
 
 const DialogContent = memo(({ 
@@ -28,7 +27,8 @@ const DialogContent = memo(({
   form, 
   brokers, 
   isLoading, 
-  onSubmit 
+  onSubmit,
+  onClose
 }: DialogContentProps) => (
   <AlertDialogContent>
     <AlertDialogHeader>
@@ -45,11 +45,11 @@ const DialogContent = memo(({
     <AccountForm form={form} brokers={brokers} onSubmit={onSubmit} />
     
     <AlertDialogFooter>
-      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
       <Button 
-        type="submit" 
+        type="submit"
+        form="account-form"
         disabled={isLoading}
-        onClick={form.handleSubmit(onSubmit)}
         aria-label={editingAccount?.isNew ? "Create account" : "Save account changes"}
       >
         {isLoading && (
@@ -63,43 +63,34 @@ const DialogContent = memo(({
 
 DialogContent.displayName = 'DialogContent'
 
-export const AccountDialog = memo(() => {
-  const {
-    form,
-    brokers,
-    isLoading,
-    editingAccount,
-    setEditingAccount,
-    onSubmit,
-    openDialog
-  } = useAccountForm()
+interface AccountDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  editingAccount: EditingAccount | null;
+  form: any;
+  brokers: any[];
+  isLoading: boolean;
+  onSubmit: (data: EditingAccount) => Promise<void>;
+}
 
-  const handleClose = useCallback(() => {
-    setEditingAccount(null)
-  }, [setEditingAccount])
-
-  const handleSubmit = useCallback(async (data: EditingAccount) => {
-    await onSubmit(data)
-    handleClose()
-  }, [onSubmit, handleClose])
-
+export const AccountDialog = memo(({ 
+  isOpen, 
+  onOpenChange, 
+  editingAccount, 
+  form, 
+  brokers, 
+  isLoading, 
+  onSubmit 
+}: AccountDialogProps) => {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button 
-          onClick={() => openDialog()}
-          aria-label="Open add account dialog"
-        >
-          <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
-          Add Account
-        </Button>
-      </AlertDialogTrigger>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
         editingAccount={editingAccount}
         form={form}
         brokers={brokers}
         isLoading={isLoading}
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        onClose={() => onOpenChange(false)}
       />
     </AlertDialog>
   )
