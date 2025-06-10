@@ -9,7 +9,7 @@ CREATE TABLE public.subscriptions (
     current_period_end TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT NOW(),
 
-    constraint subscriptions_stripe_subscription_id_key unique (stripe_subscription_id),
+  constraint subscriptions_stripe_subscription_id_key unique (stripe_subscription_id),
   constraint subscriptions_status_check check (
     (
       status = any (
@@ -23,14 +23,16 @@ CREATE TABLE public.subscriptions (
   )
 );
 
+CREATE INDEX idx_subscriptions_user_id ON public.subscriptions (user_id);
+
 -- Enable Row Level Security
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for subscriptions
 CREATE POLICY "Users can view their own subscriptions"
     ON public.subscriptions FOR SELECT
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can update their own subscriptions"
     ON public.subscriptions FOR UPDATE
-    USING (auth.uid() = user_id); 
+    USING ((select auth.uid()) = user_id); 

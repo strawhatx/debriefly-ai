@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { fetchWithAuth } from '@/utils/api';
 
 export const ContactPage = () => {
   const {toast} = useToast();
@@ -26,16 +27,10 @@ export const ContactPage = () => {
     });
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_API}/send-email`, {
+      await fetchWithAuth("/send-email", {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to send message');
-      }
 
       toast({
         variant: "success",

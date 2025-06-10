@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchWithAuth } from "@/utils/api";
 
 export const EdgeFunctions = () => {
     const [analysis, setAnalysis] = useState([]);
@@ -9,15 +10,11 @@ export const EdgeFunctions = () => {
     useEffect(() => {
         const runTradeAnalysis = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-analysis`; // API path
             try {
-                const response = await fetch(API_URL, {
+                const result = await fetchWithAuth("/ai-analysis", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ user_id: user.id, trading_account_id: null }),
                 });
-
-                const result = await response.json();
                 setAnalysis(result);
             }
             catch (error) {

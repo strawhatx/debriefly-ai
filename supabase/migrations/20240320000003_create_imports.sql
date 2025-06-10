@@ -14,6 +14,7 @@ CREATE TABLE public.imports (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+
 create index IF not exists idx_imports_trading_account_id on public.imports using btree (trading_account_id) TABLESPACE pg_default;
 
 create index IF not exists idx_imports_user_id on public.imports using btree (user_id) TABLESPACE pg_default;
@@ -24,19 +25,19 @@ ALTER TABLE public.imports ENABLE ROW LEVEL SECURITY;
 -- Create RLS policies
 CREATE POLICY "Users can view their own imports"
     ON public.imports FOR SELECT
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can insert their own imports"
     ON public.imports FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can update their own imports"
     ON public.imports FOR UPDATE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can delete their own imports"
     ON public.imports FOR DELETE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 -- Create updated_at trigger
 CREATE TRIGGER set_updated_at

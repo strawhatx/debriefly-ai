@@ -7,6 +7,10 @@ create table public.forex_rates (
   constraint forex_rates_base_currency_quote_currency_rate_date_key unique (base_currency, quote_currency, rate_date)
 );
 
+-- Indexes for foreign keys
+CREATE INDEX idx_forex_rates_base_currency ON public.forex_rates (base_currency);
+CREATE INDEX idx_forex_rates_quote_currency ON public.forex_rates (quote_currency);
+
 -- Enable Row Level Security
 ALTER TABLE public.forex_rates ENABLE ROW LEVEL SECURITY;
 

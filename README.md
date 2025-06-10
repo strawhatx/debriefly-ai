@@ -29,9 +29,10 @@ Login: supabase login
 supabase functions serve --env-file supabase/.env
 
 ## Debug Edge Functions: 
-- supabase functions serve stripe-subscriptions-webhook --env-file supabase/.env --inspect-mode brk
-- supabase functions serve ai-analysis --env-file supabase/.env --inspect-mode brk
+- supabase functions serve [folder] --env-file supabase/.env --inspect-mode brk
+
 - supabase functions serve payments --env-file supabase/.env --inspect-mode brk
+
 
 ## Migrations
  - supabase db diff --use-migra -f [migration name]

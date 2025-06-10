@@ -1,8 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateBehaviorScore } from "../../utils/calculate-behavioral-score";
 import { allStrategies, allTags } from "@/utils/constants";
+import { fetchWithAuth } from "@/utils/api";
 
 export const PositionReviewGenerator = () => {
     const [trades, setTrades] = useState<any[]>();
@@ -48,20 +48,14 @@ export const PositionReviewGenerator = () => {
 
     const runTradeAnalysis = async () => {
         const { data: { user } } = await supabase.auth.getUser();
-        const API_URL = `${import.meta.env.VITE_SUPABASE_API}/ai-analysis`; // API path
         try {
-            const response = await fetch(API_URL, {
+            const result = await fetchWithAuth("/ai-analysis", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: user.id, trading_account_id: "all" }),
             });
 
-            const result = await response.json();
-
             setAnalysis(result.insights);
-
             console.log("AI analysis result:", result);
-
             console.log("Positions updated successfully!");
         }
         catch (error) {

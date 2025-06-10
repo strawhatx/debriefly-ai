@@ -77,21 +77,11 @@ const mapStockToDomain = async (symbol: string): Promise<string> => {
     }
 
     try {
-        const response = await fetch(
-            `${import.meta.env.VITE_SUPABASE_API}/stock-domain`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ symbol: upperSymbol })
-            }
-        );
+        const data = await fetchWithAuth("/stock-domain", {
+            method: "POST",
+            body: JSON.stringify({ symbol: upperSymbol })
+        });
 
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Failed to fetch stock domain');
-        }
-
-        const data = await response.json();
         dynamicStockDomainCache[upperSymbol] = data.domain;
         return data.domain;
     } catch (error) {

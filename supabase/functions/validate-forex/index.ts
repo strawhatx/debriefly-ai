@@ -1,10 +1,15 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
+import { validateSupabaseToken } from "../utils/auth.ts";
 
 serve(async (req) => {
   try {
     const corsResponse = handleCORS(req);
     if (corsResponse) return corsResponse;
+
+    // Validate the JWT token
+    const authHeader = req.headers.get("Authorization");
+    await validateSupabaseToken(authHeader);
 
     const { symbol } = await req.json();
     

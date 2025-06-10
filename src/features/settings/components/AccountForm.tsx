@@ -86,9 +86,9 @@ export const AccountForm = ({ form, brokers, onSubmit }: AccountFormProps) => {
                     <SelectValue placeholder="Select a market" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-gray-900">
                   {MARKETS.map((market) => (
-                    <SelectItem key={market} value={market}>
+                    <SelectItem key={market} value={market} className="text-white hover:bg-gray-800">
                       {market}
                     </SelectItem>
                   ))}

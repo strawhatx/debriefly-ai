@@ -1,6 +1,7 @@
 // ✅ Updated Asset Detection with Asset Store Integration
 import useAssetStore from "@/store/assets";
 import { normalizeSymbol } from "./utils";
+import { fetchWithAuth } from "./api";
 
 interface FuturesAssetConfig {
   tick_size: number;
@@ -29,21 +30,10 @@ const getCryptoInfo = async (symbol: string): Promise<number> => {
 
 const getForexInfo = async (symbol: string): Promise<{}> => {
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_API}/validate-forex`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symbol })
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to validate forex symbol');
-    }
-
-    const data = await response.json();
+    const data = await fetchWithAuth("/validate-forex", {
+      method: "POST",
+      body: JSON.stringify({ symbol })
+    });
     return data.exists;
   } catch (error) {
     console.error(`Forex validation error for ${symbol}:`, error);

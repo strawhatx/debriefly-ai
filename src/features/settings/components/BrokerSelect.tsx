@@ -14,9 +14,9 @@ export const BrokerSelect = ({ brokers, field, placeholder }: BrokerSelectProps)
       <SelectTrigger>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-gray-900">
         {brokers.map((broker) => (
-          <SelectItem key={broker.id} value={broker.id}>
+          <SelectItem key={broker.id} value={broker.id} className="text-white hover:bg-gray-800">
             {broker.name}
           </SelectItem>
         ))}

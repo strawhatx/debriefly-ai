@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
+import { validateSupabaseToken } from "../utils/auth.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -8,6 +9,10 @@ serve(async (req) => {
   try {
     const corsResponse = handleCORS(req);
     if (corsResponse) return corsResponse;
+
+    // Validate the JWT token
+    const authHeader = req.headers.get("Authorization");
+    await validateSupabaseToken(authHeader);
 
     const { name, email, message } = await req.json();
     

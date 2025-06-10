@@ -47,25 +47,30 @@ CREATE TABLE public.trade_history (
     )
 );
 
+-- Indexes for foreign keys
+CREATE INDEX idx_trade_history_user_id ON public.trade_history (user_id);
+CREATE INDEX idx_trade_history_trading_account_id ON public.trade_history (trading_account_id);
+CREATE INDEX idx_trade_history_import_id ON public.trade_history (import_id);
+
 -- Enable Row Level Security
 ALTER TABLE public.trade_history ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
 CREATE POLICY "Users can view their own trade history"
     ON public.trade_history FOR SELECT
-    USING (auth.uid() = user_id);
+    USING ( (select auth.uid()) = user_id );
 
 CREATE POLICY "Users can insert their own trade history"
     ON public.trade_history FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can update their own trade history"
     ON public.trade_history FOR UPDATE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can delete their own trade history"
     ON public.trade_history FOR DELETE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 -- Create updated_at trigger
 CREATE TRIGGER set_updated_at

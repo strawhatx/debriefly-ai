@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-const API_URL = `${import.meta.env.VITE_SUPABASE_API}/payments`; // API path
+import { fetchWithAuth } from "@/utils/api";
 
 export const usePayment = () => {
   const [loading, setLoading] = useState(false);
@@ -10,15 +9,10 @@ export const usePayment = () => {
   const apiRequest = async (body: object) => {
     setLoading(true);
     try {
-      const response = await fetch(API_URL, {
+      const result = await fetchWithAuth("/payments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
-      const result = await response.json();
-      if (result.error) throw new Error(result.error);
-
       return result;
     } catch (error) {
       console.error("❌ API Error:", error.message);
