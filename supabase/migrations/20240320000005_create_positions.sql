@@ -27,25 +27,31 @@ CREATE TABLE public.positions (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Create indexes for foreign keys
+CREATE INDEX idx_positions_user_id ON public.positions (user_id);
+CREATE INDEX idx_positions_trading_account_id ON public.positions (trading_account_id);
+CREATE INDEX idx_positions_entry_trade_id ON public.positions (entry_trade_id);
+CREATE INDEX idx_positions_close_trade_id ON public.positions (close_trade_id);
+
 -- Enable Row Level Security
 ALTER TABLE public.positions ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
 CREATE POLICY "Users can view their own positions"
     ON public.positions FOR SELECT
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can insert their own positions"
     ON public.positions FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can update their own positions"
     ON public.positions FOR UPDATE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can delete their own positions"
     ON public.positions FOR DELETE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 -- Create updated_at trigger
 CREATE TRIGGER set_updated_at

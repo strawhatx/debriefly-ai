@@ -12,10 +12,21 @@ const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 const handleSubscriptionUpdate = async (subscription) => {
   const userId = subscription.metadata.userId;
   const priceId = subscription.items.data[0].price.id;
-  const status = subscription.status;
+  let status = subscription.status;
+
+  // Map Stripe status to our status types
+  if (status === 'trialing') status = 'active';
+  if (status === 'incomplete' || status === 'incomplete_expired' || status === 'canceled') status = 'canceled';
+  if (status === 'unpaid') status = 'past_due';
+
   const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
 
-  console.log(`🔄 Updating subscription for user: ${userId}`);
+  console.log(`🔄 Updating subscription for user: ${userId}`, {
+    subscriptionId: subscription.id,
+    status,
+    priceId,
+    currentPeriodEnd
+  });
 
   await supabase
     .from("subscriptions")
@@ -30,7 +41,10 @@ const handleSubscriptionUpdate = async (subscription) => {
 
 // ✅ **Helper Function: Cancel Subscription in Supabase**
 const handleSubscriptionCancel = async (subscription) => {
-  console.log(`❌ Canceling subscription: ${subscription.id}`);
+  console.log(`❌ Canceling subscription: ${subscription.id}`, {
+    userId: subscription.metadata.userId,
+    status: subscription.status
+  });
 
   await supabase
     .from("subscriptions")
@@ -52,20 +66,30 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: "Invalid webhook signature" }), { status: 400 });
   }
 
-  console.log(`📢 Received event: ${event.type}`);
+  console.log(`📢 Received event: ${event.type}`, {
+    subscriptionId: event.data.object.id,
+    status: event.data.object.status
+  });
 
   switch (event.type) {
     case "customer.subscription.created":
     case "customer.subscription.updated":
+    case "customer.subscription.trial_will_end":
+    case "customer.subscription.resumed":
+    case "customer.subscription.paused":
       await handleSubscriptionUpdate(event.data.object);
       break;
     
     case "customer.subscription.deleted":
+    case "customer.subscription.canceled":
       await handleSubscriptionCancel(event.data.object);
       break;
 
     default:
-      console.log(`ℹ️ Unhandled event type: ${event.type}`);
+      console.log(`ℹ️ Unhandled event type: ${event.type}`, {
+        subscriptionId: event.data.object.id,
+        status: event.data.object.status
+      });
   }
 
   return new Response(JSON.stringify({ success: true }), { status: 200 });

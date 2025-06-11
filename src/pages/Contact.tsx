@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Resend } from 'resend';
 import { useToast } from "@/components/ui/use-toast";
 import { Mail, MessageSquare, Send, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -7,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { fetchWithAuth } from '@/integrations/fetch/api';
 
 export const ContactPage = () => {
   const {toast} = useToast();
@@ -25,34 +25,25 @@ export const ContactPage = () => {
     });
 
     try {
-      const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
-
-      await resend.emails.send({
-        from: 'contact@debriefly.com', // Verified domain email
-        to: 'nathanieltjames24@gmail.com', // Where you want to receive messages
-        subject: `Debriefly: Contact Form Inquiry from ${data.name}`,
-        text: `
-          Name: ${data.name}
-          Email: ${data.email}
-          Message: ${data.message}
-        `,
+      await fetchWithAuth("/send-email", {
+        method: 'POST',
+        body: JSON.stringify(data)
       });
 
       toast({
-        variant:"success",
+        variant: "success",
         title: "Success",
         description: "Message sent successfully!",
       });
       setData({ name: '', email: '', message: '' });
     } catch (error) {
       console.error(error);
-
       toast({
         title: "Error",
-        description: "Failed to send message. Please try again.",
+        description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
-    }
+    }``
   };
 
   return (

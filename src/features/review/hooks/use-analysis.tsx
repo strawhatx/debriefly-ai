@@ -66,7 +66,7 @@ export const useAnalysis = () => {
     
           const { data, error } = await supabase
             .rpc('get_unanalyzed_positions', { 
-                user_id_param: user.id, trading_acccount_id_param: selectedAccount 
+                user_id_param: user.id, trading_account_id_param: selectedAccount 
             });
     
           if (error) throw error;

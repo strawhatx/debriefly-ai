@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 import { tradeDebriefPrompt } from "../utils/prompts.ts";
+import { validateSupabaseToken } from "../utils/auth.ts";
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL"), Deno.env.get("SUPABASE_SERVICE_ROLE_KEY"));
 const GEMINI_API_KEY = Deno.env.get("GOOGLE_GEMINI_API_KEY");
@@ -78,8 +79,12 @@ serve(async (req) => {
     const corsResponse = handleCORS(req);
     if (corsResponse) return corsResponse;
 
+    // Validate the JWT token
+    const authHeader = req.headers.get("Authorization");
+    await validateSupabaseToken(authHeader);
+
     // Validate request body
-    const { user_id , trading_account_id} = (await req.json()) as RequestBody;
+    const { user_id, trading_account_id } = (await req.json()) as RequestBody;
     if (!user_id) {
       return new Response(
         JSON.stringify({ error: ERRORS.MISSING_USER_ID }),
@@ -157,12 +162,15 @@ serve(async (req) => {
     }
 
     console.log(`✅ AI analysis stored successfully for ${dailyAnalysisResults.length} sessions.`);
+    
     return new Response(
       JSON.stringify({ insights: dailyAnalysisResults }),
       { headers: handleReturnCORS(req), status: 200 }
     );
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("❌ Unexpected Error:", error instanceof Error ? error.message : String(error));
+    
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
       { headers: handleReturnCORS(req), status: 500 }

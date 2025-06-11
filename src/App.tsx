@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,8 +29,8 @@ import { NotebookHeader } from "./components/layouts/headers/Notebook";
 import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
 import { TradeHistoryGenerator } from "./pages/dev-pages/TradeHistoryGenerator";
 import { ReviewPage } from "./pages/Review";
-import { ReviewHeader } from "./components/layouts/headers/Review";
 import { PositionReviewGenerator } from "./pages/dev-pages/PositionReviewGenerator";
+import { FeatureRequestsPage } from "./pages/FeatureRequests";
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -118,6 +117,13 @@ const App = () => {
                   <BehaviorPage />
                 </SidebarLayout>
               } />
+              <Route path="/app/feature-requests" element={
+                <SidebarLayout
+                  breadcrumbs={[{ name: "Feature Requests", href: "/app/feature-requests" }]}
+                >
+                  <FeatureRequestsPage />
+                </SidebarLayout>
+              } />
               <Route path="/settings" element={
                 <SidebarLayout
                   breadcrumbs={[{ name: "Settings", href: "/app/settings" }]}
@@ -136,7 +142,7 @@ const App = () => {
                   breadcrumbs={[
                     { name: "Trade Import", href: "/app/trade-import" },
                     { name: "Review", href: "/app/trade-import/review" }]}
-                  rightContent={<ReviewHeader />}>
+                  >
                   <ReviewPage />
                 </SidebarLayout>
               } />

@@ -12,25 +12,29 @@ CREATE TABLE public.trading_accounts (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Create indexes for foreign keys
+CREATE INDEX idx_trading_accounts_user_id ON public.trading_accounts (user_id);
+CREATE INDEX idx_trading_accounts_broker_id ON public.trading_accounts (broker_id);
+
 -- Enable Row Level Security
 ALTER TABLE public.trading_accounts ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
 CREATE POLICY "Users can view their own trading accounts"
     ON public.trading_accounts FOR SELECT
-    USING (auth.uid() = user_id);
+    USING ( (select auth.uid()) = user_id );
 
 CREATE POLICY "Users can insert their own trading accounts"
     ON public.trading_accounts FOR INSERT
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can update their own trading accounts"
     ON public.trading_accounts FOR UPDATE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 CREATE POLICY "Users can delete their own trading accounts"
     ON public.trading_accounts FOR DELETE
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 
 -- Create updated_at trigger
 CREATE TRIGGER set_updated_at

@@ -1,6 +1,7 @@
 // ✅ Updated Asset Detection with Asset Store Integration
 import useAssetStore from "@/store/assets";
 import { normalizeSymbol } from "./utils";
+import { fetchWithAuth } from "@/integrations/fetch/api";
 
 interface FuturesAssetConfig {
   tick_size: number;
@@ -29,19 +30,14 @@ const getCryptoInfo = async (symbol: string): Promise<number> => {
 
 const getForexInfo = async (symbol: string): Promise<{}> => {
   try {
-    // Use an API to confirm the symbol exists
-    const response = await fetch(
-      `https://api.twelvedata.com/symbol_search?symbol=${symbol}&apikey=${import.meta.env.VITE_TWELVE_DATA_API_KEY}`,
-      {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
-
-    const data = await response.json();
-    return data; // Assuming the API returns a field `exists` to confirm the symbol 
+    const data = await fetchWithAuth("/validate-forex", {
+      method: "POST",
+      body: JSON.stringify({ symbol })
+    });
+    return data.exists;
   } catch (error) {
-    console.error(`Crypto API error for ${symbol}:`, error);
-    return 1;
+    console.error(`Forex validation error for ${symbol}:`, error);
+    return false;
   }
 };
 

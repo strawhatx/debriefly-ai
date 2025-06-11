@@ -1,3 +1,5 @@
+import { fetchWithAuth } from "@/integrations/fetch/api";
+
 export const getAssetIcon = async (symbol: string, type: string): Promise<string> => {
     switch (type) {
         case "STOCK":
@@ -77,19 +79,15 @@ const mapStockToDomain = async (symbol: string): Promise<string> => {
     }
 
     try {
-        const response = await fetch(
-            `https://finnhub.io/api/v1/stock/profile2?symbol=${upperSymbol}&token=${import.meta.env.VITE_FINNHUB_API_KEY}`
-        );
+        const data = await fetchWithAuth("/stock-domain", {
+            method: "POST",
+            body: JSON.stringify({ symbol: upperSymbol })
+        });
 
-        const data = await response.json();
-        const hostname = data.weburl
-            ? new URL(data.weburl).hostname.replace("www.", "")
-            : "example.com";
-
-        dynamicStockDomainCache[upperSymbol] = hostname;
-        return hostname;
+        dynamicStockDomainCache[upperSymbol] = data.domain;
+        return data.domain;
     } catch (error) {
-        console.error(`❌ Finnhub error for ${symbol}:`, error);
+        console.error(`❌ Stock domain lookup error for ${symbol}:`, error);
         return "example.com";
     }
 };

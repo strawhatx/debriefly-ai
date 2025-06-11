@@ -1,6 +1,7 @@
 // ✅ Advanced P&L Calculator (Futures, Forex, Stocks, Crypto, Options) with Real-Time Currency Conversion
 import { supabase } from "@/integrations/supabase/client";
 import { getAssetType, getFuturesInfo } from "./asset-detection";
+import { fetchWithAuth } from "@/integrations/fetch/api";
 
 // Local cache to avoid duplicate calls (in-memory for now)
 
@@ -32,12 +33,11 @@ const getForexConversionRate = async (
             return parseFloat(cachedRate.rate);
         }
 
-        // 2. Fetch from CurrencyFreaks if not cached
-        const response = await fetch(
-            `https://api.forexrateapi.com/v1/latest?api_key=${import.meta.env.VITE_FOREX_RATE_API_KEY}&currencies=${quoteCurrency}&base=${baseCurrency}`
-        );
-
-        const data = await response.json();
+        const data = await fetchWithAuth("/forex-rates", {
+            method: "POST",
+            body: JSON.stringify({ baseCurrency, quoteCurrency })
+        });
+        
         const rate = parseFloat(data.rates[quoteCurrency]);
 
         if (!isNaN(rate)) {

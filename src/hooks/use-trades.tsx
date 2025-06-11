@@ -41,7 +41,7 @@ interface UseTradesResult {
   isLoading: boolean;
   error: Error | null;
   fetchTrades: () => Promise<void>;
-  saveTrades: (updatedTrades: TradeUpdate[]) => Promise<void>;
+  saveTrade: (updatedTrade: TradeUpdate) => Promise<void>;
 }
 
 // Validation functions
@@ -50,22 +50,22 @@ const validateTrade = (trade: TradeUpdate): boolean => {
     console.warn("Trade missing ID, skipping:", trade);
     return false;
   }
-  
+
   if (trade.strategy !== null && typeof trade.strategy !== 'string') {
     console.warn(`Invalid strategy for trade ${trade.id}: ${trade.strategy}`);
     return false;
   }
-  
+
   if (typeof trade.reward !== 'number' || isNaN(trade.reward)) {
     console.warn(`Invalid reward for trade ${trade.id}: ${trade.reward}`);
     return false;
   }
-  
+
   if (trade.tags !== null && (!Array.isArray(trade.tags) || !trade.tags.every(tag => typeof tag === 'string'))) {
     console.warn(`Invalid tags for trade ${trade.id}: ${trade.tags}`);
     return false;
   }
-  
+
   return true;
 };
 
@@ -89,7 +89,7 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
     if (isReview) {
       query = query.eq("state", "DRAFT");
     }
-    
+
     if (selectedAccount) {
       query = query.eq("trading_account_id", selectedAccount);
     }
@@ -108,7 +108,7 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
 
       const query = buildTradesQuery();
       const { data, error } = await query.eq("user_id", user.id);
-      
+
       if (error) throw error;
       setTrades(data || []);
     } catch (err) {
@@ -121,7 +121,7 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
   }, [buildTradesQuery]);
 
   // Save trades to the database
-  const saveTrades = useCallback(async (updatedTrades: TradeUpdate[]) => {
+  const saveTrade = useCallback(async (updatedTrade: TradeUpdate) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -130,48 +130,46 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
       if (!user) throw new Error("Not authenticated");
 
       // Validate trades before saving
-      const validatedTrades = updatedTrades.filter(validateTrade);
+      const validatedTrade = validateTrade(updatedTrade);
 
-      if (validatedTrades.length === 0) {
+      if (!validatedTrade) {
         throw new Error("No valid trades to save after validation");
       }
 
       // Batch updates for better performance
-      const updates = validatedTrades.map((trade) => ({
-        id: trade.id,
-        strategy: trade.strategy,
-        reward: trade.reward,
-        tags: trade.tags,
+      const update = {
+        id: updatedTrade.id,
+        strategy: updatedTrade.strategy,
+        reward: updatedTrade.reward,
+        tags: updatedTrade.tags,
         state: "PUBLISHED" as const,
-        trading_account_id: trade.trading_account_id,
-        user_id: trade.user_id
-      }));
+        trading_account_id: updatedTrade.trading_account_id,
+        user_id: updatedTrade.user_id
+      };
 
-      // Update each trade individually
-      for (const update of updates) {
-        const { error } = await supabase
-          .from("positions")
-          .update({
-            strategy: update.strategy,
-            reward: update.reward,
-            tags: update.tags,
-            state: update.state,
-            trading_account_id: update.trading_account_id,
-            user_id: update.user_id
-          })
-          .eq('id', update.id);
-          
-        if (error) throw error;
-      }
+
+      const { error } = await supabase
+        .from("positions")
+        .update({
+          strategy: update.strategy,
+          reward: update.reward,
+          tags: update.tags,
+          state: update.state,
+          trading_account_id: update.trading_account_id,
+          user_id: update.user_id
+        })
+        .eq('id', update.id);
+
+      if (error) throw error;
 
       // Update local state after saving
       await fetchTrades();
-    } 
+    }
     catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update trades";
       setError(new Error(errorMessage));
       console.error("Error updating trades:", err);
-    } 
+    }
     finally {
       setIsLoading(false);
     }
@@ -184,8 +182,8 @@ export const useTrades = (isReview: boolean = false): UseTradesResult => {
     isLoading,
     error,
     fetchTrades,
-    saveTrades
-  }), [trades, isLoading, error, fetchTrades, saveTrades]);
+    saveTrade
+  }), [trades, isLoading, error, fetchTrades, saveTrade]);
 
   useEffect(() => {
     fetchTrades();

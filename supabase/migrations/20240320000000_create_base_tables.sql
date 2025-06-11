@@ -5,7 +5,7 @@ CREATE TYPE public.import_status AS ENUM ('PENDING', 'UPLOADED', 'PROCESSING', '
 CREATE TYPE public.insight_type AS ENUM ('debrief', 'pattern', 'suggestion');
 CREATE TYPE public.profit_calc_method AS ENUM ('FIFO', 'LIFO');
 CREATE TYPE public.subscription_tier AS ENUM ('FREE', 'PREMIUM');
-CREATE TYPE public.trade_status AS ENUM ('DRAFT', 'OPEN', 'CLOSED', 'CANCELLED');
+CREATE TYPE public.trade_status AS ENUM ('DRAFT', 'PUBLISHED');
 
 -- Create profiles table
 CREATE TABLE public.profiles (
@@ -51,7 +51,7 @@ ALTER TABLE public.futures_multipliers ENABLE ROW LEVEL SECURITY;
 -- Create RLS policies for profiles
 CREATE POLICY "Users can view their own profile"
     ON public.profiles FOR SELECT
-    USING (auth.uid() = id);
+    USING ((select auth.uid()) = id );
 
 CREATE POLICY "Users can update their own profile"
     ON public.profiles FOR UPDATE
@@ -60,6 +60,9 @@ CREATE POLICY "Users can update their own profile"
 create policy "Users can insert their own profile." on profiles
   for insert with check ((select auth.uid()) = id);
 
+-- Set up Storage!
+insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true);
+
 -- Set up access controls for storage.
 -- See https://supabase.com/docs/guides/storage#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects
@@ -67,6 +70,12 @@ create policy "Avatar images are publicly accessible." on storage.objects
 
 create policy "Anyone can upload an avatar." on storage.objects
   for insert with check (bucket_id = 'avatars');
+
+create policy "Users can update their own avatars." on storage.objects
+  for update using (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+create policy "Users can delete their own avatars." on storage.objects
+  for delete using (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
 
 -- Create RLS policies for brokers
 CREATE POLICY "Anyone can view brokers"
@@ -120,9 +129,6 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
-
--- Set up Storage!
-insert into storage.buckets (id, name) values ('avatars', 'avatars');
 
 -- Seeding data
 INSERT INTO "public"."brokers" ("id", "name", "description", "asset_types", "created_at", "updated_at", "file_upload_enabled", "broker_sync_enabled") 

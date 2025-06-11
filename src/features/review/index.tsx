@@ -11,33 +11,22 @@ import { useAnalysis } from "./hooks/use-analysis";
 
 export const Review = () => {
   const [mappedTrades, setMappedTrades] = useState([]);
-  const { trades, setTrades, fetchTrades, saveTrades, error } = useTrades(true);
+  const { trades, fetchTrades, saveTrade, error } = useTrades(true);
   const { hasUnanalyzedTrades, isLoading, runTradeAnalysis, checkForUnanalyzedTrades } = useAnalysis();
-  const { publish, subscribe } = useEventBus();
   const { toast } = useToast();
 
-  const handleUpdate = (id, key, value) => {
-    setTrades((prevTrades) =>
-      prevTrades.map((trade) =>
-        trade.id === id ? { ...trade, [key]: value } : trade
-      )
-    );
-  };
-
-  const handleSave = async () => {
+  const handleSave = async (updatedTrade) => {
     try {
-      await saveTrades(mappedTrades);
+      await saveTrade(updatedTrade);
+      await fetchTrades(); // Refresh the list after successful save
 
       toast({
         title: "Success",
         description: "Changes saved successfully!",
         variant: "success",
       });
-
-      publish("review_trades_refresh", { tradeCount: trades.length, refresh: fetchTrades }); // send the refresh event
     } catch (err) {
-      console.error("Error saving trades:", err);
-
+      console.error("Error saving trade:", err);
       toast({
         title: "Error",
         description: "Failed to save changes. Please try again.",
@@ -45,19 +34,6 @@ export const Review = () => {
       });
     }
   };
-
-  useEffect(() => {
-    // Subscribe to the event when the component mounts
-    const unsubscribe = subscribe('review_trade_save', (data: { setSaving: (value: boolean) => void }) => {
-      handleSave();
-      data.setSaving(false);
-    });
-
-    // Cleanup function: Unsubscribe when the component unmounts
-    return () => {
-      unsubscribe();
-    };
-  }, [subscribe]);
 
   useEffect(() => {
     const result = trades.map((trade) => ({
@@ -80,7 +56,6 @@ export const Review = () => {
 
   useEffect(() => {
     if (trades && trades.length > 0) return;
-
     checkForUnanalyzedTrades();
   }, [trades]);
 
@@ -120,7 +95,11 @@ export const Review = () => {
 
           {/* Desktop-only Component */}
           <div className="hidden lg:block">
-            <TradeTable columns={Columns(handleUpdate)} data={mappedTrades} />
+            <TradeTable 
+              columns={Columns} 
+              data={mappedTrades} 
+              onSave={handleSave} 
+            />
           </div>
 
           {/* Mobile-only Component */}
