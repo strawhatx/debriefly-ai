@@ -6,12 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { fetchWithAuth } from '@/utils/api';
+import { fetchWithAuth } from '@/integrations/fetch/api';
 
 export const ContactPage = () => {
   const {toast} = useToast();
   const [data, setData] = useState({ name: '', email: '', message: '' });
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,7 +19,6 @@ export const ContactPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     toast({
       title: "Status",
       description: "Sending...",
@@ -45,9 +43,7 @@ export const ContactPage = () => {
         description: error.message || "Failed to send message. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
-    }
+    }``
   };
 
   return (
@@ -96,13 +92,11 @@ export const ContactPage = () => {
                   Name
                 </Label>
                 <Input
-                  name="name"
                   type="text"
                   className="border-gray-600"
                   value={data.name}
                   onChange={handleChange}
                   placeholder="Enter your name" 
-                  required
                 />
               </div>
 
@@ -111,13 +105,11 @@ export const ContactPage = () => {
                   Email
                 </Label>
                 <Input
-                  name="email"
                   type="email"
                   className="border-gray-600"
                   value={data.email}
                   onChange={handleChange}
-                  placeholder="Enter your email" 
-                  required
+                  placeholder="Enter your name" 
                 />
               </div>
 
@@ -126,23 +118,20 @@ export const ContactPage = () => {
                   Message
                 </Label>
                 <Textarea
-                  name="message"
                   rows={4}
                   className="border-gray-600"
                   value={data.message}
                   onChange={handleChange}
                   placeholder="Enter your message" 
-                  required
                 />
               </div>
 
               <Button
                 type="submit"
                 className="w-full px-8 py-3 bg-primary hover:bg-emerald-300"
-                disabled={isLoading}
               >
-                {isLoading ? "Sending..." : "Send Message"}
-                <Send className="w-4 h-4 ml-2" />
+                Send Message
+                <Send className="w-4 h-4" />
               </Button>
             </form>
           </Card>

@@ -1,7 +1,7 @@
 // ✅ Advanced P&L Calculator (Futures, Forex, Stocks, Crypto, Options) with Real-Time Currency Conversion
 import { supabase } from "@/integrations/supabase/client";
 import { getAssetType, getFuturesInfo } from "./asset-detection";
-import { fetchWithAuth } from "./api";
+import { fetchWithAuth } from "@/integrations/fetch/api";
 
 // Local cache to avoid duplicate calls (in-memory for now)
 
@@ -18,12 +18,39 @@ const getForexConversionRate = async (
     try {
         if (quoteCurrency === baseCurrency) return 1;
 
+        const today = new Date().toISOString().split("T")[0]; // format: YYYY-MM-DD
+
+        // 1. Check Supabase for cached rate
+        const { data: cachedRate, error } = await supabase
+            .from("forex_rates")
+            .select("rate")
+            .eq("base_currency", baseCurrency)
+            .eq("quote_currency", quoteCurrency)
+            .eq("rate_date", today)
+            .maybeSingle();
+
+        if (cachedRate?.rate) {
+            return parseFloat(cachedRate.rate);
+        }
+
         const data = await fetchWithAuth("/forex-rates", {
             method: "POST",
             body: JSON.stringify({ baseCurrency, quoteCurrency })
         });
+        
+        const rate = parseFloat(data.rates[quoteCurrency]);
 
-        return data.rate;
+        if (!isNaN(rate)) {
+            // 3. Save to Supabase for future use
+            await supabase.from("forex_rates").insert({
+                base_currency: baseCurrency, quote_currency: quoteCurrency, rate, rate_date: today,
+            });
+
+            return rate;
+        }
+
+        console.warn("Invalid rate from CurrencyFreaks. Defaulting to 1.");
+        return 1;
     } catch (err) {
         console.error("Error getting forex rate:", err);
         return 1;

@@ -5,7 +5,7 @@ CREATE TYPE public.import_status AS ENUM ('PENDING', 'UPLOADED', 'PROCESSING', '
 CREATE TYPE public.insight_type AS ENUM ('debrief', 'pattern', 'suggestion');
 CREATE TYPE public.profit_calc_method AS ENUM ('FIFO', 'LIFO');
 CREATE TYPE public.subscription_tier AS ENUM ('FREE', 'PREMIUM');
-CREATE TYPE public.trade_status AS ENUM ('DRAFT', 'OPEN', 'CLOSED', 'CANCELLED');
+CREATE TYPE public.trade_status AS ENUM ('DRAFT', 'PUBLISHED');
 
 -- Create profiles table
 CREATE TABLE public.profiles (

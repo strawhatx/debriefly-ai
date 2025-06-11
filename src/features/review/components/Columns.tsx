@@ -4,7 +4,7 @@ import { allStrategies, allTagObjects as allTags } from "../../../utils/constant
 import { MultiSelect } from "./MultiSelect";
 import { displayTotal } from "@/utils/utils";
 
-export const Columns = (handleUpdate: (id: string, key: string, value: any) => void) => [
+export const Columns = [
   {
     accessorKey: "date",
     header: "Date",
@@ -12,7 +12,7 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
       className: "hidden lg:table-cell", // Hidden on small screens
     },
     cell: ({ row }) => (
-      <div className="text-right">{new Date(row.getValue("date")).toLocaleDateString()}</div>
+      <div className="text-right">{new Date(row.date).toLocaleDateString()}</div>
     ),
   },
   {
@@ -28,15 +28,15 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
     cell: ({ row }) => (
       <span
         className={`flex items-center gap-1 ${
-          row.getValue("type") === "LONG" ? "text-emerald-400" : "text-red-400"
+          row.type === "LONG" ? "text-emerald-400" : "text-red-400"
         }`}
       >
-        {row.getValue("type") === "LONG" ? (
+        {row.type === "LONG" ? (
           <ArrowUpRight className="w-4 h-4" />
         ) : (
           <ArrowDownRight className="w-4 h-4" />
         )}
-        {row.getValue("type")}
+        {row.type}
       </span>
     ),
   },
@@ -46,28 +46,26 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
     cell: ({ row }) => (
       <div
         className={`text-right ${
-          row.getValue("pnl") >= 0 ? "text-emerald-400" : "text-red-400"
+          row.pnl >= 0 ? "text-emerald-400" : "text-red-400"
         }`}
       >
-        {displayTotal(row.getValue("pnl") >= 0, row.getValue("pnl"))}
+        {displayTotal(row.pnl >= 0, row.pnl)}
       </div>
     ),
   },
   {
     accessorKey: "strategy",
     header: "Strategy",
-    cell: ({ row }) => {
-      const strategy = row.getValue("strategy");
-
-      const handleStrategyChange = (newStrategy) => {
-        handleUpdate(row.original.id, "strategy", newStrategy);
-      };
+    cell: ({ row, updateData, isEditing }) => {
+      if (!isEditing) {
+        return <div className="text-gray-300">{row.strategy || 'Not set'}</div>;
+      }
 
       return (
         <Select
           options={allStrategies}
-          value={strategy}
-          onChange={handleStrategyChange}
+          value={row.strategy}
+          onChange={(newStrategy) => updateData?.(newStrategy)}
         />
       );
     },
@@ -75,35 +73,50 @@ export const Columns = (handleUpdate: (id: string, key: string, value: any) => v
   {
     accessorKey: "reward",
     header: "Reward",
-    cell: ({ row }) => (
-      <input
-        type="number"
-        className="bg-gray-800 text-right text-white border border-gray-600 rounded px-4 py-2"
-        value={row.getValue("reward") || 0}
-        min={0.5}
-        max={10}
-        step={0.5}
-        onChange={(e) =>
-          handleUpdate(row.original.id, "reward", parseFloat(e.target.value))
-        }
-      />
-    ),
+    cell: ({ row, updateData, isEditing }) => {
+      if (!isEditing) {
+        return (
+          <div className="text-right text-gray-300">
+            {row.reward ? row.reward.toFixed(1) : 'Not set'}
+          </div>
+        );
+      }
+
+      return (
+        <input
+          type="number"
+          className="w-full bg-gray-800 text-right text-white border border-gray-600 rounded px-4 py-2"
+          value={row.reward ?? ''}
+          min={0.5}
+          max={10}
+          step={0.5}
+          onChange={(e) => {
+            const value = e.target.value === '' ? null : parseFloat(e.target.value);
+            updateData?.(value);
+          }}
+        />
+      );
+    },
   },
   {
     accessorKey: "tags",
     header: "Emotions",
-    cell: ({ row }) => {
-      const tags: string[] = row.getValue("tags");
-
-      const handleTagsChange = (newTags: string[]) => {
-        handleUpdate(row.original.id, "tags", newTags);
-      };
+    cell: ({ row, updateData, isEditing }) => {
+      if (!isEditing) {
+        return (
+          <div className="text-gray-300">
+            {row.tags?.length > 0 
+              ? row.tags.join(', ')
+              : 'No emotions tagged'}
+          </div>
+        );
+      }
 
       return (
         <MultiSelect
           options={allTags}
-          values={tags}
-          onValueChange={handleTagsChange}
+          values={row.tags}
+          onValueChange={(newTags) => updateData?.(newTags)}
         />
       );
     },

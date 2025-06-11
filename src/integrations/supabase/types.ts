@@ -6,15 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export type AssetType = 'STOCK' | 'OPTION' | 'FUTURES' | 'FOREX' | 'CRYPTO'
-export type BrokerFieldType = 'TEXT' | 'PASSWORD' | 'APIKEY'
-export type ImportStatus = 'PENDING' | 'UPLOADED' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
-export type InsightType = 'debrief' | 'pattern' | 'suggestion'
-export type ProfitCalcMethod = 'FIFO' | 'LIFO'
-export type SubscriptionTier = 'FREE' | 'PREMIUM'
-export type TradeStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'CANCELLED'
-
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       broker_connection_fields: {
@@ -623,6 +615,9 @@ export interface Database {
       profit_calc_method: "FIFO" | "LIFO"
       subscription_tier: "FREE" | "PREMIUM"
       trade_status: "DRAFT" | "OPEN" | "CLOSED" | "CANCELLED"
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

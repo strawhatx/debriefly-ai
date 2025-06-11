@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 export const ReviewHeader = () => {
   const [visible, setVisible] = useState(true);
-  const [saving, setSaving] = useState(true);
+  const [saving, setSaving] = useState(false);
   const { trades, isLoading } = useTrades(true);
   const publish = useEventBus((state) => state.publish);
 

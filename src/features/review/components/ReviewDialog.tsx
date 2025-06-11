@@ -78,7 +78,10 @@ export const ReviewDialog = ({
         console.log(`trade ${trade}`)
         await save();
         onSave();
-        publish("review_trades_refresh", { }); // send the refresh 
+        publish("review_trades_refresh", { 
+            tradeCount: 1, // Since we're updating a single trade
+            refresh: onSave 
+        });
     }, [save, onSave, trade]);
 
     // Reset form when dialog opens/closes

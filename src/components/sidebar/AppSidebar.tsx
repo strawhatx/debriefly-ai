@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   BarChart2, ClipboardList, Brain, LineChart, History, Home, Eye,
-  Import,
+  Import, Lightbulb,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SelectAccount } from "../SelectAccount";
@@ -33,6 +33,7 @@ const AppSidebar = () => {
       },
       { title: "Behavior", icon: Brain, url: "/app/behavioral-patterns" },
       { title: "Strategy", icon: LineChart, url: "/app/strategy-optimization" },
+      { title: "Feature Requests", icon: Lightbulb, url: "/app/feature-requests" },
     ],
     [count]
   );
