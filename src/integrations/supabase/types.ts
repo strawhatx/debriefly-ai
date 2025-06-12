@@ -1,3 +1,14 @@
+export interface AnalysisResult {
+  insights: {
+    summary: string;
+    patterns: string[];
+    strengths: string[];
+    areas_for_improvement: string[];
+    recommendations: string[];
+  } | string;
+  model: string;
+}
+
 export type Json =
   | string
   | number
@@ -443,43 +454,36 @@ export type Database = {
       }
       trade_analysis: {
         Row: {
-          analysis: Json
-          created_at: string | null
           id: string
-          model: string | null
-          session_date: string | null
-          trading_account_id: string | null
-          updated_at: string | null
           user_id: string
+          trading_account_id: string | null
+          session_date: string | null
+          analysis: Json
+          model: string | null
+          created_at: string | null
+          updated_at: string | null
         }
         Insert: {
-          analysis: Json
-          created_at?: string | null
           id?: string
-          model?: string | null
-          session_date?: string | null
-          trading_account_id?: string | null
-          updated_at?: string | null
           user_id: string
+          trading_account_id?: string | null
+          session_date?: string | null
+          analysis: Json
+          model?: string | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Update: {
-          analysis?: Json
-          created_at?: string | null
           id?: string
-          model?: string | null
-          session_date?: string | null
-          trading_account_id?: string | null
-          updated_at?: string | null
           user_id?: string
+          trading_account_id?: string | null
+          session_date?: string | null
+          analysis?: Json
+          model?: string | null
+          created_at?: string | null
+          updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "trade_analysis_trading_account_id_fkey"
-            columns: ["trading_account_id"]
-            isOneToOne: false
-            referencedRelation: "trading_accounts"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "trade_analysis_user_id_fkey"
             columns: ["user_id"]
@@ -487,6 +491,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "trade_analysis_trading_account_id_fkey"
+            columns: ["trading_account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          }
         ]
       }
       trade_history: {

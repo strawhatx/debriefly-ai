@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { AnalysisJob, AnalysisResult, GeminiResponse, TradeAnalysis } from './types';
+import { tradeDebriefPrompt } from './prompts';
 
 // Load environment variables
 dotenv.config();
@@ -11,27 +12,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Initialize PostgreSQL connection pool
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
 // Rate limiting configuration
 const RATE_LIMIT = 15; // requests per minute (Gemini free tier)
 const RATE_WINDOW = 60 * 1000; // 1 minute in milliseconds
 const MIN_REQUEST_GAP = 100; // minimum 100ms between requests
 const requestTimestamps: number[] = [];
-
-// Gemini API response types
-interface GeminiResponse {
-  candidates?: Array<{
-    content?: {
-      parts?: Array<{
-        text?: string;
-      }>;
-    };
-  }>;
-}
 
 // Helper function to check rate limit
 function checkRateLimit(): boolean {
@@ -52,7 +37,7 @@ function getWaitTime(): number {
 }
 
 // Helper function for Gemini API calls with rate limiting
-async function analyzeWithGemini(prompt: string) {
+async function analyzeWithGemini(prompt: string): Promise<AnalysisResult> {
   // Check rate limit
   if (!checkRateLimit()) {
     const waitTime = getWaitTime();
@@ -94,7 +79,7 @@ async function analyzeWithGemini(prompt: string) {
     throw new Error(`Gemini API error: ${geminiResponse.statusText} - ${errorText}`);
   }
 
-  const result = (await geminiResponse.json()) as GeminiResponse;
+  const result = await geminiResponse.json() as GeminiResponse;
   const insights = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!insights) {
@@ -113,21 +98,6 @@ async function analyzeWithGemini(prompt: string) {
       model: "gemini-pro"
     };
   }
-}
-
-// Helper function to generate trade debrief prompt
-function tradeDebriefPrompt(trades: any[]): string {
-  return `Analyze the following trading session and provide insights in JSON format:
-${JSON.stringify(trades, null, 2)}
-
-Please provide the analysis in this exact JSON format:
-{
-  "summary": "Brief summary of the trading session",
-  "patterns": ["List of top 5 identified patterns"],
-  "strengths": ["List of top 5 strengths demonstrated"],
-  "areas_for_improvement": ["List of top 5 areas that need improvement"],
-  "recommendations": ["List of top 5 specific actionable recommendations"]
-}`;
 }
 
 // Process a single job
@@ -151,14 +121,16 @@ async function processJob(jobId: string) {
     }
 
     // Generate and run analysis
-    const prompt = tradeDebriefPrompt(job.trades);
+    const prompt = tradeDebriefPrompt(job.trades as any[]);
     const analysis = await analyzeWithGemini(prompt);
     
     if (!analysis) {
       throw new Error("Gemini analysis failed");
     }
 
-    const insights = analysis.insights.replace(/```json|```/g, "").trim();
+    const insights = typeof analysis.insights === 'string' 
+      ? analysis.insights.replace(/```json|```/g, "").trim()
+      : analysis.insights;
 
     // Save analysis results
     const { error: saveError } = await supabase
@@ -167,10 +139,10 @@ async function processJob(jobId: string) {
         user_id: job.user_id,
         trading_account_id: job.trading_account_id,
         session_date: job.session_date,
-        analysis: JSON.parse(insights) || analysis.insights,
+        analysis: typeof insights === 'string' ? JSON.parse(insights) : insights,
         model: analysis.model,
         created_at: new Date().toISOString(),
-      })
+      } satisfies TradeAnalysis)
       .select();
 
     if (saveError) {
@@ -205,34 +177,39 @@ async function processJob(jobId: string) {
 
 // Main function to listen for new jobs
 async function startWorker() {
-  const client = await pool.connect();
+  console.log('🎧 Starting worker...');
   
   try {
-    // Listen for new jobs
-    await client.query('LISTEN new_job');
-    console.log('🎧 Listening for new jobs...');
+    // Poll for pending jobs
+    setInterval(async () => {
+      const { data: pendingJobs, error: jobsError } = await supabase
+        .from("analysis_jobs")
+        .select()
+        .eq("status", "pending")
+        .limit(1);
 
-    client.on('notification', async (msg) => {
-      const jobId = JSON.parse(msg.payload!);
-      await processJob(jobId);
-    });
+      if (jobsError) {
+        console.error('Error fetching jobs:', jobsError);
+        return;
+      }
+
+      if (pendingJobs && pendingJobs.length > 0) {
+        const job = pendingJobs[0];
+        await processJob(job.id);
+      }
+    }, 5000); // Check every 5 seconds
 
     // Keep the process running
     process.on('SIGINT', () => {
       console.log('Shutting down...');
-      client.release();
       process.exit(0);
     });
 
   } catch (error) {
     console.error('Error in worker:', error);
-    client.release();
     process.exit(1);
   }
 }
 
 // Start the worker
-startWorker().catch(error => {
-  console.error('Failed to start worker:', error);
-  process.exit(1);
-}); 
+startWorker(); 

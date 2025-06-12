@@ -12,11 +12,10 @@ RUN npm ci --only=production
 COPY . .
 
 # Set environment variables
-ENV NODE_ENV=production
-ENV SUPABASE_URL=""
-ENV SUPABASE_SERVICE_ROLE_KEY=""
-ENV DATABASE_URL=""
-ENV GOOGLE_GEMINI_API_KEY=""
+ENV NODE_ENV=production \
+    SUPABASE_URL="" \
+    SUPABASE_SERVICE_ROLE_KEY="" \
+    GOOGLE_GEMINI_API_KEY=""
 
 # Start the worker
 CMD [ "npm", "start" ] 

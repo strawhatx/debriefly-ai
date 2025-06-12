@@ -1,4 +1,4 @@
-export const tradeDebriefPrompt = (tradesByDay) => {
+export const tradeDebriefPrompt = (tradesByDay: any[]): string => {
   return `
 Analyze the following trading history and provide a structured JSON response for each trading day. The trading data is:
 
