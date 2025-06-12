@@ -17,6 +17,7 @@ jobs:
   deploy:
     name: Deploy Lambda Worker
     runs-on: ubuntu-latest
+    environment: Staging
     defaults:
       run:
         working-directory: lambda-worker
@@ -53,4 +54,4 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GOOGLE_GEMINI_API_KEY: ${{ secrets.GOOGLE_GEMINI_API_KEY }}
-        run: serverless deploy --verbose 
+        run: serverless deploy --verbose --stage staging  # Add --stage staging here
