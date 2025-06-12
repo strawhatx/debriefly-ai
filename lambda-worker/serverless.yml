@@ -1,0 +1,51 @@
+service: debriefly-lambda-worker
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  environment:
+    SUPABASE_URL: ${env:SUPABASE_URL}
+    SUPABASE_SERVICE_ROLE_KEY: ${env:SUPABASE_SERVICE_ROLE_KEY}
+    GOOGLE_GEMINI_API_KEY: ${env:GOOGLE_GEMINI_API_KEY}
+    RATE_LIMIT_TABLE: ${self:service}-${sls:stage}-rate-limits
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: !GetAtt RateLimitTable.Arn
+
+functions:
+  processJobs:
+    handler: dist/handler.processJobs
+    timeout: 900 # 15 minutes
+    events:
+      - schedule: rate(1 minute)
+    memorySize: 256
+
+resources:
+  Resources:
+    RateLimitTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.RATE_LIMIT_TABLE}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
+
+plugins:
+  - serverless-plugin-typescript 

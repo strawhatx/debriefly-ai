@@ -1,8 +1,10 @@
-export const tradeDebriefPrompt = (tradesByDay: any[]): string => {
+import { Json } from './types';
+
+export function generateTradeAnalysisPrompt(trades: Json[]): string {
   return `
 Analyze the following trading history and provide a structured JSON response for each trading day. The trading data is:
 
-${JSON.stringify(tradesByDay, null, 2)}
+${JSON.stringify(trades, null, 2)}
 
 Please provide your analysis in the following JSON format:
 
@@ -33,6 +35,5 @@ Requirements:
 - All descriptions should be specific and actionable
 - Win rate increases should be expressed as percentages
 
-Return ONLY the JSON object with no additional text or formatting.
-`;
-};
+Return ONLY the JSON object with no additional text or formatting.`;
+} 
