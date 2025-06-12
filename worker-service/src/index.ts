@@ -22,6 +22,17 @@ const RATE_WINDOW = 60 * 1000; // 1 minute in milliseconds
 const MIN_REQUEST_GAP = 100; // minimum 100ms between requests
 const requestTimestamps: number[] = [];
 
+// Gemini API response types
+interface GeminiResponse {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+}
+
 // Helper function to check rate limit
 function checkRateLimit(): boolean {
   const now = Date.now();
@@ -40,7 +51,7 @@ function getWaitTime(): number {
   return MIN_REQUEST_GAP;
 }
 
-// Helper function for Gemini API calls
+// Helper function for Gemini API calls with rate limiting
 async function analyzeWithGemini(prompt: string) {
   // Check rate limit
   if (!checkRateLimit()) {
@@ -53,7 +64,7 @@ async function analyzeWithGemini(prompt: string) {
   requestTimestamps.push(Date.now());
 
   // Make Gemini API call
-  const response = await fetch(
+  const geminiResponse = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_GEMINI_API_KEY}`,
     {
       method: "POST",
@@ -73,17 +84,17 @@ async function analyzeWithGemini(prompt: string) {
     }
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
+  if (!geminiResponse.ok) {
+    const errorText = await geminiResponse.text();
     if (errorText.includes("429") || errorText.includes("Too Many Requests")) {
       console.warn("Rate limit hit, retrying after delay...");
       await new Promise(resolve => setTimeout(resolve, getWaitTime()));
-      return analyzeWithGemini(prompt);
+      return analyzeWithGemini(prompt); // Retry the request
     }
-    throw new Error(`Gemini API error: ${response.statusText} - ${errorText}`);
+    throw new Error(`Gemini API error: ${geminiResponse.statusText} - ${errorText}`);
   }
 
-  const result = await response.json();
+  const result = (await geminiResponse.json()) as GeminiResponse;
   const insights = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
   if (!insights) {
@@ -104,78 +115,91 @@ async function analyzeWithGemini(prompt: string) {
   }
 }
 
+// Helper function to generate trade debrief prompt
+function tradeDebriefPrompt(trades: any[]): string {
+  return `Analyze the following trading session and provide insights in JSON format:
+${JSON.stringify(trades, null, 2)}
+
+Please provide the analysis in this exact JSON format:
+{
+  "summary": "Brief summary of the trading session",
+  "patterns": ["List of top 5 identified patterns"],
+  "strengths": ["List of top 5 strengths demonstrated"],
+  "areas_for_improvement": ["List of top 5 areas that need improvement"],
+  "recommendations": ["List of top 5 specific actionable recommendations"]
+}`;
+}
+
 // Process a single job
 async function processJob(jobId: string) {
-  console.log(`Processing job ${jobId}`);
+  console.log(`🔄 Processing job: ${jobId}`);
   
   try {
-    // Get job details
-    const { data: job, error: jobError } = await supabase
-      .from('analysis_jobs')
-      .select()
-      .eq('id', jobId)
-      .single();
-
-    if (jobError || !job) {
-      throw new Error(`Failed to fetch job: ${jobError?.message || 'Job not found'}`);
-    }
-
-    // Update status to processing
-    await supabase
-      .from('analysis_jobs')
+    // Update job status to processing
+    const { data: job, error: updateError } = await supabase
+      .from("analysis_jobs")
       .update({ 
-        status: 'processing',
+        status: "processing",
         started_at: new Date().toISOString()
       })
-      .eq('id', jobId);
+      .eq("id", jobId)
+      .select()
+      .single();
 
-    // Process each session
-    for (const session of job.sessions) {
-      console.log(`Analyzing session ${session.trade_day}`);
-      
-      if (!session.trades || session.trades.length === 0) {
-        console.warn(`No trade data for session ${session.trade_day}`);
-        continue;
-      }
-
-      const analysis = await analyzeWithGemini(JSON.stringify(session.trades));
-      
-      // Store results
-      await supabase
-        .from('trade_analysis')
-        .insert({
-          user_id: job.user_id,
-          trading_account_id: job.trading_account_id,
-          session_date: session.trade_day,
-          analysis: analysis.insights,
-          model: analysis.model,
-          created_at: new Date().toISOString()
-        });
+    if (updateError || !job) {
+      throw new Error(`Failed to update job status: ${updateError?.message}`);
     }
 
-    // Mark job as complete
+    // Generate and run analysis
+    const prompt = tradeDebriefPrompt(job.trades);
+    const analysis = await analyzeWithGemini(prompt);
+    
+    if (!analysis) {
+      throw new Error("Gemini analysis failed");
+    }
+
+    const insights = analysis.insights.replace(/```json|```/g, "").trim();
+
+    // Save analysis results
+    const { error: saveError } = await supabase
+      .from("trade_analysis")
+      .insert({
+        user_id: job.user_id,
+        trading_account_id: job.trading_account_id,
+        session_date: job.session_date,
+        analysis: JSON.parse(insights) || analysis.insights,
+        model: analysis.model,
+        created_at: new Date().toISOString(),
+      })
+      .select();
+
+    if (saveError) {
+      throw new Error(`Failed to save analysis: ${saveError.message}`);
+    }
+
+    // Mark job as completed
     await supabase
-      .from('analysis_jobs')
+      .from("analysis_jobs")
       .update({ 
-        status: 'completed',
+        status: "completed",
         completed_at: new Date().toISOString()
       })
-      .eq('id', jobId);
+      .eq("id", jobId);
 
-    console.log(`Completed job ${jobId}`);
+    console.log(`✅ Job completed successfully: ${jobId}`);
 
   } catch (error) {
-    console.error(`Error processing job ${jobId}:`, error);
+    console.error(`❌ Error processing job ${jobId}:`, error);
     
-    // Handle errors
+    // Mark job as failed
     await supabase
-      .from('analysis_jobs')
+      .from("analysis_jobs")
       .update({ 
-        status: 'failed',
-        error: error instanceof Error ? error.message : String(error),
+        status: "failed",
+        error_message: error instanceof Error ? error.message : String(error),
         completed_at: new Date().toISOString()
       })
-      .eq('id', jobId);
+      .eq("id", jobId);
   }
 }
 
@@ -208,4 +232,7 @@ async function startWorker() {
 }
 
 // Start the worker
-startWorker().catch(console.error); 
+startWorker().catch(error => {
+  console.error('Failed to start worker:', error);
+  process.exit(1);
+}); 

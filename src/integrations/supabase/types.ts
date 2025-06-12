@@ -9,6 +9,63 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      analysis_jobs: {
+        Row: {
+          id: string
+          user_id: string
+          trading_account_id: string
+          status: 'pending' | 'processing' | 'completed' | 'failed'
+          error_message: string | null
+          created_at: string
+          updated_at: string
+          started_at: string | null
+          completed_at: string | null
+          session_date: string
+          trades: Json
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          trading_account_id: string
+          status?: 'pending' | 'processing' | 'completed' | 'failed'
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+          session_date: string
+          trades: Json
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          trading_account_id?: string
+          status?: 'pending' | 'processing' | 'completed' | 'failed'
+          error_message?: string | null
+          created_at?: string
+          updated_at?: string
+          started_at?: string | null
+          completed_at?: string | null
+          session_date?: string
+          trades?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_jobs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_jobs_trading_account_id_fkey"
+            columns: ["trading_account_id"]
+            isOneToOne: false
+            referencedRelation: "trading_accounts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       broker_connection_fields: {
         Row: {
           broker_id: string

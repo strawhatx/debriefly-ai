@@ -33,6 +33,10 @@ supabase functions serve --env-file supabase/.env
 
 - supabase functions serve ai-analysis --env-file supabase/.env --inspect-mode brk
 
+## Run Worker-Service
+ - in the background: [docker-compose -f docker-compose.dev.yml up -d]
+ - with the logs: [docker-compose -f docker-compose.dev.yml logs -f]
+ - stop: [docker-compose -f docker-compose.dev.yml down]
 
 ## Migrations
  - supabase db diff --use-migra -f [migration name]

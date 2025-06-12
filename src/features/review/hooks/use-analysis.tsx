@@ -1,20 +1,19 @@
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import useTradingAccountStore from "@/store/trading-account";
-import { fetchWithAuth } from "@/utils/api";
 import { useState } from "react";
 
 export const useAnalysis = () => {
   const [hasUnanalyzedTrades, setHasUnanalyzedTrades] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // State to track loading
+  const [isLoading, setIsLoading] = useState(false);
   const selectedAccount = useTradingAccountStore((state) => state.selected);
 
   const runTradeAnalysis = async () => {
     try {
-      setIsLoading(true); // Start the loader
+      setIsLoading(true);
       toast({
-        title: "Running Analysis",
-        description: "Please wait while the analysis is running...",
+        title: "Starting Analysis",
+        description: "Queuing trades for analysis...",
         variant: "default",
       });
 
@@ -25,22 +24,52 @@ export const useAnalysis = () => {
           description: "You must be logged in to run analysis",
           variant: "destructive",
         });
-        setIsLoading(false); // Stop the loader
         return;
       }
 
-      const data = await fetchWithAuth("/ai-analysis", {
-        method: "POST",
-        body: JSON.stringify({ user_id: user.id, trading_account_id: selectedAccount })
-      });
+      // Get unanalyzed positions
+      const { data: sessions, error: rpcError } = await supabase
+        .rpc('get_unanalyzed_positions', {
+          user_id_param: user.id,
+          trading_account_id_param: selectedAccount
+        });
 
-      if (!data) {
-        throw new Error("Failed to run analysis");
+      if (rpcError) {
+        throw new Error(`Failed to fetch unanalyzed positions: ${rpcError.message}`);
+      }
+
+      if (!sessions || sessions.length === 0) {
+        toast({
+          title: "No trades to analyze",
+          description: "All your trades have been analyzed.",
+          variant: "default",
+        });
+        return;
+      }
+
+      // Create analysis jobs for each session
+      const jobPromises = sessions.map(session => 
+        supabase
+          .from('analysis_jobs')
+          .insert({
+            user_id: user.id,
+            trading_account_id: selectedAccount,
+            session_date: session.trade_day,
+            trades: session.trades,
+            status: 'pending'
+          })
+      );
+
+      const results = await Promise.all(jobPromises);
+      const errors = results.filter(r => r.error).map(r => r.error);
+      
+      if (errors.length > 0) {
+        throw new Error(`Failed to create some analysis jobs: ${errors.map(e => e.message).join(', ')}`);
       }
 
       toast({
-        title: "Success",
-        description: "Analysis completed successfully!",
+        title: "Analysis Started",
+        description: `Queued ${sessions.length} trading sessions for analysis. This may take a few minutes.`,
         variant: "success",
       });
 
@@ -50,11 +79,11 @@ export const useAnalysis = () => {
       console.error("❌ Error:", error);
       toast({
         title: "Error",
-        description: "Failed to run analysis. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to start analysis. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false); // Stop the loader
+      setIsLoading(false);
     }
   };
 
@@ -65,7 +94,8 @@ export const useAnalysis = () => {
 
       const { data, error } = await supabase
         .rpc('get_unanalyzed_positions', {
-          user_id_param: user.id, trading_account_id_param: selectedAccount
+          user_id_param: user.id,
+          trading_account_id_param: selectedAccount
         });
 
       if (error) throw error;
@@ -77,7 +107,7 @@ export const useAnalysis = () => {
 
   return {
     hasUnanalyzedTrades,
-    isLoading, // Expose the loading state
+    isLoading,
     runTradeAnalysis,
     checkForUnanalyzedTrades
   }

@@ -1,22 +1,22 @@
-FROM node:18-slim
+# Use Node.js LTS version
+FROM node:20-slim
 
-WORKDIR /app
+# Create app directory
+WORKDIR /usr/src/app
 
-# Install dependencies
+# Install app dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production
 
-# Copy source code
+# Bundle app source
 COPY . .
 
-# Build TypeScript
-RUN npm run build
-
-# Environment variables will be provided by Railway
-ENV SUPABASE_URL=
-ENV SUPABASE_SERVICE_ROLE_KEY=
-ENV DATABASE_URL=
-ENV GOOGLE_GEMINI_API_KEY=
+# Set environment variables
+ENV NODE_ENV=production
+ENV SUPABASE_URL=""
+ENV SUPABASE_SERVICE_ROLE_KEY=""
+ENV DATABASE_URL=""
+ENV GOOGLE_GEMINI_API_KEY=""
 
 # Start the worker
-CMD ["npm", "run", "start"] 
+CMD [ "npm", "start" ] 
