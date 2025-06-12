@@ -92,26 +92,23 @@ BEGIN
     RETURN QUERY
     SELECT 
         DATE_TRUNC('day', p.entry_date) as trade_day,
-        jsonb_build_object(
-            'trades', 
-            jsonb_agg(
-                jsonb_build_object(
-                    'id', p.id,
-                    'entry_date', p.entry_date,
-                    'symbol', p.symbol,
-                    'pnl', p.pnl,
-                    'position_type', p.position_type,
-                    'asset_type', p.asset_type,
-                    'quantity', p.quantity,
-                    'fill_price', p.fill_price,
-                    'stop_price', p.stop_price,
-                    'closing_date', p.closing_date,
-                    'fees', p.fees,
-                    'leverage', p.leverage,
-                    'strategy', p.strategy,
-                    'risk_reward', CONCAT(p.risk, ':', p.reward),
-                    'emotional_tags', p.tags
-                )
+        jsonb_agg(
+            jsonb_build_object(
+                'id', p.id,
+                'entry_date', p.entry_date,
+                'symbol', p.symbol,
+                'pnl', p.pnl,
+                'position_type', p.position_type,
+                'asset_type', p.asset_type,
+                'quantity', p.quantity,
+                'fill_price', p.fill_price,
+                'stop_price', p.stop_price,
+                'closing_date', p.closing_date,
+                'fees', p.fees,
+                'leverage', p.leverage,
+                'strategy', p.strategy,
+                'risk_reward', CONCAT(p.risk, ':', p.reward),
+                'emotional_tags', p.tags
             )
         ) as trades
     FROM positions p

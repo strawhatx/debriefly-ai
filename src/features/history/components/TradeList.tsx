@@ -4,7 +4,7 @@ import React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { ArrowDownRight, ArrowUpRight, ChevronsUpDown, ClipboardCopy, Database, MoreHorizontal, Search } from "lucide-react"
+import { ArrowDownRight, ArrowUpRight, ClipboardCopy, Database, MoreHorizontal, Search } from "lucide-react"
 import { getAssetIcon } from "@/utils/asset-icons"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
@@ -28,7 +28,7 @@ export const TradeList = ({ data, onViewRawData }: TradeListProps) => {
 
     // Memoize filtered trades
     const filteredTrades = React.useMemo(() => {
-        if (!searchTerm.trim()) return data;
+        if (!data || !searchTerm.trim()) return data || [];
 
         const lowerSearchTerm = searchTerm.toLowerCase();
         return data.filter(trade =>
@@ -45,6 +45,8 @@ export const TradeList = ({ data, onViewRawData }: TradeListProps) => {
     // Load asset icons
     React.useEffect(() => {
         const loadIcons = async () => {
+            if (!data || data.length === 0) return;
+
             const icons: Record<string, string> = {};
 
             for (const trade of data) {
@@ -66,14 +68,17 @@ export const TradeList = ({ data, onViewRawData }: TradeListProps) => {
         loadIcons();
     }, [data]);
 
-    if (!filteredTrades || filteredTrades.length === 0) {
+    if (!data || !filteredTrades || filteredTrades.length === 0) {
         return (
             <Card className="w-full">
-                <p className="text-gray-400">No trades found for this account.</p>
+                <CardContent className="py-6">
+                    <p className="text-gray-400 text-center">
+                        {!data ? "Loading trades..." : "No trades found for this account."}
+                    </p>
+                </CardContent>
             </Card>
         );
     }
-
 
     return (
         <Card className="w-full">

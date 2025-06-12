@@ -1,7 +1,7 @@
 // ✅ Updated Asset Detection with Asset Store Integration
 import useAssetStore from "@/store/assets";
 import { normalizeSymbol } from "./utils";
-import { fetchWithAuth } from "@/integrations/fetch/api";
+import { fetchWithAuth } from "@/utils/api";
 
 interface FuturesAssetConfig {
   tick_size: number;

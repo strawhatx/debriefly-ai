@@ -23,7 +23,7 @@ interface Trade {
 
 export const History = () => {
   const [showModal, setShowModal] = useState(false);
-  const [mappedTrades, setMappedTrades] = useState<Trade[]>(null);
+  const [mappedTrades, setMappedTrades] = useState<Trade[]>([]);
   const { trades, isLoading: tradesLoading, error } = useTrades();
   const [selectedTradeId, setSelectedTradeId] = useState<string | null>(null);
   const { data: rawTrade, isLoading: isLoadingRaw, error: rawError } = useRawTrade(selectedTradeId);
@@ -31,21 +31,21 @@ export const History = () => {
   const handleViewRawData = (tradeId: string) => setSelectedTradeId(tradeId);
 
   useEffect(() => {
-    var result = trades.map((trade) => {
-      return {
-        id: trade.id,
-        date: trade.entry_date,
-        asset: trade.symbol,
-        market: trade.asset_type,
-        type: trade.position_type,
-        entry: trade.fill_price,
-        exit: trade.stop_price,
-        pnl: trade.pnl,
-        topEmotion: trade.tags[0] || "None",
-        fees: trade.fees,
-        emotional_tags: trade.tags || null,
-      }
-    });
+    if (!trades) return;
+
+    const result = trades.map((trade) => ({
+      id: trade.id,
+      date: trade.entry_date,
+      asset: trade.symbol,
+      market: trade.asset_type,
+      type: trade.position_type,
+      entry: trade.fill_price,
+      exit: trade.stop_price,
+      pnl: trade.pnl,
+      topEmotion: trade.tags?.[0] || "None",
+      fees: trade.fees,
+      emotional_tags: trade.tags || null,
+    }));
 
     setMappedTrades(result);
   }, [trades]);
@@ -70,12 +70,22 @@ export const History = () => {
     );
   }
 
+  if (tradesLoading) {
+    return (
+      <div className="p-6">
+        <div className="bg-gray-500/10 border border-gray-500/20 rounded-lg p-4">
+          <p className="text-gray-400">Loading trades...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <NoDataModal open={showModal} onClose={() => setShowModal(false)} />
 
       {/* Trade Statistics */}
-      <TradeStatistics trades={trades} />
+      <TradeStatistics trades={trades || []} />
 
       {/* Desktop-only Component */}
       <div className="hidden lg:block">

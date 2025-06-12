@@ -1,7 +1,7 @@
 // ✅ Advanced P&L Calculator (Futures, Forex, Stocks, Crypto, Options) with Real-Time Currency Conversion
 import { supabase } from "@/integrations/supabase/client";
 import { getAssetType, getFuturesInfo } from "./asset-detection";
-import { fetchWithAuth } from "@/integrations/fetch/api";
+import { fetchWithAuth } from "@/utils/api";
 
 // Local cache to avoid duplicate calls (in-memory for now)
 

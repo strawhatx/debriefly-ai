@@ -1,4 +1,4 @@
-import { fetchWithAuth } from "@/integrations/fetch/api";
+import { fetchWithAuth } from "@/utils/api";
 
 export const getAssetIcon = async (symbol: string, type: string): Promise<string> => {
     switch (type) {

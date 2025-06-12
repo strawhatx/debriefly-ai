@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthGuard from "@/components/AuthGuard";
 import { LandingPage } from "./pages/Landing";
 import { BlogPage } from "./pages/Blog";
@@ -16,17 +16,14 @@ import { TradeHistoryPage } from "./pages/TradeHistory";
 import { BehaviorPage } from "./pages/Behavior";
 import { SettingsPage } from "./pages/Settings";
 import { TradeImportPage } from "./pages/TradeImport";
-import { NotebookPage } from "./pages/Notebook";
 import { EdgeFunctions } from "./pages/dev-pages/EdgeFunctions";
-import { DoubleLayout, PlainLayout, SidebarLayout } from "./components/layouts/Index";
+import { SidebarLayout } from "./components/layouts/Index";
 import { NavbarLayout } from "./components/layouts/Index";
 import { SignOutButton } from "./features/settings/components/SignOutButton";
 import { DateRangeHeader } from "./components/layouts/headers/DateRange";
 import { TradeHistoryHeader } from "./components/layouts/headers/TradeHistory";
 import { DebriefHeader } from "./components/layouts/headers/Debrief";
 import { DashboardHeader } from "./components/layouts/headers/Dashboard";
-import { NotebookHeader } from "./components/layouts/headers/Notebook";
-import { NotebookSidebar } from "./components/sidebar/NotebookSidebar";
 import { TradeHistoryGenerator } from "./pages/dev-pages/TradeHistoryGenerator";
 import { ReviewPage } from "./pages/Review";
 import { PositionReviewGenerator } from "./pages/dev-pages/PositionReviewGenerator";
@@ -34,23 +31,6 @@ import { FeatureRequestsPage } from "./pages/FeatureRequests";
 const queryClient = new QueryClient();
 
 const App = () => {
-  const NotebookWithSidebar = () => {
-    const { id } = useParams(); // Extracts the dynamic `id` from the route
-
-    return (
-      <DoubleLayout
-        breadcrumbs={[
-          { name: "Trades", href: "/app/trade-history" },
-          { name: `Notebook ${id}`, href: `/app/notebook/${id}` }
-        ]}
-        rightContent={<NotebookHeader />}
-        rightSidebar={<NotebookSidebar id={id} />}
-      >
-        <NotebookPage />
-      </DoubleLayout>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
