@@ -35,6 +35,22 @@ functions:
 
 resources:
   Resources:
+    DeploymentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: debriefly-lambda-worker-deployment-${sls:stage}
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        VersioningConfiguration:
+          Status: Enabled
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
     RateLimitTable:
       Type: AWS::DynamoDB::Table
       Properties:
