@@ -2,13 +2,20 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_KEY;
+// Try both import.meta.env and process.env
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_KEY || process.env.VITE_SUPABASE_KEY;
 
 // Add debugging
-console.log('Supabase config:', {
-  url: supabaseUrl,
-  hasKey: !!supabaseAnonKey
+console.log('Environment variables:', {
+  importMetaEnv: {
+    url: import.meta.env.VITE_SUPABASE_URL,
+    hasKey: !!import.meta.env.VITE_SUPABASE_KEY
+  },
+  processEnv: {
+    url: process.env.VITE_SUPABASE_URL,
+    hasKey: !!process.env.VITE_SUPABASE_KEY
+  }
 });
 
 if (!supabaseUrl) {
