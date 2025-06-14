@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@12.3.0?target=deno";
+import Stripe from "https://esm.sh/stripe@14.17.0?target=deno";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { handleCORS, handleReturnCORS } from "../utils/cors.ts";
 
@@ -121,9 +121,12 @@ serve(async (req) => {
 
         const paymentLink = await stripe.paymentLinks.create({
           line_items: [{ price: priceId, quantity: 1 }],
-          customer: customerId,
-          success_url: Deno.env.get("PRODUCTION_URL") + "/success",
-          cancel_url: Deno.env.get("PRODUCTION_URL") + "/cancel",
+          after_completion: {
+            type: 'redirect',
+            redirect: {
+              url: Deno.env.get("PRODUCTION_URL") + "/success"
+            }
+          }
         });
 
         return new Response(JSON.stringify({ url: paymentLink.url }), { headers: handleReturnCORS(req), status: 200 });
