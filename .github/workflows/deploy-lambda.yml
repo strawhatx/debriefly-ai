@@ -7,79 +7,22 @@ on:
     paths:
       - 'lambda-worker/**'
       - '.github/workflows/deploy-lambda.yml'
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Action to perform'
-        required: true
-        default: 'deploy'
-        type: choice
-        options:
-          - deploy
-          - cleanup
+  workflow_dispatch:  # Allow manual triggers
 
 env:
   AWS_REGION: us-east-1
   NODE_VERSION: '18'
 
 jobs:
-  cleanup:
-    name: Cleanup Resources
-    runs-on: ubuntu-latest
-    environment: Staging
-    if: ${{ github.event.inputs.action == 'cleanup' }}
-    defaults:
-      run:
-        working-directory: lambda-worker
-
-    steps:
-      - name: Debug Event
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Action input: ${{ github.event.inputs.action }}"
-          
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: lambda-worker/package-lock.json
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Install Serverless Framework
-        run: npm install -g serverless@3
-
-      - name: Remove Lambda Stack
-        run: serverless remove --stage staging --verbose
-
-      - name: Cleanup S3 Bucket
-        run: |
-          aws s3 rb s3://debriefly-lambda-worker-deployment-staging --force || true
-
   deploy:
     name: Deploy Lambda Worker
     runs-on: ubuntu-latest
     environment: Staging
-    if: ${{ github.event.inputs.action == 'deploy' }}
     defaults:
       run:
         working-directory: lambda-worker
 
     steps:
-      - name: Debug Event
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Action input: ${{ github.event.inputs.action }}"
-
       - name: Checkout code
         uses: actions/checkout@v4
 
