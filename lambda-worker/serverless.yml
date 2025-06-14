@@ -6,7 +6,6 @@ provider:
   name: aws
   runtime: nodejs18.x
   region: us-east-1
-  deploymentBucket: debriefly-lambda-worker-deployment-staging  # Simplified bucket name
   environment:
     SUPABASE_URL: ${env:SUPABASE_URL}
     SUPABASE_SERVICE_ROLE_KEY: ${env:SUPABASE_SERVICE_ROLE_KEY}
@@ -33,6 +32,22 @@ functions:
 
 resources:
   Resources:
+    DeploymentBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: debriefly-lambda-worker-deployment-${sls:stage}
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+        VersioningConfiguration:
+          Status: Enabled
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
     RateLimitTable:
       Type: AWS::DynamoDB::Table
       Properties:
