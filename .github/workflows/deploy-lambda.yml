@@ -27,12 +27,17 @@ jobs:
     name: Cleanup Resources
     runs-on: ubuntu-latest
     environment: Staging
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'cleanup'
+    if: ${{ github.event.inputs.action == 'cleanup' }}
     defaults:
       run:
         working-directory: lambda-worker
 
     steps:
+      - name: Debug Event
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Action input: ${{ github.event.inputs.action }}"
+          
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -64,12 +69,17 @@ jobs:
     name: Deploy Lambda Worker
     runs-on: ubuntu-latest
     environment: Staging
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy'
+    if: ${{ github.event.inputs.action == 'deploy' }}
     defaults:
       run:
         working-directory: lambda-worker
 
     steps:
+      - name: Debug Event
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Action input: ${{ github.event.inputs.action }}"
+
       - name: Checkout code
         uses: actions/checkout@v4
 
