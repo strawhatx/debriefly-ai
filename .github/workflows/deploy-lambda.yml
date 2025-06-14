@@ -7,7 +7,16 @@ on:
     paths:
       - 'lambda-worker/**'
       - '.github/workflows/deploy-lambda.yml'
-  workflow_dispatch:  # Allow manual triggers
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - cleanup
 
 env:
   AWS_REGION: us-east-1
